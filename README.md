@@ -26,7 +26,6 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 - **Filter** per rarity, elemen, tipe, dan kategori yang tersimpan di URL.
 - **Tampilan responsif** untuk laptop maupun HP.
 - **Data dan gambar langsung dari file game**, diolah dengan skrip Python (`tools/nte/`) menjadi JSON dan gambar WebP.
-- **Pemberitahuan update otomatis**: setiap Senin, GitHub Action membandingkan data dengan versi terbaru NTE_Assets dan membuka Issue bila ada yang berubah.
 
 ## Teknologi
 
