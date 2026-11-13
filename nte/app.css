@@ -1195,3 +1195,7 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .vi.has-pic.has-wide { grid-template-columns: 1fr; }
   .vi.has-wide .vi-pics.n1 .vi-pic.wide { width: 100% !important; }
 }
+
+/* gambar besar (mis. kalender banner): satu kolom, gambar penuh di atas teks */
+.vi.has-pic.is-big { grid-template-columns: 1fr; }
+.vi.is-big .vi-pics.n1 .vi-pic.wide { width: 100% !important; max-width: 760px; aspect-ratio: 1000 / 522; }

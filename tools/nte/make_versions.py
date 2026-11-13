@@ -251,6 +251,88 @@ for _sec in V15["sections"]:
         if _k in EXTRA:
             _it["img"] = EXTRA[_k]
 
+
+# ---- Pembaruan dari siaran resmi "NTE Version 1.5 Preview Special Program" ----
+def _sec(sid):
+    return next(x for x in V15["sections"] if x["id"] == sid)
+
+
+def _item(sid, title):
+    return next(x for x in _sec(sid)["items"] if x["t"] == title)
+
+
+def _insert_after(sid, after, item):
+    items = _sec(sid)["items"]
+    items.insert(next(i for i, x in enumerate(items) if x["t"] == after) + 1, item)
+
+
+V15["phases"][1]["note"] = "Exe debut, Chaos rerun"
+V15["sources"] = [
+    {"name": "Catatan patch resmi (nte.perfectworld.com)", "url": OFFICIAL},
+    {"name": "Siaran resmi: NTE Version 1.5 Preview Special Program (YouTube NTE Global)", "url": "https://youtu.be/UxT6b7h5Mcc"},
+]
+
+_sec("esper")["items"].insert(0, {
+    "t": "Jadwal banner dan program Arc Research", "img": [K("vid-calendar")], "big": True, "tag": "Kalender 1.5",
+    "d": "Fase 1 (11 Nov setelah update – 2 Des 04.59 WIB): Limited Board Android Dreams (Elyms) dan Before the Dawn (Shinku), "
+         "program Arc Research Echo Special (Echoes on Hold) dan Resolve Special (Blushing Mirage). "
+         "Fase 2 (2 Des setelah update – 23 Des 04.59 WIB): Limited Board Offline Equations (Exe) dan Forsaken Path (Chaos), "
+         "program Arc Research Encryption Special (Dotted Horizon) dan Pursuit Special (What's Desired). Tiap fase berlangsung 21 hari. "
+         "Jumlah roll dibagi antar board yang sedang aktif, tetapi progres Skin Perks dihitung per board. Jumlah pull dan pity Arc Research juga dibagi antar program sejenis."})
+
+_item("esper", "Elyms")["img"] = [K("vid-android")]
+_item("esper", "Exe").update({
+    "img": [K("vid-offline")],
+    "d": "Kapten ETD-6. Esper Chaos dengan peran ranged DPS dan Summoner. Debut di fase 2 lewat Limited Board \"Offline Equations\". "
+         "Ia memakai dua mekanik inti: Frame, yang dikumpulkan lewat serangan lalu dipakai untuk \"mengekspor\" Digital Echo yang menyerang serempak, "
+         "dan Rating, nilai performa tempur yang naik saat ia menyerang dan memakai skill."})
+_item("esper", "Shinku (rerun)")["img"] = [K("vid-dawn")]
+_insert_after("esper", "Shinku (rerun)", {
+    "t": "Chaos (rerun)", "img": [K("vid-forsaken")], "tag": "Rerun · S-Class · Limited", "link": "/esper/chaos",
+    "date": "2 Des – 23 Des 2026",
+    "d": "Kembali di fase 2 lewat Limited Board \"Forsaken Path\", berdampingan dengan banner Exe."})
+
+_item("arc", "Echoes on Hold")["img"] = [K("vid-arc-echo")]
+_item("arc", "Dotted Horizon").update({
+    "img": [K("vid-arc-enc")], "date": "2 Des – 23 Des 2026",
+    "d": "Hadir di fase 2 lewat program Arc Research \"Encryption Special\". Bertipe Plasma, tipe yang sama dengan Exe."})
+_insert_after("arc", "Dotted Horizon", {
+    "t": "What's Desired (rerun)", "img": [A("what-s-desired")], "tag": "Arc · Rerun · tipe Synthesis", "link": "/arc/what-s-desired",
+    "date": "2 Des – 23 Des 2026",
+    "d": "Kembali lewat program Arc Research \"Pursuit Special\" di fase 2, berpasangan dengan banner Chaos."})
+
+_insert_after("cerita", "Episode utama: Meet Me in the Data Stream", {
+    "t": "Wilayah baru: The Invalid Number", "img": [K("vid-invalid")], "tag": "Wilayah baru",
+    "d": "Legenda urban \"nomor tidak valid\" membawamu ke sebuah kota terendam yang mengambang di lautan digital, bernuansa nostalgia core, dreamcore, dan pool core. "
+         "Di sini juga ada Anomali setingkat boss yang unik, dan masih banyak rahasia lain yang bisa ditemukan di dalam kota."})
+_item("cerita", "Anomaly Pilgrimage: Amber Broodmother").update({
+    "img": [K("vid-amber")],
+    "d": "Terbuka setelah menamatkan episode \"Fogden Game\". Tantangan ini menjadi sumber material upgrade baru bernama Hollowflower Seeds."})
+
+_item("fitur", "City Logistics").update({
+    "img": [K("vid-logistics")],
+    "d": "Buka cabang waralaba Kool Logistics dan bangun logistics hub milikmu sendiri. Setelah hub berdiri, pencari kerja muncul di sekitar kota untuk diwawancarai. "
+         "Tiap pengemudi punya aptitude dan keahlian khusus, dengan gaji pokok ditambah bagian dari setiap komisi. Ada kendaraan seperti ambulans, van pengawal, "
+         "dan truk kas lapis baja untuk komisi bank. Token Kool bisa ditukar dengan berbagai item, termasuk skin eksklusif ambulans dan van pengawal."})
+_item("fitur", "Full Tank Ahead").update({
+    "d": "Mode tank memakai TerraX \"Iron Ogre\": kumpulkan skor di arena dan hadiah dibagikan sesuai skor akhir saat waktu habis. "
+         "Arena punya zona yang diperebutkan, dan air drop yang jatuh di zona itu membawa perk kuat sekaligus menunjukkan posisi tank lain."})
+_insert_after("fitur", "Full Tank Ahead", {
+    "t": "Tycoon's Deck", "img": [K("vid-tycoon")], "tag": "Event · board game", "date": "2 Des – 23 Des 2026",
+    "d": "DSD Pop kembali dengan board game baru. Taruh kartu bangunan di grid 3x3 untuk menghasilkan foot traffic (skor dasar, biru), lalu kalikan dengan kartu strategi "
+         "(pengali, merah) demi mencapai target pendapatan. Kartu strategi tidak bisa ditempatkan di grid tetapi membawa aturan unik, dan bisa saling berantai. Ada juga indeks kartu yang bisa dilengkapi."})
+
+_item("kosmetik", "Prototype Land Overlord 001")["img"] = [K("vid-overlord")]
+
+_item("event", "Fortune's Bounty")["img"] = [K("vid-fortune")]
+_item("event", "Full Tank Ahead")["img"] = [K("vid-tank")]
+_item("event", "Fishing Frenzy")["img"] = [K("vid-fishing")]
+_item("event", "Pixel Surge")["img"] = [K("vid-pixel")]
+_item("event", "Gold Clash")["img"] = [K("vid-gold")]
+_insert_after("event", "Gold Clash", {
+    "t": "Magic Lucky Flip", "img": [K("vid-lucky")], "tag": "Event", "date": "10 Des (04.00 WIB) – 23 Des 2026",
+    "d": "Event bertema malam ajaib ketika Hethereau berubah menjadi labu raksasa. Pratinjau hadiahnya menampilkan Annulith, dadu, dan item kartu."})
+
 VERSIONS = [V15]
 
 if __name__ == "__main__":

@@ -716,7 +716,7 @@
       update: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg>',
     };
     const pics = (x) => (x.img && x.img.length ? `<div class="vi-pics n${Math.min(x.img.length, 3)}">${x.img.map((m) => `<figure class="vi-pic ${esc(m.k || "ico")}"><img src="${img(m.s)}" alt="${esc(m.n || "")}" title="${esc(m.n || "")}" loading="lazy"></figure>`).join("")}</div>` : "");
-    const item = (x) => `<div class="vi${x.img && x.img.length ? " has-pic" : ""}${x.img && x.img.length > 1 ? " multi" : ""}${x.img && x.img.length === 1 && x.img[0].k === "wide" ? " has-wide" : ""}">${pics(x)}<div class="vi-main">
+    const item = (x) => `<div class="vi${x.img && x.img.length ? " has-pic" : ""}${x.img && x.img.length > 1 ? " multi" : ""}${x.img && x.img.length === 1 && x.img[0].k === "wide" ? " has-wide" : ""}${x.big ? " is-big" : ""}">${pics(x)}<div class="vi-main">
         <div class="vi-h">${x.link ? `<a href="${esc(x.link)}" data-link><b>${esc(x.t)}</b></a>` : `<b>${esc(x.t)}</b>`}${x.tag ? `<span class="vi-tag">${esc(x.tag)}</span>` : ""}${x.date ? `<span class="vi-date">${esc(x.date)}</span>` : ""}</div>
         <p class="txt">${esc(x.d)}</p></div></div>`;
     const cards = v.sections.map((sc) => ({
