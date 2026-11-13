@@ -1,7 +1,7 @@
 """Isi halaman Versi & Patch -> nte/data/versions.json
 
 Ditulis tangan (diringkas dan diterjemahkan ke bahasa Indonesia) dari catatan patch resmi
-dan liputan pihak ketiga. Tambah versi baru dengan menambah satu entri di VERSIONS,
+. Tambah versi baru dengan menambah satu entri di VERSIONS,
 lalu jalankan:  python tools/nte/make_versions.py
 
 Format item: {"t": judul, "d": isi, "tag": label kecil, "date": periode, "link": halaman di situs}
@@ -67,14 +67,11 @@ V15 = {
     ],
     "art": E("elyms"),
     "lead": "Update 1.5 membawa episode utama baru \"Meet Me in the Data Stream\", Esper baru Elyms (lalu Exe di fase 2), "
-            "mode tank 4 pemain, sistem City Logistics, kendaraan baru, dan banyak perbaikan kenyamanan.",
+            "mode tank, event City Logistics, kendaraan baru, dan banyak perbaikan kenyamanan.",
     "sources": [
         {"name": "Catatan patch resmi (nte.perfectworld.com)", "url": OFFICIAL},
         {"name": "Trailer NTE Version 1.5 PV (YouTube)", "url": "https://youtu.be/4mdb_aRMVF4"},
-        {"name": "Game8: Version 1.5", "url": "https://game8.co/games/Neverness-to-Everness/archives/634991"},
     ],
-    "note": "Jam dan tanggal mengikuti waktu server (UTC+8). WIB = UTC+7, jadi kurangi satu jam. "
-            "Butir bertanda \"menurut Game8\" berasal dari liputan pihak ketiga, bukan catatan resmi, jadi bisa berubah.",
     "sections": [
         {
             "id": "esper", "title": "Esper & Banner", "open": True,
@@ -87,15 +84,12 @@ V15 = {
                       "Hadiah bonus tersedia di milestone 50, 120, dan 200 total roll lewat halaman Skin Perks."},
                 {"t": "Exe", "img": [E("exe")], "tag": "Esper baru · S-Class · Limited (Fase 2)", "link": "/esper/exe",
                  "date": "2 Des – 23 Des 2026",
-                 "d": "Esper Chaos dengan peran Main DPS dan Summoner. Menurut Game8, ia membangun Frame lewat serangan lalu memakainya untuk "
-                      "memanggil Digital Echo yang menaikkan damage, dengan Rating yang mengatur jumlah Frame yang dihasilkan."},
+                 "d": "Esper Chaos dengan peran Damage, Main DPS, dan Summoner (sesuai data game). Debut di fase 2 lewat Limited Board miliknya."},
                 {"t": "Shinku (rerun)", "img": [E("crimson")], "tag": "Rerun · S-Class · Limited", "link": "/esper/crimson",
                  "date": "11 Nov – 2 Des 2026",
                  "d": "Kembali lewat Limited Board \"Before the Dawn\" bersama Mint, Edgar, dan Adler. Ada livery glider \"Overcast Canopy\", "
                       "livery Blizzard-V4 \"Hidden Dragon\", dan kostum \"Student of Terrasea\". Di data game Esper ini tercatat sebagai Crimson. "
                       "Hanya roll di board yang sama yang dihitung untuk Resolve Perks, dan tiap board dihitung terpisah."},
-                {"t": "Chaos (rerun)", "img": [E("chaos")], "tag": "Rerun · menurut sumber komunitas", "link": "/esper/chaos",
-                 "d": "Beberapa liputan menyebut Chaos ikut rerun di fase 2. Periksa banner di dalam game sebelum memutuskan."},
                 {"t": "Syarat membuka banner", "tag": "Info",
                  "d": "Selesaikan quest utama \"Prologue - A New Destination - Head to Eibon Antique Shop\" untuk bisa memakai board karakter baru."},
             ],
@@ -108,8 +102,8 @@ V15 = {
                  "d": "Arc khas Elyms. Hanya didapat lewat program Arc Research \"Echo Special\" memakai Tri-Key atau Echo Key (menu Arc Shop > Arc Research Program)."},
                 {"t": "Blushing Mirage (rerun)", "img": [A("blushing-mirage")], "tag": "Arc S-Class · Rerun · tipe Synthesis", "link": "/arc/blushing-mirage",
                  "d": "Arc khas Shinku. Hanya lewat program Arc Research \"Resolve Special\" memakai Tri-Key atau Resolve Key."},
-                {"t": "Dotted Horizon", "img": [A("dotted-horizon")], "tag": "Arc S-Class · tipe Plasma · menurut Game8", "link": "/arc/dotted-horizon",
-                 "d": "Arc khas Exe, tersedia bersamaan dengan banner Exe di fase 2."},
+                {"t": "Dotted Horizon", "img": [A("dotted-horizon")], "tag": "Arc S-Class · tipe Plasma", "link": "/arc/dotted-horizon",
+                 "d": "Arc bertipe Plasma, tipe yang sama dengan Exe, sehingga cocok dipasangkan dengannya."},
             ],
         },
         {
@@ -119,10 +113,8 @@ V15 = {
                  "d": "Episode baru yang terbuka setelah menamatkan episode \"The Witch\". Ceritanya berawal dari legenda tentang mimpi bertemu teman lama yang "
                       "meninggalkan \"nomor tidak valid\", lalu sebuah panggilan masuk di dalam mimpi. Muncul pertanyaan: apakah kapten dan letnan ETD-6 menghilang "
                       "dalam misi rahasia, dan apakah Anomali tingkat tinggi atau kejahatan Anomali ada di baliknya?"},
-                {"t": "Anomalous Realm: The Invalid Number System", "tag": "Wilayah baru · menurut Game8",
-                 "d": "Dunia digital berisi Anomali yang lahir dari rumor internet dan legenda urban, dijelajahi selama episode utama 1.5."},
                 {"t": "Anomaly Pilgrimage: Amber Broodmother", "tag": "Boss mingguan",
-                 "d": "Terbuka setelah menamatkan episode \"Fogden Game\". Menurut Game8, mengalahkannya memberi material Ascension utama untuk Elyms dan Exe."},
+                 "d": "Terbuka setelah menamatkan episode \"Fogden Game\". Boss ini muncul sebagai tantangan Anomaly Pilgrimage."},
                 {"t": "City Hangouts dan Home Time Elyms", "img": [E("elyms")], "tag": "Bond",
                  "d": "Cerita City Hangouts dan mode undangan Home Time dengan Elyms, terbuka setelah punya Elyms dan mencapai Bond Level tertentu. "
                       "Ada juga quest Bond, ikut duduk di kursi penumpang kendaraan, dan tutorial tempur Elyms."},
@@ -132,11 +124,9 @@ V15 = {
             "id": "fitur", "title": "Fitur & Mode Baru", "open": False,
             "items": [
                 {"t": "City Logistics", "img": [I("Avatar_Logistics")], "tag": "Sistem baru · event", "date": "11 Nov – 23 Des 2026",
-                 "d": "Perluasan hobi City Delivery: kamu membangun bisnis logistik, merekrut karyawan, dan memberi tugas pengiriman. Event-nya memberi token \"Kool\" untuk Event Shop."},
-                {"t": "Full Tank Ahead", "img": [V("Iron Ogre")], "tag": "Mode PvP · event", "date": "19 Nov – 23 Des 2026",
-                 "d": "Mode tank mini 4 pemain memakai TerraX \"Iron Ogre\". Mata uangnya \"TX Token\" untuk ditukar di Event Shop."},
-                {"t": "Tycoon's Deck", "tag": "Event · menurut Game8", "date": "2 Des – 23 Des 2026",
-                 "d": "Permainan kartu membangun kota: bangunan disusun untuk menciptakan sinergi dan menaikkan skor. Sebagian liputan menyebutnya board game."},
+                 "d": "Event terbatas dengan quest khusus. Menyelesaikannya memberi token \"Kool\" yang bisa ditukar di Event Shop, ditambah hadiah level Reputasi."},
+                {"t": "Full Tank Ahead", "img": [V("Iron Ogre")], "tag": "Event · mode tank", "date": "19 Nov (09.00 WIB) – 23 Des 2026",
+                 "d": "Event peluncuran tank TerraX \"Iron Ogre\". Mata uangnya \"TX Token\" untuk ditukar di Event Shop."},
                 {"t": "Volley Star", "tag": "Peringkat", "d": "Ditambahkan sistem peringkat PvP."},
                 {"t": "Going, Going, Gone!", "tag": "Mini game",
                  "d": "Etalase koleksi, laporan saat pertandingan, riwayat pertandingan, asisten lelang baru Elyms, koleksi baru, dan penyesuaian peluang muncul beberapa koleksi."},
@@ -180,13 +170,11 @@ V15 = {
                 {"t": "Circle Bounty (panduan versi 1.5)", "img": [I("combat_68")], "tag": "Event", "date": "11 Nov – 22 Des 2026",
                  "d": "Butuh quest utama \"Relax Time\". Selesaikan Circle Quest untuk EXP dan rank. Ada Elite Hunter Supplies (Annulith x680, Solid Dice x4, Fabricated Dice x2, Fons x950.000, dan lainnya) "
                       "dan Honor Hunter Supplies (tambahan avatar \"Long Time No See\", frame \"Who's Calling?\", namecard \"City of Wonders\"). Arc-light Trove II memberi pilihan salah satu Arc Fluff of ... atau Fons x2.000.000."},
-                {"t": "Full Tank Ahead", "tag": "Event", "date": "19 Nov – 23 Des 2026", "d": "Event peluncuran Iron Ogre. Hadiah Event Shop: Annulith, Floe Cinema Ticket, Fons, Elite Hunter Guide, Chaotic Dye."},
+                {"t": "Full Tank Ahead", "tag": "Event", "date": "19 Nov (09.00 WIB) – 23 Des 2026", "d": "Event peluncuran Iron Ogre. Hadiah Event Shop: Annulith, Floe Cinema Ticket, Fons, Elite Hunter Guide, Chaotic Dye."},
                 {"t": "Fishing Frenzy", "img": [I("EquipmentUpMaterial_lv3")], "tag": "Event", "date": "23 Nov – 23 Des 2026", "d": "Memancing di titik \"Sea Angler\" Nacupeda Park dan naikkan level memancing. Hadiah: Annulith, Floe Cinema Ticket, Elite Hunter Guide, Chaotic Dye, dan boss Manhole."},
                 {"t": "Pixel Surge", "tag": "Event", "date": "16 Nov – 23 Nov 2026",
                  "d": "Hadiah dobel saat memakai Character Pixels di Houdinii's Magic Stage, Houdinii's Schemes, Bubble Can Factory, dan Rabbit Hole. Batas dobel 120 per hari (sisa terbawa), total 840."},
                 {"t": "Gold Clash", "img": [I("steal_gold")], "tag": "Event", "date": "23 Nov – 7 Des 2026", "d": "Efisiensi Fons 2x di Pink Paws Heist."},
-                {"t": "Event tambahan (menurut Game8)", "tag": "Event",
-                 "d": "Beyond the Rails - Frozen Circle (19 Nov – 3 Des), Fons Rush dengan Fons 2x saat memakai City Stamina (7 – 14 Des), dan Magic Lucky Flip (10 – 23 Des)."},
             ],
         },
         {
@@ -222,11 +210,11 @@ V15 = {
             "id": "update", "title": "Maintenance, Kompensasi & Cara Update", "open": False,
             "items": [
                 {"t": "Maintenance", "tag": "Jadwal", "date": "11 Nov 2026",
-                 "d": "06.00 – 11.00 (UTC+8), atau sekitar 05.00 – 10.00 WIB, bisa maju atau mundur. Login tidak tersedia selama maintenance, dan \"Pink Paws Heist\" ditutup sementara sejak 05.30 (UTC+8)."},
+                 "d": "05.00 – 10.00 WIB, bisa maju atau mundur tergantung progres. Login tidak tersedia selama maintenance, dan \"Pink Paws Heist\" ditutup sementara sejak 04.30 WIB."},
                 {"t": "Kompensasi", "img": [I("Annulith_x300")], "tag": "Hadiah",
-                 "d": "Annulith x300 untuk maintenance dan Annulith x300 untuk perbaikan bug, dikirim lewat surat dalam game. Berlaku untuk Appraiser yang membuat karakter sebelum 11 Nov 2026, 06.00 (UTC+8). Klaim sebelum surat kedaluwarsa."},
+                 "d": "Annulith x300 untuk maintenance dan Annulith x300 untuk perbaikan bug, dikirim lewat surat dalam game. Berlaku untuk Appraiser yang membuat karakter sebelum 11 Nov 2026, 05.00 WIB. Klaim sebelum surat kedaluwarsa."},
                 {"t": "Pengingat", "tag": "Info",
-                 "d": "Limited Board Akane Rin \"Dazzling Star\" berakhir 11 Nov 2026, 05.59 (UTC+8). Tukarkan hadiah kosmetiknya di halaman event Void Perks sebelum itu."},
+                 "d": "Limited Board Akane Rin \"Dazzling Star\" berakhir 11 Nov 2026, 04.59 WIB. Tukarkan hadiah kosmetiknya di halaman event Void Perks sebelum itu."},
                 {"t": "Cara update", "tag": "Panduan",
                  "d": "PC dan Epic: tutup game, buka launcher lagi, klik Update. Steam: tutup game, mulai ulang Steam, Library > NTE > Update. Android: jalankan game dan ikuti petunjuk. "
                       "iOS dan Mac: lewat App Store. PlayStation: menu sistem > pilih NTE > OPTIONS > Check for Update."},
