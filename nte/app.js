@@ -847,15 +847,24 @@
       if (sha) body.sha = sha;
       const r = await api("PUT", body);
       if (r.status === 409 || r.status === 422) { await pull(); toast("Data berubah di GitHub, muat ulang lalu simpan lagi."); pick(); render(); return; }
-      if (r.status === 401 || r.status === 403) { toast("Token ditolak atau tidak punya izin tulis."); return; }
-      if (!r.ok) { toast("Gagal menyimpan (" + r.status + ")."); return; }
+      if (!r.ok) {
+        const info = await r.json().catch(() => ({}));
+        const gh = info && info.message ? ` GitHub: "${info.message}"` : "";
+        let why = `Gagal menyimpan (${r.status}).`;
+        if (r.status === 401) why = "Token salah atau sudah kedaluwarsa (401). Buat token baru lalu simpan lagi.";
+        else if (r.status === 403) why = /rate limit/i.test(info.message || "") ? "Terlalu banyak permintaan ke GitHub, coba lagi beberapa menit lagi (403)." : "Token tidak punya izin tulis ke repo nteid (403). Di pengaturan token: pilih repo nteid dan atur Contents ke Read and write.";
+        else if (r.status === 404) why = "Repo nteid tidak terlihat oleh token ini (404). Pastikan repo nteid dipilih di Repository access.";
+        toast(why);
+        render("GAGAL " + r.status + (info && info.message ? " · " + info.message.toUpperCase().slice(0, 80) : ""));
+        return;
+      }
       const j = await r.json(); sha = j.content.sha; builds = copy; pick(); render("TERSIMPAN"); toast("Tersimpan. Situs diperbarui sekitar 1 menit.");
     }
     const st = await pull();
     pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
     root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
-      if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN OK" : "TOKEN GAGAL (" + r + ")"); return; }
+      if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN TERBACA (IZIN TULIS DIUJI SAAT MENYIMPAN)" : "TOKEN GAGAL (" + r + ")"); return; }
       if (t.id === "admClrTok") { token = ""; try { localStorage.removeItem(KEY); } catch (e) {} await pull(); pick(); render("TOKEN DIHAPUS"); return; }
       if (t.dataset.addArc) { working.arcs.push(t.dataset.addArc); render(); return; }
       if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
