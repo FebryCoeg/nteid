@@ -1,0 +1,539 @@
+1. Blackbird
+
+* Role: S-Rank / Psyche Main DPS / Instant Cycle / DMG Boost
+* Best Arcs: Crime and Punishment (Signature), Ravenous Blade, Good Boy's Grand Adventure, Watch Your Heads!
+* Best Modules: Devil's Blood: Curse, Speedy Hedgehog
+* Main Stats: CRIT DMG, Psyche DMG
+* Sub Stats Priority: CRIT Rate / CRIT DMG → DMG% → ATK% → Cycle Intensity
+* Best Teams (Nova Team): Blackbird + Lacrimosa (Chaos DPS), Zankou (Sub-DPS), Sakiri (Support)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Renegade) [Prioritas 1]: Menghabiskan seluruh sisa Malice saat Witch of Deliverance menggunakan Flammae in Unum dan meningkatkan DMG multiplier Flames of Deliverance sebesar 150%.
+   2. A6 (Mortal Coil) [Prioritas 2]: Meningkatkan Psyche DMG Blackbird sebesar 25% selama 25 detik setelah menggunakan Requies Animarum. Di luar wujud Witch of Deliverance, setiap serangan terkoordinasi Forsaken Bird memberikan 4 Malice.
+   3. A3 (Blind Spot) [Prioritas 3]: Meningkatkan DMG yang diberikan Blackbird saat mengonsumsi Malice sebesar 50%.
+   4. A5 (Revenant) [Prioritas 4]: Saat Blackbird memberikan DMG, mengurangi Psyche, Lakshana, dan Chaos RES target sebesar 8% selama 25 detik.
+   5. A4 (Bad Seed) [Prioritas 5]: Memperpanjang durasi bonus ATK tim dari Requies Animarum menjadi 25 detik dan meningkatkan DMG seluruh tim sebesar 12% selama durasi tersebut.
+   6. A2 (Wayward Chronicle) [Prioritas 6]: Meningkatkan DMG multiplier Netherplume Rite sebesar 100%, meningkatkan DEF sebesar 20% dalam wujud Witch of Deliverance, dan memulihkan HP sebesar 400% Base ATK setiap kali Flames of Deliverance mengenai musuh.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Colorful Ticket Stub, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Hesitation of the Waves, 40× Blurred Numeral, 40× Suspended Whispers, 40× Unsolved Numeral, 32× Eternal Memory, 64× The Second Self, 64× Distorted Numeral.
+   * Best Bond Gift: Gubicrisp (+100 Affection, 300 Fons di 2-Four Convenience Store Miguel District; 560× = 168,000 Fons untuk Lv. 10) atau Moonmelt Tea Set (+400 Affection, 140× = 2,100,000 Fons).
+
+2. Akane Rin
+
+* Role: S-Rank / Lakshana Damage / Main DPS
+* Best Arcs: Far Side of the Moon (Signature), Fluff of Fleetness, The Last Rose, Shiny Days
+* Best Modules: Street Boxer, Shadow Creed
+* Main Stats: CRIT Rate / CRIT DMG, Lakshana DMG
+* Sub Stats Priority: CRIT Rate / CRIT DMG → Lakshana DMG Bonus → ATK%
+* Best Teams (Stain and Remora): Akane Rin + Blackbird (Psyche Sub-DPS), Zero (Cosmos Burst DPS), Iroi (Support)
+* Skill Priority: Skill → Basic Attack → Ultimate → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A2 (Capo On) [Prioritas 1]: Musuh yang terkena Overtone atau berada di dalam Reverb Field mengalami pengurangan Lakshana RES sebesar 12%.
+   2. A5 (Rehearsal Click) [Prioritas 2]: Meningkatkan bonus multiplier Basic Attack yang diteruskan oleh Overtone dari 40% menjadi 64%, dan bonus DMG Basic Attack yang diteruskan oleh Reverb Field dari 60% menjadi 90%.
+   3. A3 (Shade Capsules) [Prioritas 3]: Menekan Rhythm Wave untuk memberikan Overtone menambah flat 1,000% ke DMG multiplier-nya. Radius Reverb Field membesar 30% dan menahan tombol Rhythm Wave akan menarik musuh di sekitar.
+   4. A4 (Headphone Static) [Prioritas 4]: Meningkatkan CRIT DMG Akane Rin sebesar 30% selama 15 detik setelah melancarkan Synced Resonance.
+   5. A6 (Front-Row Supernova) [Prioritas 5]: Pasif Starlit Anthem memberikan tambahan 16% DEF Ignore kepada Akane Rin.
+   6. A1 (After-School Tabs) [Prioritas 6]: Setiap kali melancarkan Synced Resonance, memulihkan HP sebesar 1,000% Base ATK serta memberikan 50% DEF dan 60% Resistance to Interruptions selama 15 detik.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Charging Knight Spark Plug, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Synchronicity of Thought, 40× Suspended Delusions, 40× Resonance of Faith, 40× Yearning Delusions, 32× Good Boy Stamp, 64× Heart-Racing Night, 64× Transcendent Delusions.
+
+3. Lacrimosa
+
+* Role: S-Rank / Chaos DPS
+* Best Arcs: The Last Rose (Signature), Youthful Fantasy, Fluff of Fleetness, Shiny Days
+* Best Modules: Diabolos
+* Main Stats: CRIT Rate, Chaos DMG
+* Sub Stats Priority: CRIT DMG → CRIT Rate → DMG% → ATK%
+* Best Teams (Discord Team): Lacrimosa + Sakiri (Support), Daffodill (Burst DPS), Haniel (Buffer)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Clock Out Clemency) [Prioritas 1]: Meningkatkan rasio DMG Nightmare sebesar 50%.
+   2. A2 (Rise and Shine) [Prioritas 2]: Meningkatkan DMG yang diberikan Lacrimosa sebesar 15% selama 15 detik ketika masuk menggunakan Support Skill.
+   3. A5 (Tempered Glass Judgement) [Prioritas 3]: Mencegah stack Nightmare hilang saat target di-heal dan mengurangi Max HP target sebesar 200% dari DMG satu instansi Nightmare.
+   4. A6 (Morning Spell) [Prioritas 4]: Memungkinkan Lacrimosa otomatis melancarkan Support Skill dan memicu reaksi Esper Cycle (Nova, Scorch, atau Discord) tanpa akumulasi Cycle Rate saat berganti ke dirinya dalam 5 detik setelah menggunakan Devilish Gift.
+   5. A3 (Molten Ice Cream) [Prioritas 5]: Memicu seluruh efek Nightmare yang terkumpul pada target sekaligus saat pukulan ke-5 Tomato Metal atau Tomato Percussion mengenai sasaran.
+   6. A4 (Almighty Lord of Tomatoes) [Prioritas 6]: Memperpanjang durasi Nightmare menjadi 6 detik.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Confessional Flower Seed, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Hesitation of the Waves, 40× Lost Whispers, 40× Suspended Whispers, 40× Obscure Whispers, 32× Dress Sleeves of Vanity, 64× The Second Self, 64× Paradoxical Whispers.
+   * Best Bond Gift: Tomato 100 (+100 Affection, 300 Fons di Tomato 100 Vending Machine; 560× = 168,000 Fons) atau Bunny Box (+400 Affection, 140× = 2,800,000 Fons).
+
+4. Zankou
+
+* Role: S-Rank / Incantation Main DPS
+* Best Arcs: Ravenous Blade (Signature), Contemplative Cat, Watch Your Heads!, Fluff of Finesse, Failing You, Heavy in My Heart
+* Best Modules: Crimson: Twin Butterflies
+* Main Stats: CRIT DMG, Cycle Intensity, Incantation DMG, CRIT Rate, ATK%
+* Sub Stats Priority: CRIT DMG → Cycle Intensity / CRIT Rate → DMG% → ATK% → Break Intensity
+* Best Teams (Best Team): Zankou + Lacrimosa (Sub-DPS), Haniel (Buffer), Sakiri (Incantation Support)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Abyss in the Eyes) [Prioritas 1]: Wildfire, Flickering Shadow, Voidstep, dan Enhanced Redirect Skill menyebarkan efek DoT. Buff Hunt (DMG pribadi naik ke 40%) dan Delusion (CRIT DMG DoT seluruh tim naik ke 50%) aktif permanen.
+   2. A2 (Kiss from the Abyss) [Prioritas 2]: Setiap kali berpartisipasi dalam Cycle yang memicu Scorch atau Hexed, menyimpan 1 stack Stored Flame yang meningkatkan Final DMG Ultimate berikutnya sebesar 150%.
+   3. A5 (Blossom Draws Blood) [Prioritas 3]: Pukulan pertama Enhanced Redirect Skill selalu langsung men-Topple/Break target yang bisa di-Break (sekali per target per battle), dan meningkatkan Break/Topple DMG seluruh tim sebesar 300%.
+   4. A6 (Blood-Stained Eyes) [Prioritas 4]: Pukulan terakhir Oblivion/Annihilation menghasilkan 12% DMG tambahan per stack DoT pada target (maksimal hingga 240%).
+   5. A4 (Nightmare in Bloom) [Prioritas 5]: Saat Ultimate utama siap, Ultimate kedua langsung aktif dan ikut mendapatkan bonus DMG dari Stored Flame.
+   6. A3 (Kiss Mark, Dream Glimpse) [Prioritas 6]: Hunt menambah Interruption Resistance sebesar 50%, sementara Delusion memulihkan 4% Max HP setiap detik.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Nest Guard Fragment, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× First Expectations, 40× Blurred Numeral, 40× Known Weariness, 40× Unsolved Numeral, 32× Eternal Memory, 64× Black Hat, 64× Distorted Numeral.
+   * Best Bond Gift: Serenade (+200 Affection, 3,000 Fons; 280× = 840,000 Fons) atau Moonmelt Tea Set (+400 Affection, 140× = 2,100,000 Fons).
+
+5. Linko
+
+* Role: S-Rank / Anima Main DPS / Follow-up Attack
+* Best Arcs: Voice of the Voyager (Signature), Ready-Ready, Raging Flames
+* Best Modules: Fireflies and the Forest, Lost Radiance, Speedy Hedgehog
+* Main Stats: CRIT Rate, CRIT DMG, Anima DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → ATK → Universal DMG
+* Best Teams (Best Team): Linko + Zankou (Sub-DPS), Daffodill (Burst DPS), Sakiri (Support)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (All Frequencies Live) [Prioritas 1]: Saat Linko berada di off-field, interval serangan kejutan Spectral Rush dipercepat sebesar 25%.
+   2. A2 (Friendly Haunting) [Prioritas 2]: Meningkatkan multiplier Anima Burst DMG dari Oversync (15%–30%).
+   3. A4 (Starlit Whispers) [Prioritas 3]: Di dalam Resonance Field, setiap Synced Strike memberikan 1 instansi tambahan AoE Anima DMG yang dapat mengonsumsi tanda Hit 'Em Here! dan memicu Synced Strike baru.
+   4. A5 (Love, Loud and Clear) [Prioritas 4]: Synced Strike yang dipicu oleh Full-Frequency Pulse dapat memicu reaksi Esper Cycle, atau menghasilkan +20%–50% DMG jika rekan tim yang dipilih tidak dapat bereaksi dengan Linko.
+   5. A6 (The World Answers) [Prioritas 5]: Selama Linko ada di tim, Synced Strike seluruh anggota party mendapat +25% CRIT Rate dan menghasilkan energi (efek Charge).
+   6. A3 (Across the Airwaves) [Prioritas 6]: Melancarkan Ultimate Oversync langsung me-reset cooldown Redirect Skill: Full-Frequency Pulse.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Water Moon Pick, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× FNG, 40× Lost Whispers, 40× CO, 40× Obscure Whispers, 32× Dress Sleeves of Vanity, 64× White Rose, 64× Paradoxical Whispers.
+
+6. Zero
+
+* Role: S-Rank / Cosmos Damage / Burst DPS / Instant Cycle
+* Best Arcs: Day Off (Signature), Fluff of Fearlessness, The Rain That Shook the World, The Forgotten
+* Best Modules: Lost Radiance
+* Main Stats: CRIT Rate, CRIT DMG, ATK%
+* Sub Stats Priority: CRIT DMG → CRIT Rate → DMG% → ATK%
+* Best Teams (Zero Hypercarry): Zero + Nanally (Main DPS), Jiuyuan (Sub-DPS), Adler (Support)
+* Skill Priority: Skill → Ultimate → QTE → Basic Attack
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A2 (Finding the Calling) [Prioritas 1]: Memberikan tambahan 8 Ultimate Energy setelah berhasil melancarkan Appraise and Engrave.
+   2. A3 (Anomalies Record) [Prioritas 2]: Meningkatkan CRIT Chance dari Ultimate Divide by Zero sebesar 50%.
+   3. A4 (Undecided Factors) [Prioritas 3]: Setiap 1 poin Base ATK Zero meningkatkan DMG Ultimate Divide by Zero sebesar 0.1%, maksimal hingga 25%.
+   4. A5 (Theopneustos) [Prioritas 4]: Meningkatkan ATK Zero sebesar 10% selama 20 detik saat memicu Support Skill.
+   5. A6 (Deceptive Liberation) [Prioritas 5]: Meningkatkan rasio Extra DMG Appraise and Engrave menjadi 300% ATK (membuka penuh Resonance 2: Zero Display untuk buff +12% ATK satu tim).
+   6. A1 (Blooming Gaze) [Prioritas 6]: Memberikan 1 pukulan tambahan sebesar 200% ATK yang mengabaikan 75% DEF terhadap musuh dengan level lebih rendah pada pukulan pertama.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Charging Knight Spark Plug, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Lost Whispers, 40× Dove's Flutter, 40× Obscure Whispers, 32× Good Boy Stamp, 64× The Olive Branch, 64× Paradoxical Whispers.
+
+7. Iroi
+
+* Role: S-Rank / Anima Support
+* Best Arcs: The Wrong Gate (Signature), The Last Rose, Youthful Fantasy, Fluff of Fleetness, Shiny Days, Clear Skies
+* Best Modules: Speedy Hedgehog, Fireflies and the Forest
+* Main Stats: ATK%, ATK, CRIT Rate, CRIT DMG
+* Sub Stats Priority: ATK% → ATK → CRIT Rate → Cycle Intensity
+* Best Teams (Shinku Hypercarry): Iroi + Shinku (Main DPS), Chaos (Sub-DPS), Hathor (Burst DPS)
+* Skill Priority: Ultimate → Skill → QTE → Basic Attack
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A3 (Trait: Cooperative) [Prioritas 1]: Meningkatkan pemulihan (healing) yang diterima oleh rekan tim yang memiliki HP rendah.
+   2. A5 (Trait: Transparent) [Prioritas 2]: Menambahkan efek pada Sympathetic Nerves: meningkatkan ATK rekan tim berdasarkan Base ATK Iroi selama durasi tertentu saat melakukan heal.
+   3. A6 (Trait: Forgiving) [Prioritas 3]: Memberikan HP, Cycle Energy, dan Ultimate Energy kepada karakter yang dihidupkan kembali (revive) setelah Iroi menggunakan 3.8-Billion-Year Mirage.
+   4. A1 (Iterated Prisoner's Dilemma) [Prioritas 4]: Meningkatkan efisiensi perolehan Imagination dan memulihkan Imagination secara perlahan saat Iroi berada di off-field.
+   5. A2 (Strategy: Tit for Tat) [Prioritas 5]: Memanggil Morpheus, Icelos, atau Phantasos secara acak saat rekan tim menggunakan skill untuk membantu dengan 1 serangan DMG.
+   6. A4 (Trait: Retaliatory) [Prioritas 6]: Meningkatkan rasio ATK bagi rekan tim yang berada dalam status Regression.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× A Page from Delusion's Shore, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 2,168,000 Beetle Coins, 40× FNG, 40× Fading Silhouette, 40× CO, 40× Blurred Silhouette, 32× Good Boy Stamp, 64× White Rose, 64× Chaos Silhouette.
+
+8. Sakiri
+
+* Role: S-Rank / Incantation Damage / Buffer / Control
+* Best Arcs: Good Boy's Grand Adventure (Signature), Failing You, Heavy in My Heart
+* Best Modules: Speedy Hedgehog
+* Main Stats: ATK%, CRIT DMG
+* Sub Stats Priority: ATK% → CRIT Rate → CRIT DMG → ATK
+* Best Teams (Sakiri Hypercarry): Sakiri + Nanally (Main DPS), Jiuyuan (Healer), Baicang (Sub-DPS)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A4 (Wishful Reliance) [Prioritas 1]: Meningkatkan ATK seluruh tim (selain Sakiri) sebesar 30% dari Base ATK Sakiri selama 20 detik setelah melancarkan Feast of Gluttony.
+   2. A1 (Diffusive Haze) [Prioritas 2]: Memperpanjang durasi efek Immovable dari Feast of Gluttony menjadi 6 detik.
+   3. A5 (Sensory Collapse) [Prioritas 3]: Memulihkan penuh Ultimate Energy dan langsung me-reset cooldown Feast of Gluttony saat Devour Whole membuat target terlempar (Airborne).
+   4. A2 (Dextrous Separation) [Prioritas 4]: Memberikan extra DMG dengan Feast of Gluttony terhadap musuh yang sedang Airborne berdasarkan massa target (maksimal 600% ATK).
+   5. A3 (Adhesive Grip) [Prioritas 5]: Meningkatkan DMG Devour Whole dan Feast of Gluttony selama 15 detik sebesar 6% untuk setiap musuh yang dikalahkan tim (maksimal 60%).
+   6. A6 (Gluttonous Dissolution) [Prioritas 6]: Memungkinkan Kiroumaru menelan dan mencerna hingga 3 musuh sekaligus dalam Eating Mode.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Charging Knight Spark Plug, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× First Expectations, 40× Blurred Numeral, 40× Known Weariness, 40× Unsolved Numeral, 32× Good Boy Stamp, 64× Black Hat, 64× Distorted Numeral.
+   * Best Bond Gift: Crave Bites! Milk Flavor (+100 Affection, 360 Fons di 2-Four Convenience Store Bridge Crossings; 560× = 201,600 Fons) atau Bunny Box (+400 Affection, 140× = 2,800,000 Fons).
+
+9. Chaos
+
+* Role: S-Rank / Lakshana DPS
+* Best Arcs: What's Desired (Signature), Camellia Society, Fluff of Ferocity, A Time Will Come
+* Best Modules: Street Boxer
+* Main Stats: Lakshana DMG, CRIT Rate / CRIT DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → DMG% → ATK%
+* Best Teams (Team 1): Chaos + Jiuyuan (Sub-DPS), Hotori (Burst DPS), Zero (Support)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Piercing Insight) [Prioritas 1]: Memberikan tambahan 30% Crime saat menyerang musuh yang memiliki tanda Warrant.
+   2. A5 (Voidgaze) [Prioritas 2]: Meningkatkan DMG yang diberikan kepada target sebesar 20% ketika hanya tersisa 1 target dengan tanda Warrant di field.
+   3. A6 (False Origin) [Prioritas 3]: Langsung memulihkan Crime hingga batas maksimal seketika setelah melancarkan Retribution.
+   4. A2 (Charge / Sin) [Prioritas 4]: Mengabaikan 20% DEF target saat menyerang musuh yang memiliki tanda Warrant.
+   5. A3 (Emberflare) [Prioritas 5]: Meningkatkan CRIT DMG sebesar 30% selama 20 detik setelah melancarkan Retribution.
+   6. A4 (Drowning Tide) [Prioritas 6]: Memindahkan Warrant ke target terdekat yang belum ditandai dan menghitung ulang durasinya saat mengalahkan musuh yang memiliki Warrant.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Tear of the Sea, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 2,168,000 Beetle Coins, 40× Synchronicity of Thought, 40× Suspended Delusions, 40× Resonance of Faith, 40× Yearning Delusions, 32× Eternal Memory, 64× Heart-Racing Night, 64× Transcendent Delusions.
+   * Best Bond Gift: Refreshing Fruity (+100 Affection, 480 Fons di 2-Four Convenience Store New Herland District; 560× = 268,800 Fons) atau Kokoro Rider L1 - Eradicator (+400 Affection, 140× = 2,016,000 Fons).
+
+10. Nanally
+
+* Role: S-Rank / Anima Damage / Main DPS / Follow-up Attack
+* Best Arcs: Ready-Ready (Signature), Fluff of Fortitude, Raging Flames, Oraora!
+* Best Modules: Fireflies and the Forest
+* Main Stats: CRIT DMG, ATK%
+* Sub Stats Priority: CRIT Rate → ATK% → CRIT DMG → ATK
+* Best Teams (Blossom Team): Nanally + Jiuyuan (Sub-DPS), Adler (Support), Haniel (Buffer)
+* Skill Priority: Basic Attack → Ultimate → Skill → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Gang Formation) [Prioritas 1]: Memberikan Nanally 2.5 Ultimate Energy setiap kali ia melakukan Follow-up Attack (maksimal sekali setiap 1 detik).
+   2. A5 (Followers Everywhere) [Prioritas 2]: Meningkatkan ATK Nanally sebesar 2% untuk setiap Follow-up Attack yang ia lakukan, hingga maksimal 20%.
+   3. A4 (Not a Troublemaker) [Prioritas 3]: Underboss memberikan 30% peningkatan DMG.
+   4. A3 (Call Me the Boss) [Prioritas 4]: Melancarkan 1 Follow-up Attack ke satu musuh sebesar 50% ATK Anima DMG setiap kali Nanally memberikan DMG dalam wujud Ichi-daime's Authority (maksimal sekali per detik).
+   5. A6 (Because We're Family) [Prioritas 5]: Memperpanjang durasi Ichi-daime's Authority menjadi 15 detik (dan 20 detik saat di luar pertarungan).
+   6. A2 (Second Member) [Prioritas 6]: Durasi Underboss bertambah 3 detik lebih lama.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× A Page from Delusion's Shore, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× FNG, 40× Fading Silhouette, 40× CO, 40× Blurred Silhouette, 32× Good Boy Stamp, 64× White Rose, 64× Chaos Silhouette.
+   * Best Bond Gift: Cool-lala Spicy Snack (+100 Affection, 300 Fons di 2-Four Convenience Store New Herland District; 560× = 168,000 Fons) atau Kokoro Rider L1 - Eradicator (+400 Affection, 140× = 2,016,000 Fons).
+
+11. Shinku
+
+* Role: S-Rank / Cosmos DPS
+* Best Arcs: Blushing Mirage (Signature), Fluff of Ferocity, Camellia Society, What's Desired, A Time Will Come
+* Best Modules: Lost Radiance, Street Boxer, Fireflies and the Forest
+* Main Stats: CRIT Rate, CRIT DMG, Cosmos DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → Universal DMG% → ATK%
+* Best Teams (Sterry Express): Shinku + Hathor (Burst DPS), Sakiri (Support), Iroi (Flex)
+* Skill Priority: Basic Attack → Ultimate → Skill → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A3 (Sunset Beach) [Prioritas 1]: Menjaga status Menacing Gaze tetap aktif saat berganti karakter dan memungkinkan Shinku mendapatkan stack Menacing Gaze dari off-field.
+   2. A2 (Pre-Dawn Training Grounds) [Prioritas 2]: Mengurangi Cosmos Resistance target sebesar 10% selama 20 detik setelah Ultimate mengenai musuh.
+   3. A1 (Rain-Lashed Alley) [Prioritas 3]: Seluruh DMG yang dihasilkan Shinku mengabaikan 12% DEF target.
+   4. A6 (Dragon's Treasure) [Prioritas 4]: Meningkatkan rasio DMG Scarlet Descent, Crimson Judgment, dan Dragonflame Verdict sebesar 30%, serta menarik musuh di sekitar.
+   5. A4 (Snowfall Slope) [Prioritas 5]: Meningkatkan batas tumpukan Menacing Gaze menjadi 16 stack dan memperkuat Instant Strike pada 16 stack dengan tambahan 20% DMG serta efek Knockback/Stun.
+   6. A5 (Room of Laughter) [Prioritas 6]: Meningkatkan DEF sebesar 50% dan Resistance to Interruptions sebesar 50% selama Surging Crimson, serta memulihkan HP sebesar 300% Base ATK setelah menggunakan Scarlet Descent.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Charging Knight Spark Plug, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Lost Whispers, 40× Dove's Flutter, 40× Obscure Whispers, 32× Dress Sleeves of Vanity, 64× The Olive Branch, 64× Paradoxical Whispers.
+   * Best Bond Gift: Grilled Corn (+50 Affection, 240 Fons; 1,120× = 268,800 Fons) atau Gigafluff - The Strong (+400 Affection, 140× = 1,680,000 Fons).
+
+12. Daffodill
+
+* Role: S-Rank / Chaos Damage / Burst DPS / Break Boost
+* Best Arcs: Youthful Fantasy (Signature), Fluff of Fleetness, Shiny Days, Mind Royale
+* Best Modules: Diabolos
+* Main Stats: CRIT DMG, CRIT Rate
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → DMG%
+* Best Teams (Daffodil Scorch Team): Daffodill + Sakiri (Support), Baicang (Sub-DPS), Haniel (Buffer)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A3 (Assembly of Creations) [Prioritas 1]: Mencegah efek Insight dihapus setelah terpasang dan memungkinkan aplikasi berulang untuk menumpuk hingga 3 stack.
+   2. A5 (Perfect Truth) [Prioritas 2]: Memberikan 1 instansi tambahan Break Damage untuk setiap stack Insight jika target memasuki kondisi Break.
+   3. A6 (Bloom in the Lake) [Prioritas 3]: Seluruh DMG yang diberikan oleh Daffodill meningkat sebesar 15%.
+   4. A1 (Eye) [Prioritas 4]: Meningkatkan DMG Resonance sebesar 100% dan Break sebesar 250% untuk setiap Support Skill yang digunakan.
+   5. A4 (In Concealment) [Prioritas 5]: Jika target memasuki kondisi Break saat berada di bawah efek Insight, Break DMG Daffodill meningkat sebesar 15% untuk setiap stack Insight.
+   6. A2 (Mechanical March) [Prioritas 6]: Memberikan DMG tinggi, menghasilkan Break, dan mengisi penuh Witness This Finale pada serangan terakhir jika Phantom Step gagal melakukan counter.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Charging Knight Spark Plug, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Hesitation of the Waves, 40× Suspended Delusions, 40× Suspended Whispers, 40× Yearning Delusions, 32× Dress Sleeves of Vanity, 64× The Second Self, 64× Transcendent Delusions.
+   * Best Bond Gift: Nyanko Cozy Uji Matcha (+100 Affection, 450 Fons di Crazy Cat Bridge Crossings; 560× = 252,000 Fons) atau Promise (+400 Affection, 140× = 1,400,000 Fons).
+
+13. Hotori
+
+* Role: S-Rank / Cosmos Buff / Burst DPS / DMG Boost
+* Best Arcs: Marching Beyond Time (Signature), The Rain That Shook the World, Fluff of Fearlessness
+* Best Modules: Lost Radiance
+* Main Stats: Cosmos DMG, CRIT DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → DMG%
+* Best Teams (Best Team): Hotori + Nanally (Main DPS), Jiuyuan (Sub-DPS), Zero (Support)
+* Skill Priority: Ultimate → Skill → QTE → Basic Attack
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Flourish) [Prioritas 1]: Meningkatkan DMG Hotori selama Time Stop sebesar 12% untuk setiap Support Skill atau Redirect Skill yang direkam.
+   2. A5 (All-Seeing) [Prioritas 2]: Saat Hotori diterjunkan dan hanya ada 1 musuh di field, DMG seluruh tim terhadap target tersebut meningkat sebesar 15%.
+   3. A6 (Time Takes Away) [Prioritas 3]: Selama Time Stop, serangan Hotori mengabaikan 30% DEF target.
+   4. A2 (Distant Memories) [Prioritas 4]: Meningkatkan DMG Hotori sebesar 20% selama durasi Time Stop.
+   5. A3 (Momentary Gaze) [Prioritas 5]: Memulihkan energi yang dihabiskan pada Present Replay setelah selesai merekam (sekali setiap 60 detik).
+   6. A4 (Scattered Relics) [Prioritas 6]: Memberikan tambahan 10 energi ke Non-Closed Timepiece setiap kali 1 target dikalahkan oleh tim (maksimal 3 kali per Ultimate).
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Confessional Flower Seed, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Lost Whispers, 40× Dove's Flutter, 40× Obscure Whispers, 32× Dress Sleeves of Vanity, 64× The Olive Branch, 64× Paradoxical Whispers.
+   * Best Bond Gift: Chiyo Family Brew (+100 Affection, 300 Fons di Budoriya Bridge Crossings; 560× = 168,000 Fons) atau Golden Moon (+400 Affection, 140× = 2,100,000 Fons).
+
+14. Haniel
+
+* Role: A-Rank / Psyche Buff / DMG Boost
+* Best Arcs: Blow up the Crowd (Signature), Hethereau's Keeper, Day Off, The Forgotten
+* Best Modules: Speedy Hedgehog
+* Main Stats: CRIT Rate, Psyche DMG
+* Sub Stats Priority: CRIT DMG → DMG% → CRIT Rate → ATK%
+* Best Teams (Haniel Hypercarry): Haniel + Daffodill (Sub-DPS), Fadia (Healer), Baicang (Main DPS)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A2 (Legendary! The g'ald back row window seat!) [Prioritas 1]: Memperpanjang durasi Hootie selama 4 detik.
+   2. A5 (Crisis! Shattering trust!) [Prioritas 2]: Meningkatkan Psyche DMG Haniel sebesar 30% selama berada dalam mode Paranormal Ace.
+   3. A6 (Finale! For the coming dawn!) [Prioritas 3]: Mengurangi cooldown Hootie sebesar 4 detik.
+   4. A3 (Assemble! The hero team is formed!) [Prioritas 4]: Selama berada dalam mode Paranormal Ace, CRIT Chance Haniel meningkat sebesar 20%.
+   5. A4 (Seaside! Beach episode!) [Prioritas 5]: Selama dalam mode Paranormal Ace, jika Haniel memicu Ensemble, DMG tambahan serangan berikutnya meningkat sebesar 100%.
+   6. A1 (New here! Genius transfer student reporting in!) [Prioritas 6]: Meningkatkan batas pantulan (ricochet) Paranormal Cannon menjadi 6 kali.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Nest Guard Fragment, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Hesitation of the Waves, 40× Blurred Numeral, 40× Suspended Whispers, 40× Unsolved Numeral, 32× Dress Sleeves of Vanity, 64× The Second Self, 64× Distorted Numeral.
+   * Best Bond Gift: Cool-lala Spicy Snack (+100 Affection, 300 Fons di 2-Four Convenience Store New Herland District; 560× = 168,000 Fons) atau Asahi Inori - Crimson (+400 Affection, 140× = 2,520,000 Fons).
+
+15. Baicang
+
+* Role: S-Rank / Incantation Damage / Main DPS / DoT
+* Best Arcs: Camellia Society (Signature), Fluff of Ferocity, A Time Will Come
+* Best Modules: Crimson: Twin Butterflies
+* Main Stats: Incantation DMG, CRIT Rate
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → DMG%
+* Best Teams (Baicang Hypercarry): Baicang + Daffodill (Sub-DPS), Sakiri (Support), Jiuyuan (Healer)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Yo, Captain!) [Prioritas 1]: Meningkatkan DMG Skill Baicang berikutnya sebesar 30% saat Silence terpicu selama Judgment of Autumn (bisa menumpuk), dan mengurangi cooldown Skill sebesar 4 detik saat Objurgate terpicu.
+   2. A6 (White Aspect) [Prioritas 2]: Meningkatkan CRIT Rate Baicang sebesar 30% selama durasi Judgment of Autumn.
+   3. A2 (Soul Caller) [Prioritas 3]: Setiap 1 Power Word yang dihasilkan meningkatkan ATK Baicang sebesar 6% (hingga 4 stack, bertahan 10 detik per stack).
+   4. A3 (Curses Spoken Into Being) [Prioritas 4]: Meningkatkan batas pembuatan Power Word menjadi 4.
+   5. A5 (In Honor of Moonlight) [Prioritas 5]: Memperpanjang durasi Judgment of Autumn menjadi 16 detik.
+   6. A4 (Or Perhaps Blessings) [Prioritas 6]: Memulihkan tambahan 5% Max HP setiap kali 1 Power Word terpicu selama Judgment of Autumn.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Nest Guard Fragment, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× First Expectations, 40× Blurred Numeral, 40× Known Weariness, 40× Unsolved Numeral, 32× Good Boy Stamp, 64× Black Hat, 64× Distorted Numeral.
+   * Best Bond Gift: Kids Energy Meal (+100 Affection, 450 Fons di Food First Bridge Crossings; 560× = 252,000 Fons) atau Gigafluff - Musclology (+400 Affection, 140× = 1,680,000 Fons).
+
+16. Jiuyuan
+
+* Role: S-Rank / Anima Damage / Burst DPS / Control / Sub-DPS / Sustain
+* Best Arcs: Reality Refuge (Signature), Fluff of Fearlessness, Hethereau's Keeper, Day Off
+* Best Modules: Fireflies and the Forest
+* Main Stats: CRIT Rate, CRIT DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → DMG%
+* Best Teams (Jiuyuan Hypercarry): Jiuyuan + Zero (Support), Nanally (Main DPS), Hathor (Support)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A6 (Know Every Secret) [Prioritas 1]: Memberikan 200% rasio DMG kepada target yang terikat Lethal Rose Pact setiap kali mereka melancarkan skill (cooldown 5 detik).
+   2. A2 (Intel Turns Into Blades) [Prioritas 2]: Meningkatkan rasio DMG Lethal Rose Pact sebesar 100% dan memulihkan HP seluruh tim sebesar 20% dari total DMG yang diakumulasikan Rose Pact saat Pact Settlement terpicu.
+   3. A5 (Intel Superiority) [Prioritas 3]: DMG Jiuyuan terhadap target yang terikat Lethal Rose Pact meningkat sebesar 8%.
+   4. A1 (To Know, To Balance) [Prioritas 4]: Meningkatkan ATK Jiuyuan sebesar 5% untuk setiap target di field yang terikat Lethal Rose Pact (maksimal 15%).
+   5. A4 (Strike to Kill) [Prioritas 5]: Meningkatkan rasio DMG sebesar 50% dan mengenai target di sekitar area saat Pact Settlement dipicu secara aktif.
+   6. A3 (Advantage Established) [Prioritas 6]: Mengurangi tambahan 4 poin Break dari target saat Pact Settlement dipicu secara aktif.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Tear of the Sea, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× FNG, 40× Fading Silhouette, 40× CO, 40× Blurred Silhouette, 32× Dress Sleeves of Vanity, 64× White Rose, 64× Chaos Silhouette.
+   * Best Bond Gift: Magi-Puff Whole Wheat Bread (+100 Affection, 360 Fons di 2-Four Convenience Store Bridge Crossings; 560× = 201,600 Fons) atau On Track (+400 Affection, 140× = 2,800,000 Fons).
+
+17. Adler
+
+* Role: A-Rank / Incantation Survival / Shield / DoT
+* Best Arcs: Umbrella (Signature), The Fools' Spring
+* Best Modules: Kingdom's Guard
+* Main Stats: DEF%, DEF
+* Sub Stats Priority: DEF% → DEF → Break Intensity → Cycle Intensity
+* Best Teams (Adler Hypercarry): Adler + Daffodill (Sub-DPS), Baicang (Main DPS), Sakiri (Support)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Form) [Prioritas 1]: Memberikan Adler 20 stack Karma seketika saat melancarkan Ultimate Tranquility.
+   2. A6 (All Forms Are Void) [Prioritas 2]: Memperpanjang durasi shield Blessing menjadi 12 detik.
+   3. A2 (Sensation) [Prioritas 3]: Setiap stack Karma memberikan Adler 3% DMG Bonus.
+   4. A3 (Perception) [Prioritas 4]: Meningkatkan kekuatan Shield dari Blessing sebesar 20%.
+   5. A5 (Discernment) [Prioritas 5]: Memberikan Adler 20 Ultimate Energy saat melancarkan Tranquility.
+   6. A4 (Formation) [Prioritas 6]: Menyerap sebagian overflow damage berdasarkan 50% DEF Adler saat shield Blessing hancur.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Water Moon Pick, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× First Expectations, 40× Blurred Numeral, 40× Known Weariness, 40× Unsolved Numeral, 32× Dress Sleeves of Vanity, 64× Black Hat, 64× Distorted Numeral.
+   * Best Bond Gift: Purification Guard Lozenges (+100 Affection, 420 Fons di Bamboo Pharmacy Bridge Crossings; 560× = 235,200 Fons) atau Promise (+400 Affection, 140× = 1,400,000 Fons).
+
+18. Fadia
+
+* Role: S-Rank / Psyche Survival / DMG Redirection
+* Best Arcs: Eternal Waltz (Signature), The Great Thief, The Good, The Bad, The Bitter
+* Best Modules: Tiny Big Adventure
+* Main Stats: HP%, Mental Damage
+* Sub Stats Priority: HP% → HP → DMG% → CRIT Rate
+* Best Teams (Fadia Hypercarry): Fadia + Haniel (Buffer), Daffodill (Sub-DPS), Aurelia (DPS)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Apostate) [Prioritas 1]: Rasio pengalihan DMG (damage redirect) Fadia meningkat menjadi 75%.
+   2. A2 (Instinct) [Prioritas 2]: Meningkatkan rasio DMG yang diterima musuh lewat Destructive Experience menjadi 600% dan menaikkan batas DMG-nya menjadi 25% Max HP Fadia.
+   3. A4 (Breaker of Taboos) [Prioritas 3]: Meningkatkan rasio pemulihan (healing) Fadia menjadi 30% Max HP dalam wujud Lilith (dan naik ke 60% Max HP jika HP yang hilang mencapai batas Destructive Threshold).
+   4. A6 (Bringer of Love and Death) [Prioritas 4]: Memberikan efek Destructive Experience hingga ke 10 target di dalam jangkauan.
+   5. A3 (Curser of Blessings) [Prioritas 5]: Saat memasuki pertarungan, Fadia meningkatkan Base Max HP miliknya sebesar 30%.
+   6. A5 (Survivor of Death) [Prioritas 6]: Meningkatkan CRIT Rate Fadia sebesar 50% selama berada dalam wujud Lilith.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Water Moon Pick, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Synchronicity of Thought, 40× Fading Silhouette, 40× Resonance of Faith, 40× Blurred Silhouette, 32× Dress Sleeves of Vanity, 64× Heart-Racing Night, 64× Chaos Silhouette.
+   * Best Bond Gift: Grilled Corn (+50 Affection, 240 Fons; 1,120× = 268,800 Fons) atau Glimmering Ice (+400 Affection, 140× = 756,000 Fons).
+
+19. Elyms
+
+* Role: S-Rank / Cosmos Buff / Burst DPS / DMG Boost / Instant Cycle
+* Best Arcs: Echoes on Hold (Signature), Day Off, The Rain That Shook the World, First Step to Success
+* Best Modules: Speedy Hedgehog, Lost Radiance, Shadow Creed
+* Main Stats: ATK%, Cosmos DMG, CRIT Rate / CRIT DMG
+* Sub Stats Priority: ATK% → CRIT Rate / CRIT DMG
+* Best Teams (Akane Rin Remora): Elyms + Shinku (Cosmos DPS), Akane Rin (Lakshana Main DPS), Iroi (Support)
+* Skill Priority: Ultimate → Skill → QTE → Basic Attack
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (404: Island Out of Reach) [Prioritas 1]: Setelah melancarkan Ultimate Do You Get Deja Vu, setiap stack Optical Illusion yang dikonsumsi sebelum cast akan meningkatkan CRIT DMG seluruh tim sebesar 10% selama 20 detik.
+   2. A2 (200: Nodes Connected) [Prioritas 2]: Meningkatkan rasio DMG Ultimate sebesar 30%, dan setiap stack Optical Illusion yang dikonsumsi saat menggunakan Goodbye to You membuat serangan itu mengabaikan 5% DEF target.
+   3. A3 (504: Gateway Timeout) [Prioritas 3]: Saat Connection Strength naik dari Medium ke Strong, Elyms mendapatkan 3 stack Optical Illusion dan batas tumpukannya naik menjadi 4.
+   4. A4 (302: Wish Redirected) [Prioritas 4]: Selama Elyms berada di dalam party dan hidup, CRIT DMG seluruh tim meningkat sebesar 20%.
+   5. A6 (301: Moved Permanently) [Prioritas 5]: Setelah menggunakan Ultimate, setiap stack Optical Illusion yang dikonsumsi sebelumnya meningkatkan Follow-up Attack DMG Elyms sebesar 25% selama 20 detik.
+   6. A5 (304: Nothing Has Changed) [Prioritas 6]: Meningkatkan rasio DMG The Ones Who Left sebesar 100% dan mengatur Cycle Energy Elyms langsung ke 100 saat memasuki pertarungan.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Tear of the Sea, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Fading Silhouette, 40× Dove's Flutter, 40× Blurred Silhouette, 32× Hollowflower Seed, 64× The Olive Branch, 64× Chaos Silhouette.
+
+20. Exe
+
+* Role: S-Rank / Chaos Damage / Main DPS / Summoner
+* Best Arcs: Dotted Horizon (Signature), The Last Rose, Youthful Fantasy
+* Best Modules: Diabolos, Shadow Creed
+* Main Stats: CRIT Rate / CRIT DMG, Chaos DMG, ATK%
+* Sub Stats Priority: CRIT Rate / CRIT DMG → Chaos DMG → ATK%
+* Best Teams (Chaos Nova / Summon): Exe + Blackbird (Psyche Hybrid), Sakiri (Support), Iroi / Haniel (Sustain/Buffer)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A2 (define X/Y) [Prioritas 1]: Meningkatkan ATK Exe sebesar 10%, 12%, 15%, 20%, atau 30% sesuai tingkatan Rating (B, A, S, SS, atau SSS).
+   2. A1 (print Hello, My World!) [Prioritas 2]: Meningkatkan Chaos DMG Exe selama Rating miliknya berada pada tingkatan SS atau lebih tinggi.
+   3. A3 (for Playing Together Forever) [Prioritas 3]: Data Exfiltration menarik musuh di dalam jangkauan dan mengurangi Chaos RES mereka selama beberapa detik.
+   4. A4 (kill Process) [Prioritas 4]: Meningkatkan DMG yang diberikan oleh seluruh summon di field, dan Digital Echoes mendapatkan tambahan DMG Bonus lagi di atasnya.
+   5. A5 (null Pointer) [Prioritas 5]: Selama Shader Compile dari Ultimate Mesh Collision aktif, Digital Echoes melepaskan gelombang kejut saat menghilang yang memberikan extra DMG berdasarkan ATK Exe.
+   6. A6 (log Bone-Animating Code) [Prioritas 6]: Setiap kali Exe memperoleh Frames, ia memulihkan HP berdasarkan ATK untuk setiap poin Rating; setiap kali menghabiskan Frames, ia mendapatkan ekstra Rating.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Confessional Flower Seed, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Hesitation of the Waves, 40× Blurred Numeral, 40× Suspended Whispers, 40× Unsolved Numeral, 32× Hollowflower Seed, 64× The Second Self, 64× Distorted Numeral.
+
+21. Chiz
+
+* Role: S-Rank / Cosmos Damage / Main DPS
+* Best Arcs: Contemplative Cat (Signature), Cosmos Daze, Wild Reverie
+* Best Modules: Lost Radiance
+* Main Stats: Cosmos DMG, CRIT Rate
+* Sub Stats Priority: CRIT Rate → CRIT DMG → DMG% → ATK%
+* Best Teams (Chiz Hypercarry): Chiz + Jiuyuan (Sub-DPS), Zero (Support), Hathor (Sub-DPS)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Sun, Sun... speak to me!) [Prioritas 1]: Meningkatkan batas penyimpanan Grain dan Grain Loan sebesar 10%.
+   2. A5 (Blank Diary Pages) [Prioritas 2]: Memberikan Chiz jumlah Grain sebesar 100% dari batas penyimpanan Grain seketika saat memasuki pertarungan.
+   3. A6 (Thirty-Three Days) [Prioritas 3]: Meningkatkan tambahan Cosmos DMG dari Grain sebesar 15%.
+   4. A4 (To Riceball, Bandage, Fons) [Prioritas 4]: Meningkatkan efisiensi perolehan Grain sebesar 20%.
+   5. A2 (Fireworks in Silence) [Prioritas 5]: Memberikan 10% dari Grain saat ini sebagai bunga (interest) per detik selama Chiz berada dalam status Surplus.
+   6. A3 (If There Were No Rainy Days) [Prioritas 6]: Meningkatkan peluang kenaikan Grain Price sebesar 50%.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Tear of the Sea, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Lost Whispers, 40× Dove's Flutter, 40× Obscure Whispers, 32× Good Boy Stamp, 64× The Olive Branch, 64× Paradoxical Whispers.
+   * Best Bond Gift: Nyanko Punch Taro Pudding Milktea (+100 Affection, 450 Fons di Crazy Cat Bridge Crossings; 560× = 252,000 Fons) atau Bunny Box (+400 Affection, 140× = 2,800,000 Fons).
+
+22. Hathor
+
+* Role: S-Rank / Lakshana Damage / Burst DPS
+* Best Arcs: Raging Flames (Signature), Fluff of Fortitude, Song of the Whale, Drawn Blade
+* Best Modules: Street Boxer
+* Main Stats: Lakshana DMG, CRIT DMG
+* Sub Stats Priority: CRIT Rate → CRIT DMG → DMG% → ATK%
+* Best Teams (Hathor Hypercarry): Hathor + Haniel (Buffer), Zero (Support), Jiuyuan (Sub-DPS)
+* Skill Priority: Ultimate → Skill → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A2 (Thorn Dominion) [Prioritas 1]: Memberikan Hathor Express Delivery Power saat Excellent Rating Lock dan Five-Star Tracking berakhir secara alami.
+   2. A1 (Elite Courier) [Prioritas 2]: Memberikan 6 stack Express Delivery Power saat menahan tombol Skill untuk pertama kalinya setelah memasuki pertarungan.
+   3. A6 (Daily Life Walkthrough) [Prioritas 3]: Meningkatkan CRIT DMG sebesar 30% selama berada dalam mode Emergency Delivery.
+   4. A5 (Regular Sandwich) [Prioritas 4]: Meningkatkan DMG terhadap target sebesar 1% untuk setiap stack Express Delivery Power yang diperoleh (maksimal 15%).
+   5. A4 (Engine Resonance) [Prioritas 5]: Meningkatkan CRIT Chance dari Cyclone Strike berikutnya sebesar 25% setiap kali Cyclone Strike berhasil dilancarkan dalam mode Emergency Delivery.
+   6. A3 (Lost Wings) [Prioritas 6]: Hathor memberikan 15% peningkatan DMG terhadap target non-Boss.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Colorful Ticket Stub, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Synchronicity of Thought, 40× Suspended Delusions, 40× Resonance of Faith, 40× Yearning Delusions, 32× Good Boy Stamp, 64× Heart-Racing Night, 64× Transcendent Delusions.
+   * Best Bond Gift: Colorful Light Salad (+100 Affection, 450 Fons di Food First Bridge Crossings; 560× = 252,000 Fons) atau On Track (+400 Affection, 140× = 2,800,000 Fons).
+
+23. Aurelia
+
+* Role: A-Rank / Psyche Damage / Main DPS
+* Best Arcs: Stellar Veil (Signature), Ready-Ready, Fluff of Fortitude, Song of the Whale
+* Best Modules: Devil's Blood: Curse
+* Main Stats: CRIT Rate, ATK%
+* Sub Stats Priority: CRIT DMG → CRIT Rate → ATK% → DMG%
+* Best Teams (Aurelia Hypercarry): Aurelia + Hathor (Buffer), Zero (Support), Jiuyuan (Healer)
+* Skill Priority: Basic Attack → Ultimate → QTE → Skill
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Futuristic Prelude) [Prioritas 1]: Meningkatkan CRIT Rate sebesar 15% selama berada dalam mode Cadenza.
+   2. A6 (Bygone Fugue) [Prioritas 2]: Meningkatkan batas maksimal tumpukan Crescendo menjadi 20 stack dan langsung memberikan 10 stack Crescendo setelah melancarkan Cadenza Aria.
+   3. A2 (Unique Melody) [Prioritas 3]: Memasuki mode Cadenza selama 5 detik setelah berhasil melakukan Critical Dodge atau menggunakan Dissonance (memperpanjang 5 detik jika sudah aktif, maksimal 12 detik).
+   4. A3 (Trio Rest) [Prioritas 4]: Meningkatkan DMG Canon Chorus sebesar 20% selama berada dalam mode Cadenza.
+   5. A5 (Simple Melody) [Prioritas 5]: Meningkatkan CRIT Rate Canon Chorus sebesar 15%.
+   6. A4 (Staff Gap) [Prioritas 6]: Meningkatkan DEF Aurelia sebesar 20% saat menggunakan Staccato.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Nest Guard Fragment, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 2,168,000 Beetle Coins, 40× FNG, 40× Suspended Delusions, 40× CO, 40× Yearning Delusions, 32× Good Boy Stamp, 64× White Rose, 64× Transcendent Delusions.
+   * Best Bond Gift: Bigmouth Custard Baozi (+100 Affection, 300 Fons di Bigmouth Baozi Bridge Crossings; 560× = 168,000 Fons) atau Promise (+400 Affection, 140× = 1,400,000 Fons).
+
+24. Mint
+
+* Role: A-Rank / Anima Damage / Main DPS
+* Best Arcs: Mind Royale (Signature), Fluff of Fleetness, Shiny Days, Clear Skies
+* Best Modules: Fireflies and the Forest
+* Main Stats: Anima DMG, CRIT Rate
+* Sub Stats Priority: CRIT Rate → CRIT DMG → ATK% → DMG%
+* Best Teams (Mint Hypercarry): Mint + Sakiri (Sub-DPS), Jiuyuan (Healer), Zero (Support)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A1 (Task Force Operation) [Prioritas 1]: Me-reset cooldown Ultimate: Super Claws saat Caramel Crisp mengenai musuh (terpicu sekali setiap 3 detik).
+   2. A2 (Re-examination) [Prioritas 2]: Meningkatkan DMG Redirect Skill: Ultimate: Super Claws sebesar 40%.
+   3. A5 (First Instinct) [Prioritas 3]: Setelah melancarkan Redirect Skill: Ultimate: Super Claws, CRIT DMG Mint meningkat sebesar 25% selama 6 detik.
+   4. A6 (Elite Member) [Prioritas 4]: Mint memberikan 15% peningkatan DMG terhadap target yang memiliki HP di bawah 40%.
+   5. A3 (Attendance Bonus) [Prioritas 5]: Saat karakter mana pun memicu Blossom atau Hexed pada musuh, ATK Mint meningkat sebesar 15% selama 15 detik.
+   6. A4 (Lunch Break) [Prioritas 6]: Meningkatkan CRIT Chance Mint sebesar 12% saat memberikan DMG kepada musuh terakhir yang tersisa di field.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× A Page from Delusion's Shore, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× FNG, 40× Fading Silhouette, 40× CO, 40× Blurred Silhouette, 32× Good Boy Stamp, 64× White Rose, 64× Chaos Silhouette.
+   * Best Bond Gift: Gubicrisp (+100 Affection, 300 Fons di 2-Four Convenience Store Miguel District; 560× = 168,000 Fons) atau Asahi Inori - Crimson (+400 Affection, 140× = 2,520,000 Fons).
+
+25. Skia
+
+* Role: A-Rank / Lakshana Damage / Main DPS
+* Best Arcs: Good Boy's Grand Adventure (Signature), Watch Your Heads!, Failing You, Heavy in My Heart, Cosmos Daze, Wild Reverie
+* Best Modules: Street Boxer
+* Main Stats: Lakshana DMG, CRIT DMG, CRIT Rate, ATK%
+* Sub Stats Priority: CRIT Rate → CRIT DMG → DMG% → ATK%
+* Best Teams (Skia Hypercarry): Skia + Haniel (Buffer), Zero (Support), Jiuyuan (Sub-DPS)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A4 (Resolution) [Prioritas 1]: Memperpanjang durasi Tailed menjadi 12 detik dan meningkatkan Attachment DMG sebesar 2% per detik selama target tertempel (maksimal 40%).
+   2. A1 (Process of Elimination) [Prioritas 2]: Meningkatkan rasio DMG auto-attack dari Fang Thrust sebesar 60%.
+   3. A6 (Unbothered Appearance) [Prioritas 3]: Meningkatkan rasio Extra DMG Fang Thrust sebesar 20% saat berada dalam mode Shadow Hound Gnaw ketika menyentuh musuh yang terkunci Fang Thrust.
+   4. A2 (Law and Order) [Prioritas 4]: Meningkatkan CRIT Chance Skia sebesar 10% dan Resistance to Interruptions sebesar 50% selama 15 detik setelah menggunakan Shadow Hound Chase.
+   5. A3 (Solution) [Prioritas 5]: DMG Skia terhadap target yang terkunci Fang Thrust meningkat 4% (dan bertambah 4% lagi jika hanya ada 1 target yang terkunci di field).
+   6. A5 (Social Contract) [Prioritas 6]: Meningkatkan massa target sebesar 50 dan mengurangi Movement Speed mereka sebesar 20% untuk setiap Fang Thrust yang mengunci mereka.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Confessional Flower Seed, 17× Suspended Delusions, 18× Yearning Delusions, 15× Transcendent Delusions.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Synchronicity of Thought, 40× Suspended Delusions, 40× Resonance of Faith, 40× Yearning Delusions, 32× Dress Sleeves of Vanity, 64× Heart-Racing Night, 64× Transcendent Delusions.
+   * Best Bond Gift: Bob's Tea Garden (+100 Affection, 300 Fons di 2-Four Convenience Store Miguel District; 560× = 168,000 Fons) atau White Jade Lamp (+400 Affection, 140× = 2,800,000 Fons).
+
+26. Edgar
+
+* Role: A-Rank / Cosmos Survival / Healing
+* Best Arcs: Call of the Twisted City (Signature), Mind Royale
+* Best Modules: Speedy Hedgehog
+* Main Stats: Healing Bonus, HP%
+* Sub Stats Priority: HP% → HP → Cycle Intensity → Break Intensity
+* Best Teams (Edgar Hypercarry): Edgar + Nanally (Main DPS), Jiuyuan (Sub-DPS), Zero (Support)
+* Skill Priority: Skill → Ultimate → Basic Attack → QTE
+* Best Awakening Nodes (Urutan Prioritas 1–6):
+   1. A6 (Visitor from Planet Curiosity) [Prioritas 1]: Memberikan 15% DEF kepada seluruh rekan tim yang berada di dalam area Ultimate Finnegan's Wake.
+   2. A5 (Guardian of the Antique Shop's Light) [Prioritas 2]: Meningkatkan Max HP Edgar sebesar 20%.
+   3. A3 (One of the Eibon Detectives) [Prioritas 3]: Meningkatkan efektivitas healing Wild Current sebesar 15% bagi rekan tim yang memiliki HP di bawah 30%.
+   4. A1 (Anomaly-Loving Observer) [Prioritas 4]: Memberikan Edgar 1 Key of Truth setiap kali rekan tim mana pun melancarkan Support Skill.
+   5. A4 (Skilled Strategist) [Prioritas 5]: Meningkatkan DMG Wild Current sebesar 50%.
+   6. A2 (Intern Anomaly Hunter) [Prioritas 6]: Membatasi perpanjangan cooldown maksimal dari Wild Current pada 3 detik.
+* Build FAQ:
+   * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Colorful Ticket Stub, 17× Lost Whispers, 18× Obscure Whispers, 15× Paradoxical Whispers.
+   * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Lost Whispers, 40× Dove's Flutter, 40× Obscure Whispers, 32× Good Boy Stamp, 64× The Olive Branch, 64× Paradoxical Whispers.
+   * Best Bond Gift: Bigmouth Custard Baozi atau Clicky Fries (+100 Affection, 300 Fons di Bigmouth Baozi Bridge Crossings; 560× = 168,000 Fons) atau Bear-o-metry (+400 Affection, 140× = 1,400,000 Fons).

@@ -1343,3 +1343,14 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-awkorder { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 6px 0 10px; padding: 10px 14px; border-radius: 14px; background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border-left: 5px solid var(--pink); }
 .bd-awkorder .mono { font-size: 0.6rem; color: var(--pink); letter-spacing: 0.08em; }
 .bd-awkorder b { font: 800 0.95rem var(--display); letter-spacing: 0.02em; }
+.bd-awks { grid-template-columns: 1fr !important; }
+.bd-awk-desc { margin: 4px 0 0; font-size: 0.78rem; line-height: 1.45; color: var(--text-2); }
+.bd-awks .bd-awk-row { align-items: flex-start; }
+.bd-tm-mem a { width: 76px; }
+.bd-tm-role { font: 600 0.52rem var(--mono) !important; color: var(--pink); text-transform: none !important; letter-spacing: 0; }
+.bd-mats { display: grid; gap: 10px; }
+.bd-mat { padding: 12px 14px; border-radius: 14px; background: var(--panel); box-shadow: var(--ring); }
+.bd-mat b { font: 800 0.74rem var(--display); text-transform: uppercase; color: var(--pink); }
+.bd-mat p { margin: 4px 0 0; font-size: 0.8rem; line-height: 1.5; color: var(--text-2); word-break: break-word; }
+.bd-awk-desc b, .bd-awk-desc i { display: inline !important; font: inherit !important; font-weight: 700 !important; text-transform: none !important; letter-spacing: 0 !important; color: var(--text) !important; }
+.bd-awk-desc i { font-style: italic !important; font-weight: 400 !important; }

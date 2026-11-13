@@ -545,7 +545,7 @@
         let html = "";
         const SRC = (x) => (x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.by)} · ${esc(x.title)} ↗</a>` : esc(x.by + " · " + x.title));
         if (bd) {
-          if (bd.role) html += `<p class="bd-roleline"><b>${esc(bd.role.rank)}-${S("RANK", "RANK")}</b><span>${esc(bd.role.role)}</span><em>${esc(bd.role.tier)}</em></p>`;
+          if (bd.role) html += `<p class="bd-roleline"><b>${esc(bd.role.rank)}-${S("RANK", "RANK")}</b><span>${esc(bd.role.role)}</span>${bd.role.tier ? `<em>${esc(bd.role.tier)}</em>` : ""}</p>`;
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
           const WHY = {
             type: S("Tipe Arc cocok", "Arc type match"), rare: S("Bintang 5", "5-star"), element: S(`Bonus ${e.element}`, `${e.element} bonus`), crit: "CRIT", atk: "ATK",
@@ -561,7 +561,7 @@
           const calcNote = bd.calc ? `<p class="bd-calc"><b>${S("HASIL SIMULASI", "SIMULATION RESULT")}</b> · ${bd.calc.team.map((sl) => { const m = list.find((x) => x.slug === sl); return esc(m ? m.name : sl); }).join(" · ")}<br>${esc(tx(bd.calc.note))}</p>` : "";
           if ((bd.teams || []).length) {
             html += `<div class="af-sec"><h4>${S("Rekomendasi tim", "Team recommendations")}</h4><p class="mono">${S("SUSUNAN TIM DARI SUMBER YANG DIKREDITKAN DAN HASIL UJI", "TEAMS FROM CREDITED SOURCES AND TEST RESULTS")}</p><div class="bd-teams">${bd.teams.map((t, ti) => `<div class="bd-tm${ti === 0 ? " best" : ""}"><div class="bd-tm-head"><b>${esc(tx(t.name))}</b><em>${esc(tx(t.tag))}</em></div>
-              <div class="bd-tm-mem">${t.members.map((sl) => { const m = list.find((x) => x.slug === sl); return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === e.slug ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small></a>` : ""; }).join("")}</div>
+              <div class="bd-tm-mem">${t.members.map((sl, mi) => { const m = list.find((x) => x.slug === sl); const rl = (t.roles || [])[mi]; return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === e.slug ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small>${rl && tx(rl) ? `<small class="bd-tm-role">${esc(tx(rl))}</small>` : ""}</a>` : ""; }).join("")}</div>
               ${t.metric ? `<p class="bd-tm-metric">${esc(tx(t.metric))}</p>` : ""}${(t.why || []).length ? `<ul class="bd-tm-why">${t.why.map((w) => `<li>${esc(tx(w))}</li>`).join("")}</ul>` : ""}
               <small class="bd-tm-src">${S("Sumber", "Source")}: ${SRC(t.src)}</small></div>`).join("")}</div></div>`;
           }
@@ -578,28 +578,29 @@
           }
           const arcStats = SD.arcs || {};
           if ((bd.arcs || []).length) html += `<div class="af-sec"><h4>${S("Arc terbaik", "Best Arcs")}</h4><p class="mono">${S("URUTAN = PRIORITAS · ATK DASAR PADA LV.80", "ORDER = PRIORITY · BASE ATK AT LV.80")}</p>${calcNote}${bd.arcNote ? `<p class="txt bd-arcnote">${esc(tx(bd.arcNote))}</p>` : ""}<div class="bd-arcs">${bd.arcs.map(arcOf).filter(Boolean).map((a, i) => {
-            const at = (arcStats[a.slug] || {}).atk, why = (bd.arcWhy || {})[a.slug] || [];
+            const at = (arcStats[a.slug] || {}).atk, why = bd.role ? [] : (bd.arcWhy || {})[a.slug] || [];
             return `<a class="bd-arc q${a.rarity}" href="/arc/${a.slug}" data-link>${rankBadge(i)}<img src="${img(a.icon)}" alt="" loading="lazy"><span><b>${esc(a.name)}</b><small>${esc(a.type)} · ★${a.rarity}${at ? ` · ATK ${at[at.length - 1]}` : ""}</small>${why.length ? `<span class="bd-why">${why.map((c) => WHY[c] ? `<em>${esc(WHY[c])}</em>` : "").join("")}</span>` : ""}</span>${pctOf((bd.arcPct || {})[a.slug])}</a>`;
           }).join("")}</div></div>`;
           if ((bd.sets || []).length) html += `<div class="af-sec"><h4>${S("Cartridge terbaik", "Best Cartridges")}</h4><p class="mono">${S("SET MODUL BERURUTAN", "MODULE SETS IN ORDER")}</p>${bd.sets.map((x, i) => {
             const st = MODS.sets.find((m) => m.id === x.id); if (!st) return "";
             const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
             const b2 = st.bonuses.find((b) => b.pieces === 2);
-            const w = (bd.setWhy || {})[x.id];
+            const w = bd.role ? null : (bd.setWhy || {})[x.id];
             return `<div class="bd-set">${rankBadge(i)}${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em>${w && SWHY[w] ? `<span class="bd-why"><em>${esc(SWHY[w])}</em></span>` : ""}</b>${pctOf((bd.setPct || {})[x.id])}${(bd.setNote || {})[x.id] ? `<p class="txt bd-setnote">${esc(tx(bd.setNote[x.id]))}</p>` : ""}${b2 && x.pieces === 4 ? `<p class="txt"><span class="bd-pc">2</span> ${rich(b2.text)}</p>` : ""}<p class="txt"><span class="bd-pc">${x.pieces}</span> ${rich(bn ? bn.text : "")}</p></div></div>`;
           }).join("")}</div>`;
           if ((bd.stats || []).length || (bd.sub || []).length) html += `<div class="af-sec"><h4>${S("Stat terbaik", "Best Stats")}</h4>${(bd.stats || []).length ? `<p class="mono">${S("STAT UTAMA (URUTAN PRIORITAS)", "MAIN STATS (BY PRIORITY)")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}${(bd.sub || []).length ? `<p class="mono" style="margin-top:14px">${S("SUB STAT (URUTAN PRIORITAS)", "SUB STATS (BY PRIORITY)")}</p><div class="bd-stats sub">${bd.sub.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}${bd.statNote ? `<p class="txt bd-arcnote">${esc(tx(bd.statNote))}</p>` : ""}</div>`;
           if ((bd.awks || []).length) html += `<div class="af-sec"><h4>${S("Awakening yang disarankan", "Recommended Awakenings")}</h4>${(() => {
-            if (!bd.awkRank) return "";
+            const rk = bd.awkRank || (bd.awks ? Object.fromEntries(bd.awks.map((n, i) => [n, i + 1])) : null);
+            if (!rk) return "";
             const byRank = {};
-            Object.entries(bd.awkRank).forEach(([n, r]) => { (byRank[r] ||= []).push(+n); });
+            Object.entries(rk).forEach(([n, r]) => { (byRank[r] ||= []).push(+n); });
             const line = Object.keys(byRank).map(Number).sort((x, y) => x - y).map((r) => byRank[r].sort((x, y) => x - y).map((n) => "A" + n).join(" = ")).join(" › ");
             return `<p class="bd-awkorder"><span class="mono">${S("AKTIFKAN BERURUTAN", "ACTIVATE IN THIS ORDER")}</span><b>${line}</b></p>`;
-          })()}${bd.awkNote ? `<p class="txt bd-arcnote">${esc(tx(bd.awkNote))}</p>` : ""}<p class="mono">${S("URUTAN TETAP SEPERTI DI GAME · ANGKA = PRIORITAS REKOMENDASI", "GAME ORDER · NUMBER = RECOMMENDED PRIORITY")}</p><div class="bd-awks">${e.awakening.slice(0, 6).map((a, k) => { const r = bd.awkRank ? (bd.awkRank[k + 1] || 0) - 1 : bd.awks.indexOf(k + 1); return `<div class="bd-awk-row${r < 0 ? " nopick" : ""}"><i>${r >= 0 ? r + 1 : "–"}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${k + 1}</small>${(bd.awkGain || {})[k + 1] ? `<small class="bd-gain">${esc(tx(bd.awkGain[k + 1]))}</small>` : ""}</span></div>`; }).join("")}
-            ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small>${(bd.awkGain || {})["b" + need] ? `<small class="bd-gain">${esc(tx(bd.awkGain["b" + need]))}</small>` : ""}</span></div>` : "").join("")}</div>`;
+          })()}${bd.awkNote ? `<p class="txt bd-arcnote">${esc(tx(bd.awkNote))}</p>` : ""}<p class="mono">${S("URUTAN TETAP SEPERTI DI GAME · ANGKA = PRIORITAS REKOMENDASI", "GAME ORDER · NUMBER = RECOMMENDED PRIORITY")}</p><div class="bd-awks">${e.awakening.slice(0, 6).map((a, k) => { const r = bd.awkRank ? (bd.awkRank[k + 1] || 0) - 1 : bd.awks.indexOf(k + 1); return `<div class="bd-awk-row${r < 0 ? " nopick" : ""}"><i>${r >= 0 ? r + 1 : "–"}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${k + 1}</small>${bd.awkDesc && bd.awkDesc[k + 1] ? `<p class="bd-awk-desc">${LANG === "en" ? rich(a.desc || "") : esc(bd.awkDesc[k + 1])}</p>` : ""}</span></div>`; }).join("")}
+            ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
-        if (bd && bd.faq) html += `<div class="af-sec"><h4>${S("Catatan", "Notes")}</h4><p class="txt">${esc(tx(bd.faq))}</p></div>`;
+        if (bd && (bd.mats || []).length) html += `<div class="af-sec"><h4>${S("Material dan hadiah", "Materials and gifts")}</h4><div class="bd-mats">${bd.mats.map((x) => `<div class="bd-mat"><b>${esc(tx(x.label))}</b><p>${esc(tx(x.text))}</p></div>`).join("")}</div></div>`;
         if (bd && (bd.src || []).length) html += `<p class="mono bd-srcline">${S("SUMBER: ", "SOURCES: ")}${bd.src.map(SRC).join(" · ")}</p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },

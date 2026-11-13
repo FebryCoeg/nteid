@@ -162,7 +162,7 @@ cur_path = D / "builds_curated.json"
 if cur_path.exists():
     for slug, c in jl(cur_path).items():
         d = out[slug]
-        for k in ("role", "faq", "awkRank", "awkNote", "arcs", "arcPct", "arcNote", "sets", "setPct", "setNote", "stats", "sub", "statNote", "awks", "awkGain", "skills", "skillNote", "src", "teams"):
+        for k in ("role", "mats", "awkDesc", "arcs", "arcPct", "arcNote", "sets", "setPct", "setNote", "stats", "sub", "statNote", "awks", "awkGain", "skills", "skillNote", "src", "teams"):
             if k in c:
                 d[k] = c[k]
 
