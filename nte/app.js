@@ -48,7 +48,7 @@
   const DATA_V = (() => { try { return new URL(document.querySelector('script[src*="app.js"]').src).searchParams.get("v") || ""; } catch (e) { return ""; } })();
   const ver = DATA_V ? "?v=" + DATA_V : "";
   let enIndex = null;
-  const getEnIndex = () => (enIndex ||= fetch(`${BASE}data/en/_index.json${ver}`).then((r) => (r.ok ? r.json() : [])).catch(() => []));
+  const getEnIndex = () => (enIndex ||= fetch(`${BASE}data/en/index.json${ver}`).then((r) => (r.ok ? r.json() : [])).catch(() => []));
   const load = async (name) => {
     const en = typeof LANG !== "undefined" && LANG === "en" && (await getEnIndex()).includes(name);
     const key = (en ? "en/" : "") + name;

@@ -4,7 +4,7 @@ Data utama (Esper, Arc, Modul, Item, Kendaraan, Properti, label rasio skill) dis
 Indonesia. Skrip ini membangun ulang bahan yang sama dengan teks aslinya (Inggris), lalu hanya
 menimpa nilai teks pada struktur data Indonesia yang sudah jadi, sehingga ikon, urutan, dan
 pengaturan lain tetap persis sama. File yang tidak berbeda tidak ditulis; daftar file yang ada
-dicatat di nte/data/en/_index.json dan dipakai app.js saat bahasa EN dipilih.
+dicatat di nte/data/en/index.json dan dipakai app.js saat bahasa EN dipilih.
 
 Jalankan SETELAH build.py, build_extra.py, dan build_stats.py:   python tools/nte/build_en.py
 """
@@ -75,7 +75,7 @@ def main():
             r["title"], r["desc"], r["intro"] = e.get("title", ""), e.get("desc", ""), (e.get("profile") or {}).get("intro", "")
     (EN_DIR / "home.json").write_text(json.dumps(home, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     written.append("home")
-    (EN_DIR / "_index.json").write_text(json.dumps(written), encoding="utf-8")
+    (EN_DIR / "index.json").write_text(json.dumps(written), encoding="utf-8")
     shutil.rmtree(TMP, ignore_errors=True)
     print("en/:", written, "| nilai teks diganti:", total["diganti"], "| daftar beda panjang:", total["panjang_beda"])
 
