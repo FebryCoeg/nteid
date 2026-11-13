@@ -90,6 +90,7 @@
     [/^\/makanan\/?$/, viewFood],
     [/^\/tierlist\/?$/, viewTierlist],
     [/^\/versi\/?$/, viewVersions],
+    [/^\/versi\/([\w.-]+)\/?$/, viewVersion],
   ];
   function go(url, replace) {
     if (replace) history.replaceState(null, "", url); else history.pushState(null, "", url);
@@ -698,12 +699,13 @@
   }
 
   // ---------------- VERSI & PATCH ----------------
-  async function viewVersions() {
+  async function viewVersion(id) {
     const data = await load("versions");
     const list = data.versions;
-    const want = new URLSearchParams(location.search).get("v");
-    const v = list.find((x) => x.id === want) || list[0];
-    setTitle(S(`Versi ${v.id}`, `Version ${v.id}`));
+    const idx = list.findIndex((x) => x.id === id);
+    if (idx < 0) return notFound();
+    const v = list[idx];
+    setTitle(`${S("Versi", "Version")} ${v.id}: ${v.title}`);
     const SI = {
       esper: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.6-4 3.4-6 7-6s6.4 2 7 6"/></svg>',
       arc: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4"/></svg>',
@@ -724,9 +726,10 @@
       icon: `<span class="vi-ico">${SI[sc.id] || ICO.chat}</span>`,
       body: sc.items.map(item).join(""),
     }));
-    main.innerHTML = `<div id="verRoot">` + head(S("VERSI", "VERSIONS"), S("Versi & Patch", "Versions & Patches"),
-      S("Apa saja yang ditambahkan dan diubah di setiap update Neverness to Everness, dirangkum dalam bahasa Indonesia.", "What each Neverness to Everness update adds and changes."), list.length) + `
-      <div class="ver-tabs" role="tablist">${list.map((x) => `<button class="tab" type="button" data-ver="${esc(x.id)}" aria-selected="${x.id === v.id}">${S("Versi", "Version")} ${esc(x.id)}</button>`).join("")}</div>
+    const adj = (x, dir) => (x ? `<a class="ver-adj ${dir}" href="/versi/${esc(x.id)}" data-link><span class="mono">${dir === "prev" ? S("← VERSI SEBELUMNYA", "← PREVIOUS VERSION") : S("VERSI BERIKUTNYA →", "NEXT VERSION →")}</span><b>${esc(x.id)} · ${esc(x.title)}</b></a>` : "<span></span>");
+    main.innerHTML = `<div id="verRoot">` + `
+      <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/versi" data-link>VERSI</a><span>/</span><span>${esc(v.id)}</span></div>
+      <p class="ver-meta mono">${S("ARTIKEL VERSI", "VERSION ARTICLE")} ${esc(v.id)}${v.published ? ` · ${S("DITERBITKAN", "PUBLISHED")} ${esc(v.published)}` : ""}</p>
       <section class="ver-hero${v.art ? " has-art" : ""}">
         <div class="ver-num"><span class="mono">${S("VERSI", "VERSION")}</span><b>${esc(v.id)}</b></div>
         <div class="ver-info">
@@ -739,13 +742,32 @@
       </section>
       ${v.note ? `<p class="ver-note">${esc(v.note)}</p>` : ""}
       <div class="ver-list">${accordion(cards)}</div>
-      <div class="ver-src"><span class="mono">${S("SUMBER", "SOURCES")}</span>${v.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)} ↗</a>`).join("")}</div></div>`;
+      <div class="ver-src"><span class="mono">${S("SUMBER", "SOURCES")}</span>${v.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)} ↗</a>`).join("")}</div>
+      <nav class="ver-nav" aria-label="${S("Versi lain", "Other versions")}">${adj(list[idx + 1], "prev")}${adj(list[idx - 1], "next")}</nav>
+      <p class="ver-all"><a href="/versi" data-link>${S("Lihat semua versi", "See all versions")}</a></p></div>`;
     $("#verRoot").addEventListener("click", (ev) => {
       const b = ev.target.closest(".skill-top");
-      if (b) { const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open")); return; }
-      const t = ev.target.closest("[data-ver]");
-      if (t) go(`/versi?v=${encodeURIComponent(t.dataset.ver)}`);
+      if (b) { const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open")); }
     });
+  }
+
+  // ---------------- VERSI: daftar artikel ----------------
+  async function viewVersions() {
+    const legacy = new URLSearchParams(location.search).get("v");
+    if (legacy) return go(`/versi/${encodeURIComponent(legacy)}`, true);
+    const list = (await load("versions")).versions;
+    setTitle(S("Versi & Patch", "Versions & Patches"));
+    main.innerHTML = head(S("VERSI", "VERSIONS"), S("Versi & Patch", "Versions & Patches"),
+      S("Rangkuman tiap update Neverness to Everness dalam bahasa Indonesia. Setiap versi punya artikelnya sendiri yang bisa dibuka kapan saja.", "A write-up of every Neverness to Everness update. Each version has its own article you can reopen any time."), list.length) + `
+      <div class="ver-cards">${list.map((v, i) => `<a class="ver-card${i === 0 ? " latest" : ""}" href="/versi/${esc(v.id)}" data-link>
+        <figure>${v.cover ? `<img src="${img(v.cover.s)}" alt="" loading="lazy">` : ""}${i === 0 ? `<span class="ver-badge">${S("TERBARU", "LATEST")}</span>` : ""}</figure>
+        <div class="ver-card-body">
+          <span class="mono">${S("VERSI", "VERSION")} ${esc(v.id)}</span>
+          <h3>${esc(v.title)}</h3>
+          <p class="mono">${esc(v.released)} – ${esc(v.end)}</p>
+          <p class="txt">${esc(v.lead)}</p>
+          <span class="ver-read">${S("Baca artikel", "Read article")} →</span>
+        </div></a>`).join("")}</div>`;
   }
 
   // ---------------- ADMIN BUILD (link rahasia) ----------------

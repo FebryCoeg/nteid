@@ -1199,3 +1199,33 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 /* gambar besar (mis. kalender banner): satu kolom, gambar penuh di atas teks */
 .vi.has-pic.is-big { grid-template-columns: 1fr; }
 .vi.is-big .vi-pics.n1 .vi-pic.wide { width: 100% !important; max-width: 760px; aspect-ratio: 1000 / 522; }
+
+/* ---------------- VERSI: daftar artikel dan navigasi ---------------- */
+.ver-cards { display: grid; gap: 16px; }
+.ver-card { display: grid; grid-template-columns: minmax(220px, 38%) 1fr; border-radius: 28px; overflow: hidden; background: var(--panel); box-shadow: var(--ring); transition: transform .15s, box-shadow .15s; }
+.ver-card:hover { transform: translateY(-4px); box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink); }
+.ver-card figure { position: relative; margin: 0; min-height: 190px; background: var(--panel-2); }
+.ver-card figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ver-badge { position: absolute; left: 12px; top: 12px; padding: 4px 12px; border-radius: 999px; background: var(--pink); color: #fff; font: 800 0.66rem var(--display); letter-spacing: .08em; }
+.ver-card-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 6px; }
+.ver-card-body .mono:first-child { color: var(--pink); font-size: 0.7rem; letter-spacing: .14em; }
+.ver-card-body h3 { font: 800 clamp(1.15rem, 2.6vw, 1.6rem) var(--display); text-transform: uppercase; }
+.ver-card-body p.mono { color: var(--text-2); font-size: 0.7rem; }
+.ver-card-body .txt { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; }
+.ver-read { margin-top: auto; align-self: flex-start; padding: 7px 16px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 0.72rem var(--display); box-shadow: 0 0 0 2px var(--edge); }
+.ver-meta { margin: 6px 0 12px; color: var(--text-2); font-size: 0.66rem; letter-spacing: .1em; }
+.ver-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+.ver-adj { display: block; padding: 14px 18px; border-radius: 20px; background: var(--panel); box-shadow: var(--ring); }
+.ver-adj:hover { box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink); }
+.ver-adj.next { text-align: right; }
+.ver-adj .mono { display: block; color: var(--pink); font-size: 0.62rem; letter-spacing: .1em; }
+.ver-adj b { font: 800 0.9rem var(--display); text-transform: uppercase; }
+.ver-all { margin-top: 14px; text-align: center; font-size: 0.82rem; }
+.ver-all a { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .ver-card { grid-template-columns: 1fr; }
+  .ver-card figure { min-height: 0; aspect-ratio: 16 / 9; }
+  .ver-card-body { padding: 16px 18px 20px; }
+  .ver-nav { grid-template-columns: 1fr; }
+  .ver-adj.next { text-align: left; }
+}

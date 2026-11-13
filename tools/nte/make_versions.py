@@ -1,7 +1,7 @@
 """Isi halaman Versi & Patch -> nte/data/versions.json
 
 Ditulis tangan (diringkas dan diterjemahkan ke bahasa Indonesia) dari catatan patch resmi
-. Tambah versi baru dengan menambah satu entri di VERSIONS,
+. Tiap versi menjadi satu artikel di /versi/<id>. Tambah versi baru dengan menaruh entrinya DI AWAL daftar VERSIONS,
 lalu jalankan:  python tools/nte/make_versions.py
 
 Format item: {"t": judul, "d": isi, "tag": label kecil, "date": periode, "link": halaman di situs}
@@ -70,6 +70,8 @@ V15 = {
         {"n": "Fase 2", "range": "2 Des – 23 Des 2026", "note": "Exe debut"},
     ],
     "art": E("elyms"),
+    "cover": K("v15-kv"),
+    "published": "13 November 2026",
     "lead": "Update 1.5 membawa episode utama baru \"Meet Me in the Data Stream\", Esper baru Elyms (lalu Exe di fase 2), "
             "mode tank, event City Logistics, kendaraan baru, dan banyak perbaikan kenyamanan.",
     "sources": [
