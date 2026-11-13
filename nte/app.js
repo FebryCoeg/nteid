@@ -503,7 +503,7 @@
               return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
             }).join("")}` : ""}
             ${(bd.awks || []).length ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN (URUTAN PRIORITAS)", "RECOMMENDED AWAKENINGS (BY PRIORITY)")}</p><div class="bd-awks">${bd.awks.map((n, i) => { const a = e.awakening[n - 1]; return a ? `<div class="bd-awk-row"><i>${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${n}</small></span></div>` : ""; }).join("")}
-              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row bonus"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("RESONANSI AKTIF", "RESONANCE ACTIVE")} · ${need} AWAKENING</small></span></div>` : "").join("")}</div>` : ""}
+              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row bonus"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>` : ""}
             ${(bd.skills || []).length ? `<p class="mono" style="margin-top:14px">${S("URUTAN NAIK LEVEL SKILL", "SKILL UPGRADE ORDER")}</p><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div>` : ""}
             ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
           </div>`;
@@ -516,16 +516,16 @@
         const card = (a, i, bn) => `<section class="skillcard awk${bn ? " bonus locked" : ""}" data-i="${i}">
           <button class="skill-top" type="button" aria-expanded="false">
             <span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="" loading="lazy">` : ""}</span>
-            <span class="skill-title"><b>${esc(a.name)}</b><small>${bn ? S(`RESONANSI · AKTIF JIKA ${need[i - 6]} AWAKENING AKTIF`, `RESONANCE · NEEDS ${need[i - 6]} ACTIVE AWAKENINGS`) : `AWAKENING ${i + 1}`}</small></span>
+            <span class="skill-title"><b>${esc(a.name)}</b><small>${bn ? S(`BONUS ${need[i - 6]} AWAKENING AKTIF`, `BONUS: ${need[i - 6]} AWAKENINGS ACTIVE`) : `AWAKENING ${i + 1}`}</small></span>
             ${bn ? `<span class="awk-lock mono"></span>` : `<span class="awk-pick" role="checkbox" aria-checked="false" aria-label="${S("Aktifkan", "Activate")}"></span>`}
             <span class="skill-chev">${ICO.chev}</span>
           </button>
           <div class="skill-body"><div class="sk"><p class="txt">${rich(a.desc)}</p></div></div>
         </section>`;
-        return `<div class="awk-head"><p class="txt">${S("Di game ini ada 6 Awakening yang boleh kamu aktifkan dalam urutan bebas. Aktifkan 3 Awakening untuk membuka Resonansi pertama, dan 6 untuk Resonansi kedua. Coba klik lingkaran di kanan tiap kartu.", "There are 6 Awakenings you can activate in any order. Activate 3 to unlock the first Resonance and 6 for the second. Try the circle on each card.")}</p>
+        return `<div class="awk-head"><p class="txt">${S("Di game ini ada 6 Awakening yang boleh kamu aktifkan dalam urutan bebas. Aktifkan 3 Awakening untuk membuka Bonus 3 Awakening Aktif, dan 6 untuk membuka Bonus 6 Awakening Aktif. Coba klik lingkaran di kanan tiap kartu.", "There are 6 Awakenings you can activate in any order. Activate 3 to unlock the 3-Awakening bonus and 6 for the 6-Awakening bonus. Try the circle on each card.")}</p>
           <div class="awk-count"><b id="awkN">0</b><span>/ 6 ${S("aktif", "active")}</span></div></div>
           ${main6.map((a, i) => card(a, i, false)).join("")}
-          <div class="group-label">${S("Bonus Resonansi", "Resonance bonus")}</div>
+          <div class="group-label">${S("Bonus Awakening", "Awakening bonus")}</div>
           ${bonus.map((a, i) => card(a, 6 + i, true)).join("")}`;
       },
       profil: () => {
@@ -735,7 +735,7 @@
             <select id="admPcs"><option value="4">4 keping</option><option value="2">2 keping</option></select><button class="btn" id="admAddSet" type="button">Tambah set</button></div>
           <label>Awakening yang disarankan (bebas pilih, klik berurutan sesuai prioritas)</label>
           <div class="adm-chips adm-awks">${e.awakening.slice(0, 6).map((a, i) => { const k = working.awks.indexOf(i + 1); return `<button type="button" class="adm-sk ${k >= 0 ? "on" : ""}" data-awk="${i + 1}"><span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}</span><span>${k >= 0 ? `<i>${k + 1}</i>` : ""}${esc(a.name)}<small>Awakening ${i + 1}</small></span></button>`; }).join("")}</div>
-          <p class="mono adm-note" style="margin:4px 0 0">${working.awks.length >= 6 ? "RESONANSI 3 DAN 6 TERBUKA" : working.awks.length >= 3 ? "RESONANSI 3 TERBUKA · BUTUH 6 AWAKENING UNTUK RESONANSI 6" : "PILIH 3 AWAKENING UNTUK MEMBUKA RESONANSI 3, 6 UNTUK RESONANSI 6"}</p>
+          <p class="mono adm-note" style="margin:4px 0 0">${working.awks.length >= 6 ? "BONUS 3 DAN BONUS 6 AWAKENING AKTIF TERBUKA" : working.awks.length >= 3 ? "BONUS 3 AWAKENING AKTIF TERBUKA · BUTUH 6 AWAKENING UNTUK BONUS 6" : "PILIH 3 AWAKENING UNTUK BONUS 3 AWAKENING AKTIF, 6 UNTUK BONUS 6"}</p>
           <label>Urutan naik level skill (klik berurutan, klik lagi untuk mencabut)</label>
           <div class="adm-chips adm-skills">${SKG.filter((g) => e.skills.some((x) => x.group === g)).map((g) => { const i = working.skills.indexOf(g); const sk = e.skills.find((x) => x.group === g); const ic = ((SD.espers[e.id] || {}).icons || {})[g]; return `<button type="button" class="adm-sk ${i >= 0 ? "on" : ""}" data-skill="${g}"><span class="skill-ico">${ic ? `<img src="${img(ic)}" alt="">` : ""}</span><span>${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(sk.name)}<small>${esc(LABEL.group[g] || g)}</small></span></button>`; }).join("")}</div>
           <label>Stat prioritas (klik berurutan, klik lagi untuk mencabut)</label>
