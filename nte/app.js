@@ -445,13 +445,14 @@
     let lookIdx = Math.max(0, looks.findIndex((l) => l.src === heroSrc));
     const AF = ST && ST.affinity;
     const BUILDS = await load("builds").catch(() => ({}));
+    const DRAFTS = await load("builds_draft").catch(() => ({}));
     const ARCS = await load("arcs");
     const MODS = await load("modules");
     const tabs = [
       ["skill", S("Kemampuan", "Abilities"), e.skills.length],
+      ["build", "Build", 1],
       ["awakening", "Awakening", e.awakening.length],
       ["affinity", "Affinity", AF ? 1 : 0],
-      ["build", "Build", e.console.length],
       ["kosmetik", S("Kostum", "Outfits"), outfits.length],
       ["profil", S("Profil", "Profile"), p.intro || p.impression || (p.stories || []).length ? 1 : 0],
     ].filter(([, , n]) => n);
@@ -475,6 +476,7 @@
           </div>
           ${e.desc ? `<p class="lede txt">${rich(e.desc)}</p>` : ""}
           ${ST && ST.tags.length ? `<div class="roles"><span class="mono">PERAN TEMPUR</span>${ST.tags.map((t) => `<b>${esc(t)}</b>`).join("")}</div>` : ""}
+          <button class="build-cta" type="button" id="goBuild"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19v-7"/></svg><span><b>${S("Lihat Build", "View Build")} ${esc(e.name.split(" (")[0])}</b><small>${S("Arc, set modul, stat, awakening, skill", "Arcs, module sets, stats, awakenings, skills")}</small></span></button>
           ${facts.length ? `<dl class="info">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : ""}
           ${ST ? levelBox(ST.hp.length, statRow("hp", "HP", "stHp") + statRow("atk", "ATK", "stAtk") + statRow("def", "DEF", "stDef") + statRow("crit", "CRIT Rate", "", Math.round(ST.crit * 100) + "%") + statRow("crit", "CRIT DMG", "", Math.round(ST.critDmg * 100) + "%")) : ""}
           ${ST ? matBox(ST.mats, SD.items, S("MATERIAL ASCENSION · LV.1 → 80", "ASCENSION MATERIALS · LV.1 → 80")) : ""}
@@ -482,6 +484,7 @@
           <div id="tabBody" class="tab-panel"></div>
         </div>
       </article>`;
+    { const gb = $("#goBuild"); if (gb) gb.onclick = () => { const t = $('.tab[data-tab="build"]'); if (t) { t.click(); t.scrollIntoView({ behavior: "smooth", block: "center" }); } }; }
     const icons = (ST && ST.icons) || {};
     const skillCards = () => {
       const order = [];
@@ -535,22 +538,45 @@
           ${AF.levels.map((l, i) => `<div class="af-lv"><div class="af-no"><i>${i + 1}</i><small>${nf(l.max)} ${S("poin", "pts")}</small></div><div class="matrow">${l.items.map(([id, n]) => tile(id, n, false)).join("")}</div></div>`).join("")}</div>`;
       },
       build: () => {
-        const bd = BUILDS[e.slug];
+        const manual = BUILDS[e.slug];
+        const hasManual = manual && ((manual.arcs || []).length || (manual.sets || []).length || (manual.stats || []).length || (manual.awks || []).length || (manual.skills || []).length);
+        const bd = hasManual ? manual : (DRAFTS[e.slug] || null);
+        const isDraft = !hasManual;
         let html = "";
-        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length || (bd.awks || []).length || (bd.skills || []).length)) {
+        if (bd) {
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
-          html += `<div class="af-sec"><h4>${S("Build rekomendasi", "Recommended build")}</h4>
-            ${bd.arcs.length ? `<p class="mono">${S("ARC (URUTAN PRIORITAS)", "ARC (BY PRIORITY)")}</p><div class="tile-grid">${bd.arcs.map(arcOf).filter(Boolean).map(arcTile).join("")}</div>` : ""}
-            ${bd.sets.length ? `<p class="mono" style="margin-top:14px">${S("SET MODUL", "MODULE SETS")}</p>${bd.sets.map((x) => {
-              const st = MODS.sets.find((m) => m.id === x.id); if (!st) return "";
-              const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
-              return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
-            }).join("")}` : ""}
-            ${(bd.awks || []).length ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN (URUTAN PRIORITAS)", "RECOMMENDED AWAKENINGS (BY PRIORITY)")}</p><div class="bd-awks">${bd.awks.map((n, i) => { const a = e.awakening[n - 1]; return a ? `<div class="bd-awk-row"><i>${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${n}</small></span></div>` : ""; }).join("")}
-              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>` : ""}
-            ${(bd.skills || []).length ? `<p class="mono" style="margin-top:14px">${S("URUTAN NAIK LEVEL SKILL", "SKILL UPGRADE ORDER")}</p><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div>` : ""}
-            ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
+          const WHY = {
+            type: S("Tipe Arc cocok", "Arc type match"), rare: S("Bintang 5", "5-star"), element: S(`Bonus ${e.element}`, `${e.element} bonus`), crit: "CRIT", atk: "ATK",
+            dot: "DoT", summon: S("Summon", "Summons"), break: "Break", followup: "Follow-up", heal: S("Penyembuhan", "Healing"), shield: S("Perisai", "Shield"), team: S("Bonus tim", "Team bonus"), cycle: "Cycle",
+          };
+          const SWHY = {
+            element: S(`Bonus DMG ${e.element}`, `${e.element} DMG bonus`), atk: S("Tambahan ATK", "ATK boost"), team: S("Menguatkan seluruh tim", "Buffs the whole team"),
+            shield: S("Memperkuat perisai", "Stronger shields"), heal: S("Memperkuat penyembuhan", "Stronger healing"), hp: S("Tambahan HP", "HP boost"),
+          };
+          const prySlug = e.slug.startsWith("zero-") ? "zero" : e.slug === "daffodill" ? "daffodil" : e.slug;
+          const role = (bd.kind || "").length ? ({ dps: S("Penyerang utama", "Main damage"), buffdps: S("Penyerang + pendukung", "Damage + support"), buff: S("Pendukung tim", "Team support"), guard: S("Pelindung", "Guardian"), heal: S("Penyembuh", "Healer") })[bd.kind] : "";
+          const rankBadge = (i) => `<i class="bd-rank r${i + 1}">${i + 1}</i>`;
+          html += `<div class="bd-hero ${isDraft ? "draft" : "manual"}">
+            <div><span class="mono">${isDraft ? S("REKOMENDASI AWAL", "STARTER RECOMMENDATION") : S("BUILD REKOMENDASI", "RECOMMENDED BUILD")}${role ? ` · ${esc(role.toUpperCase())}` : ""}</span>
+            <p class="txt">${isDraft ? S("Draf ini disusun dari data game (tipe Arc, elemen, peran tempur, dan bonus set modul), bukan hasil hitungan damage. Anggap sebagai titik awal, bukan urutan mutlak.", "This draft is derived from game data (Arc type, element, combat role and module set bonuses), not from damage calculations. Treat it as a starting point, not an absolute ranking.") : S("Disusun dan dirapikan oleh admin Hethereau.", "Curated by the Hethereau admin.")}</p></div>
+            <a class="bd-ref" href="https://www.prydwen.gg/neverness-to-everness/characters/${prySlug}" target="_blank" rel="noopener">${S("Bandingkan dengan Prydwen", "Compare with Prydwen")} ↗</a>
           </div>`;
+          const arcStats = SD.arcs || {};
+          if ((bd.arcs || []).length) html += `<div class="af-sec"><h4>${S("Arc terbaik", "Best Arcs")}</h4><p class="mono">${S("URUTAN = PRIORITAS · ATK DASAR PADA LV.80", "ORDER = PRIORITY · BASE ATK AT LV.80")}</p><div class="bd-arcs">${bd.arcs.map(arcOf).filter(Boolean).map((a, i) => {
+            const at = (arcStats[a.slug] || {}).atk, why = (bd.arcWhy || {})[a.slug] || [];
+            return `<a class="bd-arc q${a.rarity}" href="/arc/${a.slug}" data-link>${rankBadge(i)}<img src="${img(a.icon)}" alt="" loading="lazy"><span><b>${esc(a.name)}</b><small>${esc(a.type)} · ★${a.rarity}${at ? ` · ATK ${at[at.length - 1]}` : ""}</small>${why.length ? `<span class="bd-why">${why.map((c) => WHY[c] ? `<em>${esc(WHY[c])}</em>` : "").join("")}</span>` : ""}</span></a>`;
+          }).join("")}</div></div>`;
+          if ((bd.sets || []).length) html += `<div class="af-sec"><h4>${S("Cartridge terbaik", "Best Cartridges")}</h4><p class="mono">${S("SET MODUL BERURUTAN", "MODULE SETS IN ORDER")}</p>${bd.sets.map((x, i) => {
+            const st = MODS.sets.find((m) => m.id === x.id); if (!st) return "";
+            const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
+            const b2 = st.bonuses.find((b) => b.pieces === 2);
+            const w = (bd.setWhy || {})[x.id];
+            return `<div class="bd-set">${rankBadge(i)}${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em>${w && SWHY[w] ? `<span class="bd-why"><em>${esc(SWHY[w])}</em></span>` : ""}</b>${b2 && x.pieces === 4 ? `<p class="txt"><span class="bd-pc">2</span> ${rich(b2.text)}</p>` : ""}<p class="txt"><span class="bd-pc">${x.pieces}</span> ${rich(bn ? bn.text : "")}</p></div></div>`;
+          }).join("")}</div>`;
+          if ((bd.stats || []).length || (bd.sub || []).length) html += `<div class="af-sec"><h4>${S("Stat terbaik", "Best Stats")}</h4>${(bd.stats || []).length ? `<p class="mono">${S("STAT UTAMA (URUTAN PRIORITAS)", "MAIN STATS (BY PRIORITY)")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}${(bd.sub || []).length ? `<p class="mono" style="margin-top:14px">${S("SUB STAT (URUTAN PRIORITAS)", "SUB STATS (BY PRIORITY)")}</p><div class="bd-stats sub">${bd.sub.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}</div>`;
+          if ((bd.awks || []).length) html += `<div class="af-sec"><h4>${S("Awakening yang disarankan", "Recommended Awakenings")}</h4><p class="mono">${S("URUTAN PRIORITAS", "BY PRIORITY")}</p><div class="bd-awks">${bd.awks.map((n, i) => { const a = e.awakening[n - 1]; return a ? `<div class="bd-awk-row"><i>${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${n}</small></span></div>` : ""; }).join("")}
+            ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div></div>`;
+          if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
         return html + `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Efek tambahan yang terbuka lewat Console (空幕)", "Extra effects unlocked through the Console (空幕)")}</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
@@ -825,6 +851,7 @@
       const j = await r.json(); builds = JSON.parse(unb64(j.content) || "{}"); sha = j.sha; return "ok";
     }
     const SD = await load("stats");
+    const DRAFT_ALL = await load("builds_draft").catch(() => ({}));
     const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
     const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
     const SKG = ["basic", "redirect", "ultimate", "support"];
@@ -844,6 +871,7 @@
         <div class="adm-box">
           <label>Esper</label>
           <select id="admEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
+          <div class="adm-row"><button class="btn ghost" id="admDraft" type="button">Mulai dari draf otomatis</button><span class="mono adm-note" style="margin:0">ISI FORM DARI DRAF DATA GAME, LALU RAPIKAN</span></div>
           <label>Arc (klik untuk menambah, urutan = prioritas)</label>
           <div class="adm-fit"><span><img src="${img(e.arcTypeIcon || "")}" alt="" ${e.arcTypeIcon ? "" : "hidden"}>${esc(e.name)} memakai Arc <b>${esc(e.arcType)}</b>: <b>${arcs.filter((a) => a.type === e.arcType).length}</b> Arc cocok</span>
             <label class="adm-chk"><input type="checkbox" id="admAllArcs"${showAllArcs ? " checked" : ""}> Tampilkan semua tipe</label></div>
@@ -915,6 +943,7 @@
     pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
     root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
+      if (t.id === "admDraft") { const d = DRAFT_ALL[cur]; if (!d) { toast("Belum ada draf untuk Esper ini."); return; } working = Object.assign(fresh(), JSON.parse(JSON.stringify(d))); delete working.draft; render("DRAF DIMUAT, KLIK SIMPAN KE GITHUB"); return; }
       if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN TERBACA (IZIN TULIS DIUJI SAAT MENYIMPAN)" : "TOKEN GAGAL (" + r + ")"); return; }
       if (t.id === "admCheck") { token = $("#admTok").value.trim() || token; await checkToken(); return; }
       if (t.id === "admClrTok") { token = ""; try { localStorage.removeItem(KEY); } catch (e) {} await pull(); pick(); render("TOKEN DIHAPUS"); return; }

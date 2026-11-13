@@ -1251,3 +1251,34 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 /* header HP: pastikan semua tombol muat */
 @media (max-width: 480px) { .logo-text { display: none; } header.top { gap: 8px; padding-left: 12px; padding-right: 12px; } .top-actions { gap: 6px; margin-left: auto; } .top-actions .icon-btn { min-width: 38px; height: 38px; padding: 0 9px; } .logo-img { height: 36px; } }
 @media (max-width: 360px) { .top-actions { gap: 4px; } .top-actions .icon-btn { min-width: 34px; padding: 0 7px; } .logo-img { height: 32px; } }
+
+/* ---- Build: tampilan menonjol ala panduan karakter ---- */
+.build-cta { display: flex; align-items: center; gap: 12px; width: 100%; margin: 14px 0 4px; padding: 12px 16px; border: 0; border-radius: 18px; cursor: pointer; text-align: left;
+  background: var(--pink); color: #fff; box-shadow: 0 0 0 3px var(--edge), 4px 5px 0 var(--edge); transition: transform 0.15s, box-shadow 0.15s; }
+.build-cta:hover { transform: translate(-1px, -1px); box-shadow: 0 0 0 3px var(--edge), 6px 7px 0 var(--edge); }
+.build-cta svg { width: 26px; height: 26px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.build-cta b { display: block; font: 800 0.95rem var(--display); text-transform: uppercase; }
+.build-cta small { display: block; font: 600 0.62rem var(--mono); letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.9; }
+.bd-hero { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 14px 16px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); border-left: 6px solid var(--pink); }
+.bd-hero.manual { border-left-color: var(--cream); }
+.bd-hero > div { flex: 1 1 260px; min-width: 0; }
+.bd-hero .mono { color: var(--pink); font-size: 0.66rem; letter-spacing: 0.08em; }
+.bd-hero .txt { margin-top: 4px; font-size: 0.82rem; color: var(--text-2); }
+.bd-ref { flex: none; padding: 8px 14px; border-radius: 999px; background: var(--panel-2); box-shadow: var(--ring); font: 800 0.72rem var(--display); text-transform: uppercase; text-decoration: none; color: var(--text); white-space: nowrap; }
+.bd-ref:hover { box-shadow: 0 0 0 2px var(--edge), 0 0 0 3px var(--pink); }
+.bd-rank { display: grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--pink); color: #fff; font: 800 0.82rem var(--display); font-style: normal; box-shadow: 0 0 0 2px var(--edge); }
+.bd-rank.r1 { background: #f6c945; color: #2a2100; }
+.bd-arcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.bd-arc { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); text-decoration: none; color: inherit; transition: box-shadow 0.2s; }
+.bd-arc:hover { box-shadow: 0 0 0 2px var(--edge), 0 0 0 3px var(--pink); }
+.bd-arc > img { width: 64px; height: 64px; object-fit: contain; flex: none; }
+.bd-arc b { display: block; font: 800 0.9rem var(--display); text-transform: uppercase; }
+.bd-arc small { display: block; font: 600 0.62rem var(--mono); color: var(--text-2); letter-spacing: 0.04em; margin-top: 2px; }
+.bd-why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.bd-why em { font: 700 0.58rem var(--mono); font-style: normal; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--pink) 18%, var(--panel-2)); color: var(--text); }
+.bd-set { align-items: center; }
+.bd-set b .bd-why { display: inline-flex; margin: 0 0 0 8px; vertical-align: middle; }
+.bd-pc { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-right: 6px; padding: 0 5px; border-radius: 6px; background: var(--pink); color: #fff; font: 800 0.68rem var(--display); }
+.bd-stats.sub span { opacity: 0.88; }
+.bd-stats.sub i { background: var(--panel-3, #444); }
+@media (max-width: 560px) { .bd-arcs { grid-template-columns: 1fr; } .bd-ref { width: 100%; text-align: center; } }
