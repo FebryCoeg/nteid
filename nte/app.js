@@ -556,7 +556,7 @@
           };
           const rankBadge = (i) => `<i class="bd-rank r${i + 1}">${i + 1}</i>`;
           const fmtPct = (v) => (v == null ? "–" : `${String(Math.round(v * 10) / 10).replace(".", S(",", "."))}%`);
-          const pctOf = (p) => (!p ? "" : p.team != null ? `<span class="bd-pct"><b>${p.team}%</b><small>${S("TIM", "TEAM")}</small><b class="solo">${p.solo}%</b><small>SOLO</small></span>` : `<span class="bd-pct"><b>${fmtPct(p.m1)}</b><small>M1</small><b class="solo">${fmtPct(p.m5)}</b><small>M5</small></span>`);
+          const pctOf = (p) => (!p ? "" : p.team != null ? `<span class="bd-pct"><b>${fmtPct(p.team)}</b><small>${S("TIM", "TEAM")}</small><b class="solo">${fmtPct(p.solo)}</b><small>SOLO</small></span>` : `<span class="bd-pct"><b>${fmtPct(p.m1)}</b><small>M1</small><b class="solo">${fmtPct(p.m5)}</b><small>M5</small></span>`);
           const calcNote = bd.calc ? `<p class="bd-calc"><b>${S("HASIL SIMULASI", "SIMULATION RESULT")}</b> · ${bd.calc.team.map((sl) => { const m = list.find((x) => x.slug === sl); return esc(m ? m.name : sl); }).join(" · ")}<br>${esc(tx(bd.calc.note))}</p>` : "";
           if ((bd.teams || []).length) {
             html += `<div class="af-sec"><h4>${S("Rekomendasi tim", "Team recommendations")}</h4><p class="mono">${S("SUSUNAN TIM DARI SUMBER YANG DIKREDITKAN DAN HASIL UJI", "TEAMS FROM CREDITED SOURCES AND TEST RESULTS")}</p><div class="bd-teams">${bd.teams.map((t, ti) => `<div class="bd-tm${ti === 0 ? " best" : ""}"><div class="bd-tm-head"><b>${esc(tx(t.name))}</b><em>${esc(tx(t.tag))}</em></div>
