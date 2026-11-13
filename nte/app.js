@@ -18,7 +18,7 @@
   const rich = (s) => String(s ?? "").replace(/<(?!\/?(b|i)>)/g, "&lt;");
   const elClass = (e) => "el-" + String(e || "").toLowerCase();
 
-  const LINK = { donate: "https://trakteer.id/febrycoeg", community: "https://www.facebook.com/groups/nteindo?locale=id_ID" };
+  const LINK = { donate: "https://trakteer.id/febrycoeg", community: "https://discord.gg/E2am3akPBB" };
   const QCOLOR = { 1: "Abu-abu", 2: "Hijau", 3: "Biru", 4: "Ungu", 5: "Emas", 6: "Merah" };
   const LABEL = {
     element: { Cosmos: "Cosmos", Anima: "Anima", Incantation: "Incantation", Chaos: "Chaos", Psyche: "Psyche", Lakshana: "Lakshana" },
@@ -241,7 +241,7 @@
           <p>${S("Esper, Arc, Modul, Item, Cerita, Anomali, Pencapaian, sampai Makanan. Semua data langsung dari file game, lengkap dalam Bahasa Indonesia.", "Espers, Arcs, Modules, Items, Story, Anomalies, Achievements and Food, straight from the game files.")}</p>
           <div class="kv-btns">
             <a class="kbtn cyan" href="/esper" data-link><b>${S("Jelajahi Database", "Explore Database")}</b><small>ESPER · ARC · ITEM</small></a>
-            <a class="kbtn violet" href="${LINK.community}" target="_blank" rel="noopener"><b>${S("Join Komunitas", "Join Community")}</b><small>NTE INDONESIA</small></a>
+            <a class="kbtn violet" href="${LINK.community}" target="_blank" rel="noopener"><b>${S("Join Komunitas", "Join Community")}</b><small>DISCORD NTE INDONESIA</small></a>
             <a class="kbtn pink" href="${LINK.donate}" target="_blank" rel="noopener"><b>Donate</b><small>TRAKTEER</small></a>
           </div>
           <div class="home-stats">
@@ -284,7 +284,7 @@
         </div>
         <div class="kv-btns">
           <a class="kbtn pink" href="${LINK.donate}" target="_blank" rel="noopener"><b>Donate</b><small>TRAKTEER</small></a>
-          <a class="kbtn violet" href="${LINK.community}" target="_blank" rel="noopener"><b>${S("Join Komunitas", "Join Community")}</b><small>FACEBOOK GROUP</small></a>
+          <a class="kbtn violet" href="${LINK.community}" target="_blank" rel="noopener"><b>${S("Join Komunitas", "Join Community")}</b><small>DISCORD</small></a>
         </div>
       </section>`;
 
