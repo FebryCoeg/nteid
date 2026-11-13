@@ -70,11 +70,11 @@
 * Best Teams (Best Team): Zankou + Lacrimosa (Sub-DPS), Haniel (Buffer), Sakiri (Incantation Support)
 * Skill Priority: Skill → Ultimate → Basic Attack → QTE
 * Best Awakening Nodes (Urutan Prioritas 1–6):
-   1. A1 (Abyss in the Eyes) [Prioritas 1]: Wildfire, Flickering Shadow, Voidstep, dan Enhanced Redirect Skill menyebarkan efek DoT. Buff Hunt (DMG pribadi naik ke 40%) dan Delusion (CRIT DMG DoT seluruh tim naik ke 50%) aktif permanen.
+   1. A5 (Blossom Draws Blood) [Prioritas 1]: Pukulan pertama Enhanced Redirect Skill selalu langsung men-Topple/Break target yang bisa di-Break (sekali per target per battle), dan meningkatkan Break/Topple DMG seluruh tim sebesar 300%.
    2. A2 (Kiss from the Abyss) [Prioritas 2]: Setiap kali berpartisipasi dalam Cycle yang memicu Scorch atau Hexed, menyimpan 1 stack Stored Flame yang meningkatkan Final DMG Ultimate berikutnya sebesar 150%.
-   3. A5 (Blossom Draws Blood) [Prioritas 3]: Pukulan pertama Enhanced Redirect Skill selalu langsung men-Topple/Break target yang bisa di-Break (sekali per target per battle), dan meningkatkan Break/Topple DMG seluruh tim sebesar 300%.
-   4. A6 (Blood-Stained Eyes) [Prioritas 4]: Pukulan terakhir Oblivion/Annihilation menghasilkan 12% DMG tambahan per stack DoT pada target (maksimal hingga 240%).
-   5. A4 (Nightmare in Bloom) [Prioritas 5]: Saat Ultimate utama siap, Ultimate kedua langsung aktif dan ikut mendapatkan bonus DMG dari Stored Flame.
+   3. A1 (Abyss in the Eyes) [Prioritas 3]: Wildfire, Flickering Shadow, Voidstep, dan Enhanced Redirect Skill menyebarkan efek DoT. Buff Hunt (DMG pribadi naik ke 40%) dan Delusion (CRIT DMG DoT seluruh tim naik ke 50%) aktif permanen.
+   4. A4 (Nightmare in Bloom) [Prioritas 4]: Saat Ultimate utama siap, Ultimate kedua langsung aktif dan ikut mendapatkan bonus DMG dari Stored Flame.
+   5. A6 (Blood-Stained Eyes) [Prioritas 5]: Pukulan terakhir Oblivion/Annihilation menghasilkan 12% DMG tambahan per stack DoT pada target (maksimal hingga 240%).
    6. A3 (Kiss Mark, Dream Glimpse) [Prioritas 6]: Hunt menambah Interruption Resistance sebesar 50%, sementara Delusion memulihkan 4% Max HP setiap detik.
 * Build FAQ:
    * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Nest Guard Fragment, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
