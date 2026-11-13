@@ -34,4 +34,4 @@ HTML, CSS, dan JavaScript murni tanpa framework · Python untuk mengolah data ·
 
 ## Kredit
 
-Data dan gambar: Neverness to Everness © Hotta Studio / Perfect World, diambil dari Waifus-Grace/NTE_Assets. Ini adalah proyek penggemar dan tidak berafiliasi dengan pengembang game.
+Data dan gambar: Neverness to Everness © Hotta Studio / Perfect World.
