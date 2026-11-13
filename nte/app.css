@@ -1229,3 +1229,6 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .ver-nav { grid-template-columns: 1fr; }
   .ver-adj.next { text-align: left; }
 }
+
+.foot-credit { margin-top: 6px; font-size: 0.72rem; color: var(--text-2); }
+.foot-credit a { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
