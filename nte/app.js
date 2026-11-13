@@ -8,6 +8,10 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const main = $("#main");
+  // pendengar event pada #main otomatis dilepas saat pindah halaman (mencegah handler ganda)
+  let routeCtl = new AbortController();
+  const rawAdd = main.addEventListener.bind(main);
+  main.addEventListener = (type, fn, opt) => rawAdd(type, fn, { ...(typeof opt === "object" ? opt : { capture: !!opt }), signal: routeCtl.signal });
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
   const img = (p) => (p ? BASE + p : "");
   // teks dari build sudah aman: hanya <b>, <i>, dan entity; tetap disaring sekali lagi
@@ -85,6 +89,7 @@
     [/^\/fashion\/?$/, viewFashion],
     [/^\/makanan\/?$/, viewFood],
     [/^\/tierlist\/?$/, viewTierlist],
+    [/^\/versi\/?$/, viewVersions],
   ];
   function go(url, replace) {
     if (replace) history.replaceState(null, "", url); else history.pushState(null, "", url);
@@ -108,6 +113,7 @@
       a.classList.toggle("active", h === "/" ? path === "/" : path.startsWith(h));
     });
     closeLayer($("#sheet"));
+    routeCtl.abort(); routeCtl = new AbortController();
     if (langBtn) langBtn.hidden = !/^\/($|cerita|anomali|istilah|pencapaian|fashion|makanan|tierlist)/.test(path);
     const r = routes.find(([rx]) => rx.test(path));
     main.innerHTML = `<div class="loading">MEMBUKA ARSIP…</div>`;
@@ -221,6 +227,7 @@
       ["/pencapaian", "11", S("Pencapaian", "Achievements"), S("Medali, syarat, hadiah, dan penanda progres", "Medals, requirements, rewards & progress tracker"), N.pencapaian, thumbs("pencapaian")],
       ["/fashion", "12", "Fashion", S("Kostum Esper dan ilustrasinya", "Esper outfits & illustrations"), N.fashion, thumbs("fashion")],
       ["/makanan", "13", S("Makanan", "Food"), S("Makanan, efek buff, dan bahan masak", "Dishes, buffs & ingredients"), N.makanan, thumbs("makanan")],
+      ["/versi", "15", S("Versi & Patch", "Versions & Patches"), S("Isi tiap update: Esper, Arc, event, dan perbaikan", "What each update adds: Espers, Arcs, events & fixes"), "", ""],
       ["/tierlist", "14", "Tier List", S("Buat tier list-mu sendiri, simpan, dan bagikan sebagai gambar", "Make your own tier list, save it and share it as an image"), "", thumbs("esper")],
     ];
     const bgs = (home && home.bg) || [];
@@ -690,6 +697,55 @@
     }
   }
 
+  // ---------------- VERSI & PATCH ----------------
+  async function viewVersions() {
+    const data = await load("versions");
+    const list = data.versions;
+    const want = new URLSearchParams(location.search).get("v");
+    const v = list.find((x) => x.id === want) || list[0];
+    setTitle(S(`Versi ${v.id}`, `Version ${v.id}`));
+    const SI = {
+      esper: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.6-4 3.4-6 7-6s6.4 2 7 6"/></svg>',
+      arc: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4"/></svg>',
+      cerita: '<svg viewBox="0 0 24 24"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M9 9h6M9 13h6"/></svg>',
+      fitur: '<svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.6 5.8.4-4.5 3.7 1.5 5.7L12 15l-5 3.4 1.5-5.7L4 8.9l5.8-.3z"/></svg>',
+      kosmetik: '<svg viewBox="0 0 24 24"><path d="M4 15l2-6h12l2 6v3H4z"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>',
+      event: '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+      qol: '<svg viewBox="0 0 24 24"><path d="M14.5 5.5a4 4 0 0 0-5 5L4 16l4 4 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/></svg>',
+      bug: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M4 11h4M16 11h4M4 18h4M16 18h4M9 5l-2-2M15 5l2-2"/></svg>',
+      update: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg>',
+    };
+    const item = (x) => `<div class="vi">
+        <div class="vi-h">${x.link ? `<a href="${esc(x.link)}" data-link><b>${esc(x.t)}</b></a>` : `<b>${esc(x.t)}</b>`}${x.tag ? `<span class="vi-tag">${esc(x.tag)}</span>` : ""}${x.date ? `<span class="vi-date">${esc(x.date)}</span>` : ""}</div>
+        <p class="txt">${esc(x.d)}</p></div>`;
+    const cards = v.sections.map((sc) => ({
+      title: sc.title, sub: `${sc.items.length} ${S("butir", "items")}`, open: !!sc.open,
+      icon: `<span class="vi-ico">${SI[sc.id] || ICO.chat}</span>`,
+      body: sc.items.map(item).join(""),
+    }));
+    main.innerHTML = `<div id="verRoot">` + head(S("VERSI", "VERSIONS"), S("Versi & Patch", "Versions & Patches"),
+      S("Apa saja yang ditambahkan dan diubah di setiap update Neverness to Everness, dirangkum dalam bahasa Indonesia.", "What each Neverness to Everness update adds and changes."), list.length) + `
+      <div class="ver-tabs" role="tablist">${list.map((x) => `<button class="tab" type="button" data-ver="${esc(x.id)}" aria-selected="${x.id === v.id}">${S("Versi", "Version")} ${esc(x.id)}</button>`).join("")}</div>
+      <section class="ver-hero">
+        <div class="ver-num"><span class="mono">${S("VERSI", "VERSION")}</span><b>${esc(v.id)}</b></div>
+        <div class="ver-info">
+          <h2>${esc(v.title)}</h2>
+          <p class="mono">${S("RILIS", "RELEASE")} ${esc(v.released)} · ${S("SAMPAI", "UNTIL")} ${esc(v.end)}</p>
+          <p class="txt">${esc(v.lead)}</p>
+          <div class="ver-phases">${v.phases.map((f) => `<div><span class="mono">${esc(f.n)}</span><b>${esc(f.range)}</b><small>${esc(f.note)}</small></div>`).join("")}</div>
+        </div>
+      </section>
+      ${v.note ? `<p class="ver-note">${esc(v.note)}</p>` : ""}
+      <div class="ver-list">${accordion(cards)}</div>
+      <div class="ver-src"><span class="mono">${S("SUMBER", "SOURCES")}</span>${v.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)} ↗</a>`).join("")}</div></div>`;
+    $("#verRoot").addEventListener("click", (ev) => {
+      const b = ev.target.closest(".skill-top");
+      if (b) { const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open")); return; }
+      const t = ev.target.closest("[data-ver]");
+      if (t) go(`/versi?v=${encodeURIComponent(t.dataset.ver)}`);
+    });
+  }
+
   // ---------------- ADMIN BUILD (link rahasia) ----------------
   async function viewAdmin() {
     setTitle("Admin Build");
@@ -718,9 +774,11 @@
     const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
     const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
     const SKG = ["basic", "redirect", "ultimate", "support"];
+    main.innerHTML = `<div id="admRoot"></div>`;
+    const root = $("#admRoot");
     function render(msg) {
       const e = es.find((x) => x.slug === cur);
-      main.innerHTML = `
+      root.innerHTML = `
         <div class="crumb mono"><span>ADMIN</span><span>/</span><span>BUILD</span></div>
         <h1 class="adm-h">Admin Build</h1>
         <p class="mono adm-note">${token ? "TOKEN TERSIMPAN DI BROWSER INI" : "TANPA TOKEN: HANYA BISA MELIHAT"}${msg ? " · " + esc(msg) : ""}</p>
@@ -771,7 +829,7 @@
     }
     const st = await pull();
     pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
-    main.addEventListener("click", async (ev) => {
+    root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
       if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN OK" : "TOKEN GAGAL (" + r + ")"); return; }
       if (t.id === "admClrTok") { token = ""; try { localStorage.removeItem(KEY); } catch (e) {} await pull(); pick(); render("TOKEN DIHAPUS"); return; }
@@ -785,7 +843,7 @@
       if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length || working.awks.length || working.skills.length ? working : null, "perbarui"); return; }
       if (t.id === "admDel") { if (await ask("Hapus build ini?", "Hapus", "Batal")) await save(null, "hapus"); }
     });
-    main.addEventListener("change", (ev) => {
+    root.addEventListener("change", (ev) => {
       if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); }
       if (ev.target.id === "admAllArcs") { showAllArcs = ev.target.checked; render(); }
     });

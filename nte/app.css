@@ -1123,3 +1123,38 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .awk-pick { width: 26px; height: 26px; }
   .awk-pick[aria-checked="true"]::after { font-size: 0.78rem; }
 }
+
+/* ---------------- VERSI & PATCH ---------------- */
+.ver-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+.ver-hero { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; margin-bottom: 14px; padding: 22px 26px; border-radius: 28px; background: radial-gradient(90% 140% at 0% 0%, color-mix(in srgb, var(--pink) 30%, var(--panel)), var(--panel) 70%); box-shadow: var(--ring); }
+.ver-num { text-align: center; padding-right: 22px; border-right: 3px dashed color-mix(in srgb, var(--cream) 30%, transparent); }
+.ver-num .mono { display: block; font-size: 0.66rem; letter-spacing: .14em; color: var(--text-2); }
+.ver-num b { display: block; font: 800 clamp(3.6rem, 9vw, 6rem)/0.95 var(--display); color: var(--cream); text-shadow: 4px 4px 0 var(--pink); }
+.ver-info h2 { font: 800 clamp(1.3rem, 3vw, 1.9rem) var(--display); text-transform: uppercase; }
+.ver-info > .mono { margin: 6px 0 10px; color: var(--pink); font-size: 0.7rem; letter-spacing: .08em; }
+.ver-info .txt { color: var(--text-2); max-width: 70ch; }
+.ver-phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-top: 14px; }
+.ver-phases div { padding: 10px 14px; border-radius: 16px; background: rgba(5,5,6,.45); border: 2px solid var(--edge); }
+.ver-phases .mono { display: block; font-size: 0.6rem; letter-spacing: .1em; color: var(--pink); }
+.ver-phases b { display: block; font: 800 0.9rem var(--display); }
+.ver-phases small { color: var(--text-2); font-size: 0.74rem; }
+.ver-note { margin: 0 0 14px; padding: 10px 16px; border-radius: 16px; border: 2px dashed color-mix(in srgb, var(--pink) 50%, transparent); color: var(--text-2); font-size: 0.8rem; }
+.ver-src { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 18px; font-size: 0.8rem; }
+.ver-src .mono { color: var(--text-2); font-size: 0.64rem; letter-spacing: .1em; }
+.ver-src a { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
+.vi-ico svg { width: 56%; height: 56%; fill: none; stroke: var(--cream); stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+.vi-ico { display: grid; place-items: center; width: 100%; height: 100%; }
+.ver-list .skill-body { padding-bottom: 8px; }
+.vi { padding: 14px 0; border-top: 2px dashed color-mix(in srgb, var(--text-2) 25%, transparent); }
+.vi:first-child { border-top: 0; }
+.vi-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.vi-h b { font: 800 0.95rem var(--display); text-transform: uppercase; }
+.vi-h a b { color: var(--cream); text-decoration: underline; text-decoration-color: var(--pink); text-underline-offset: 4px; }
+.vi-tag { padding: 3px 10px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 0.6rem var(--display); letter-spacing: .02em; }
+.vi-date { padding: 3px 10px; border-radius: 999px; border: 2px solid var(--pink); color: var(--pink); font: 700 0.62rem var(--mono); }
+.vi .txt { margin-top: 6px; color: var(--text-2); font-size: 0.9rem; line-height: 1.65; }
+@media (max-width: 640px) {
+  .ver-hero { grid-template-columns: 1fr; padding: 18px; gap: 12px; }
+  .ver-num { display: flex; align-items: baseline; gap: 12px; text-align: left; border-right: 0; padding: 0; }
+  .ver-num b { font-size: 3.4rem; }
+}

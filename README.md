@@ -16,6 +16,7 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 | **Pencapaian** | 450+ achievement per kategori dengan medali, syarat, dan hadiah. Bisa ditandai selesai (tersimpan di browser) dan diekspor/impor sebagai file JSON. |
 | **Fashion & Makanan** | Galeri ilustrasi kostum setiap Esper, serta makanan dan bahan masak beserta efeknya. |
 | **Tier List** | Tier list Esper atau Arc buatan pengunjung sendiri: seret ke tier, ganti nama dan warna tier, tersimpan di browser, bisa diunduh sebagai gambar atau diekspor/impor JSON. |
+| **Versi & Patch** | Rangkuman isi tiap update game dalam bahasa Indonesia (saat ini versi 1.5): Esper dan Arc baru, cerita, fitur dan mode, kendaraan dan kostum, event dengan jadwalnya, perbaikan, bug fix, serta kompensasi dan cara update. Isinya ditulis di `tools/nte/make_versions.py`. |
 
 ## Fitur
 
