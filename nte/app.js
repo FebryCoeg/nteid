@@ -127,6 +127,11 @@
     if (href !== location.pathname + location.search) go(href);
   });
   addEventListener("popstate", render);
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest && e.target.closest(".nav-grp-btn");
+    $$(".nav-group").forEach((g) => { const open = btn && g.contains(btn) ? !g.classList.contains("open") : false; g.classList.toggle("open", open); const b = g.querySelector(".nav-grp-btn"); if (b) b.setAttribute("aria-expanded", String(open)); });
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".nav-group.open").forEach((g) => g.classList.remove("open")); });
 
   async function render() {
     const path = location.pathname.replace(/\/index\.html$/, "/") || "/";
@@ -134,6 +139,7 @@
       const h = a.getAttribute("href");
       a.classList.toggle("active", h === "/" ? path === "/" : path.startsWith(h));
     });
+    $$(".nav-group").forEach((g) => { g.classList.toggle("active", !!g.querySelector("a.active")); g.classList.remove("open"); const b = g.querySelector(".nav-grp-btn"); if (b) b.setAttribute("aria-expanded", "false"); });
     closeLayer($("#sheet"));
     routeCtl.abort(); routeCtl = new AbortController();
     if (langBtn) langBtn.hidden = false;
@@ -1106,7 +1112,7 @@
   const ST_TEXT = {
     "Lewati ke konten": "Skip to content", "Database NTE": "NTE Database", "Beranda": "Home",
     "Esper": "Espers", "Arc": "Arcs", "Modul": "Modules", "Item": "Items", "Furnitur": "Furniture", "Kendaraan": "Vehicles", "Properti": "Property",
-    "Cerita": "Story", "Anomali": "Anomalies", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
+    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
     "MENU · INDEKS ARSIP": "MENU · ARCHIVE INDEX", "LAINNYA": "MORE",
     "Portofolio Febry Coeg": "Febry Coeg's Portfolio", "Profil, sosial media, game, dan video YouTube": "Profile, socials, games and YouTube videos",
     "Join Discord NTE Indonesia ↗": "Join the NTE Indonesia Discord ↗", "Donate lewat Trakteer ↗": "Donate via Trakteer ↗",

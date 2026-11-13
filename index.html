@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/nte/app.css?v=44" />
+  <link rel="stylesheet" href="/nte/app.css?v=45" />
   <script>
     try { const t = localStorage.getItem("nte-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
@@ -44,16 +44,26 @@
       <a href="/esper" data-link>Esper</a>
       <a href="/arc" data-link>Arc</a>
       <a href="/modul" data-link>Modul</a>
-      <a href="/item" data-link>Item</a>
-      <a href="/furnitur" data-link>Furnitur</a>
-      <a href="/kendaraan" data-link>Kendaraan</a>
-      <a href="/properti" data-link>Properti</a>
-      <a href="/cerita" data-link>Cerita</a>
-      <a href="/anomali" data-link>Anomali</a>
-      <a href="/istilah" data-link>Istilah</a>
-      <a href="/pencapaian" data-link>Pencapaian</a>
-      <a href="/fashion" data-link>Fashion</a>
-      <a href="/makanan" data-link>Makanan</a>
+      <div class="nav-group">
+        <button class="nav-grp-btn" type="button" aria-haspopup="true" aria-expanded="false">Katalog<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-menu">
+          <a href="/item" data-link>Item</a>
+          <a href="/furnitur" data-link>Furnitur</a>
+          <a href="/kendaraan" data-link>Kendaraan</a>
+          <a href="/properti" data-link>Properti</a>
+          <a href="/fashion" data-link>Fashion</a>
+          <a href="/makanan" data-link>Makanan</a>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button class="nav-grp-btn" type="button" aria-haspopup="true" aria-expanded="false">Informasi<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-menu">
+          <a href="/cerita" data-link>Cerita</a>
+          <a href="/anomali" data-link>Anomali</a>
+          <a href="/istilah" data-link>Istilah</a>
+          <a href="/pencapaian" data-link>Pencapaian</a>
+        </div>
+      </div>
       <a href="/tierlist" data-link>Tier List</a>
       <a href="/versi" data-link>Versi</a>
     </nav>
@@ -153,6 +163,6 @@
     </div>
   </footer>
 
-  <script src="/nte/app.js?v=44" defer></script>
+  <script src="/nte/app.js?v=45" defer></script>
 </body>
 </html>

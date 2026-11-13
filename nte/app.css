@@ -70,13 +70,27 @@ p { margin: 0; }
 }
 .logo-text b { display: block; font: 800 0.98rem var(--display); letter-spacing: 0; text-transform: uppercase; }
 .logo-text small { display: block; font: 500 0.62rem var(--mono); letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
-.top-nav { display: flex; gap: 4px; margin-left: auto; max-width: calc(100vw - 420px); overflow-x: auto; scrollbar-width: none; padding: 3px; }
-.top-nav::-webkit-scrollbar { display: none; }
+.top-nav { display: flex; gap: 4px; margin-left: auto; padding: 3px; }
 .top-nav a {
   flex: none; white-space: nowrap; text-decoration: none; padding: 6px 13px; border-radius: 999px; font-weight: 700; font-size: 0.82rem;
   color: var(--text-2); transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .top-nav a:hover { background: var(--panel-2); color: var(--text); }
+.nav-group { position: relative; }
+.nav-grp-btn {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; padding: 6px 10px 6px 13px; border-radius: 999px; border: 0; background: none; cursor: pointer;
+  font: inherit; font-weight: 700; font-size: 0.82rem; color: var(--text-2); transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.nav-grp-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s; }
+.nav-grp-btn:hover, .nav-group.open .nav-grp-btn { background: var(--panel-2); color: var(--text); }
+.nav-group.open .nav-grp-btn svg { transform: rotate(180deg); }
+.nav-group.active .nav-grp-btn { background: var(--cream); color: var(--ink); box-shadow: 0 0 0 2px var(--edge), 0 0 0 4px var(--pink); }
+.nav-menu {
+  display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; min-width: 170px; padding: 6px; flex-direction: column; gap: 2px;
+  background: var(--panel); border-radius: 16px; box-shadow: var(--ring), 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+.nav-group.open .nav-menu { display: flex; }
+.nav-menu a { border-radius: 10px; padding: 8px 12px; }
 .top-nav a.active { background: var(--cream); color: var(--ink); box-shadow: 0 0 0 2px var(--edge), 0 0 0 4px var(--pink); }
 .top-actions { display: flex; gap: 8px; align-items: center; }
 .top-nav + .top-actions { margin-left: 8px; }
