@@ -882,10 +882,3 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .dlg-btns .btn { height: 42px; padding: 0 20px; }
 .toast { position: fixed; left: 50%; bottom: 24px; z-index: 310; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 10px 20px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 0.8rem var(--display); box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink); animation: pop 0.2s ease; transition: opacity 0.4s; }
 .toast.out { opacity: 0; }
-
-/* Istilah: gambar per kartu */
-.wcard-img.gloss { aspect-ratio: 16 / 8; }
-.wcard-img.gloss img { padding: 14px; filter: none; }
-.wcard-img.gloss.cover img { padding: 0; object-position: 50% 22%; filter: none; }
-.sheet-hero.gloss { background: var(--panel-2); }
-.sheet-hero.gloss img { object-fit: contain; padding: 22px; max-height: 220px; }
