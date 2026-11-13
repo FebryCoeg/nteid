@@ -1340,3 +1340,6 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-roleline b { font: 800 0.74rem var(--display); padding: 5px 12px; border-radius: 999px; background: var(--pink); color: #fff; }
 .bd-roleline span { font: 800 0.9rem var(--display); text-transform: uppercase; }
 .bd-roleline em { font: 700 0.62rem var(--mono); font-style: normal; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; background: var(--panel-2); box-shadow: var(--ring); text-transform: uppercase; }
+.bd-awkorder { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 6px 0 10px; padding: 10px 14px; border-radius: 14px; background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border-left: 5px solid var(--pink); }
+.bd-awkorder .mono { font-size: 0.6rem; color: var(--pink); letter-spacing: 0.08em; }
+.bd-awkorder b { font: 800 0.95rem var(--display); letter-spacing: 0.02em; }
