@@ -20,22 +20,43 @@
 
   const LINK = { donate: "https://trakteer.id/febrycoeg", community: "https://discord.gg/E2am3akPBB" };
   const QCOLOR = { 1: "Abu-abu", 2: "Hijau", 3: "Biru", 4: "Ungu", 5: "Emas", 6: "Merah" };
-  const LABEL = {
-    element: { Cosmos: "Cosmos", Anima: "Anima", Incantation: "Incantation", Chaos: "Chaos", Psyche: "Psyche", Lakshana: "Lakshana" },
-    group: { basic: "Serangan Dasar", reflexive: "Respons Refleks", redirect: "Redirect Skill", ultimate: "Ultimate", support: "Support Skill", passive: "Pasif" },
-    rarity: { 1: "Biasa", 2: "Umum", 3: "Langka", 4: "Epik", 5: "Legendaris", 6: "Mitos" },
-    vehicleKind: { Car: "Mobil", Motorcycle: "Motor", Bike: "Motor", Boat: "Kapal", Ship: "Kapal", Plane: "Pesawat" },
-    source: { Shop: "Toko", Quest: "Misi", Activity: "Event", Gacha: "Gacha", Default: "Bawaan" },
+  const LABELS = {
+    id: {
+      element: { Cosmos: "Cosmos", Anima: "Anima", Incantation: "Incantation", Chaos: "Chaos", Psyche: "Psyche", Lakshana: "Lakshana" },
+      group: { basic: "Serangan Dasar", reflexive: "Respons Refleks", redirect: "Redirect Skill", ultimate: "Ultimate", support: "Support Skill", passive: "Pasif" },
+      rarity: { 1: "Biasa", 2: "Umum", 3: "Langka", 4: "Epik", 5: "Legendaris", 6: "Mitos" },
+      vehicleKind: { Car: "Mobil", Motorcycle: "Motor", Bike: "Motor", Boat: "Kapal", Ship: "Kapal", Plane: "Pesawat" },
+      source: { Shop: "Toko", Quest: "Misi", Activity: "Event", Gacha: "Gacha", Default: "Bawaan" },
+      fstat: { Comfort: "Kenyamanan", Fortune: "Keberuntungan", Love: "Kehangatan", Collect: "Nilai koleksi" },
+    },
+    en: {
+      element: { Cosmos: "Cosmos", Anima: "Anima", Incantation: "Incantation", Chaos: "Chaos", Psyche: "Psyche", Lakshana: "Lakshana" },
+      group: { basic: "Basic Attack", reflexive: "Reflexive", redirect: "Redirect Skill", ultimate: "Ultimate", support: "Support Skill", passive: "Passive" },
+      rarity: { 1: "Common", 2: "Uncommon", 3: "Rare", 4: "Epic", 5: "Legendary", 6: "Mythic" },
+      vehicleKind: { Car: "Car", Motorcycle: "Motorcycle", Bike: "Motorcycle", Boat: "Boat", Ship: "Ship", Plane: "Plane" },
+      source: { Shop: "Shop", Quest: "Quest", Activity: "Event", Gacha: "Gacha", Default: "Default" },
+      fstat: { Comfort: "Comfort", Fortune: "Fortune", Love: "Warmth", Collect: "Collection value" },
+    },
   };
+  // LABEL.<jenis> selalu mengikuti bahasa yang sedang dipilih
+  const LABEL = new Proxy({}, { get: (_, k) => LABELS[typeof LANG !== "undefined" && LANG === "en" ? "en" : "id"][k] });
+
 
   // ---------------- data ----------------
   const cache = {};
   // versi file data mengikuti ?v= pada app.js, supaya data lama di cache browser tidak terpakai
   const DATA_V = (() => { try { return new URL(document.querySelector('script[src*="app.js"]').src).searchParams.get("v") || ""; } catch (e) { return ""; } })();
-  const load = (name) => (cache[name] ||= fetch(`${BASE}data/${name}.json${DATA_V ? "?v=" + DATA_V : ""}`).then((r) => {
-    if (!r.ok) throw new Error(r.status);
-    return r.json();
-  }));
+  const ver = DATA_V ? "?v=" + DATA_V : "";
+  let enIndex = null;
+  const getEnIndex = () => (enIndex ||= fetch(`${BASE}data/en/_index.json${ver}`).then((r) => (r.ok ? r.json() : [])).catch(() => []));
+  const load = async (name) => {
+    const en = typeof LANG !== "undefined" && LANG === "en" && (await getEnIndex()).includes(name);
+    const key = (en ? "en/" : "") + name;
+    return (cache[key] ||= fetch(`${BASE}data/${key}.json${ver}`).then((r) => {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }));
+  };
 
   // ---------------- tema & menu ----------------
   if ($(".theme-toggle")) $(".theme-toggle").onclick = () => {
@@ -115,23 +136,23 @@
     });
     closeLayer($("#sheet"));
     routeCtl.abort(); routeCtl = new AbortController();
-    if (langBtn) langBtn.hidden = !/^\/($|cerita|anomali|istilah|pencapaian|fashion|makanan|tierlist)/.test(path);
+    if (langBtn) langBtn.hidden = false;
     const r = routes.find(([rx]) => rx.test(path));
-    main.innerHTML = `<div class="loading">MEMBUKA ARSIP…</div>`;
+    main.innerHTML = `<div class="loading">${S("MEMBUKA ARSIP…", "OPENING ARCHIVE…")}</div>`;
     scrollTo(0, 0);
     try {
       if (!r) return notFound();
       await r[1](...path.match(r[0]).slice(1));
     } catch (err) {
       console.error(err);
-      main.innerHTML = `<div class="empty">Arsip gagal dimuat. Coba muat ulang halaman.</div>`;
+      main.innerHTML = `<div class="empty">${S("Arsip gagal dimuat. Coba muat ulang halaman.", "Failed to load the archive. Please reload the page.")}</div>`;
     }
     main.focus({ preventScroll: true });
   }
-  function setTitle(t) { document.title = t ? `${t} | Arsip Hethereau` : "Arsip Hethereau | Database Neverness to Everness Bahasa Indonesia"; }
+  function setTitle(t) { document.title = t ? `${t} | ${S("Arsip Hethereau", "Hethereau Archive")}` : S("Arsip Hethereau | Database Neverness to Everness Bahasa Indonesia", "Hethereau Archive | Neverness to Everness Database"); }
   function notFound() {
-    setTitle("Tidak ditemukan");
-    main.innerHTML = `<div class="empty"><h2>Arsip tidak ditemukan</h2><p style="margin-top:8px">Halaman yang kamu cari tidak ada. <a href="/" data-link>Kembali ke beranda</a>.</p></div>`;
+    setTitle(S("Tidak ditemukan", "Not found"));
+    main.innerHTML = `<div class="empty"><h2>${S("Arsip tidak ditemukan", "Archive not found")}</h2><p style="margin-top:8px">${S("Halaman yang kamu cari tidak ada.", "The page you are looking for does not exist.")} <a href="/" data-link>${S("Kembali ke beranda", "Back to home")}</a>.</p></div>`;
   }
 
   // ---------------- dialog & notifikasi buatan sendiri ----------------
@@ -161,16 +182,16 @@
   const head = (crumb, title, desc, count) => `
     <div class="page-head">
       <div>
-        <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><span>${esc(crumb)}</span></div>
+        <div class="crumb mono"><a href="/" data-link>${S("ARSIP", "ARCHIVE")}</a><span>/</span><span>${esc(crumb)}</span></div>
         <h1>${esc(title)}</h1>
         ${desc ? `<p>${desc}</p>` : ""}
       </div>
-      ${count != null ? `<span class="count-tag" id="countTag">${count} ENTRI</span>` : ""}
+      ${count != null ? `<span class="count-tag" id="countTag">${count} ${S("ENTRI", "ENTRIES")}</span>` : ""}
     </div>`;
   function filterBox(placeholder) {
     return `<input class="filter-input" type="search" placeholder="${esc(placeholder)}" aria-label="${esc(placeholder)}" autocomplete="off" />`;
   }
-  function chips(list, key, current, all = "Semua") {
+  function chips(list, key, current, all = S("Semua", "All")) {
     return `<div class="chips" data-key="${key}">
       <button class="chip" type="button" data-v="" aria-pressed="${!current}">${all}</button>
       ${list.map((x) => `<button class="chip ${x.cls || ""}" type="button" data-v="${esc(x.v)}" aria-pressed="${current === x.v}">${x.dot ? '<span class="dot"></span>' : ""}${x.icon ? `<img src="${img(x.icon)}" alt="">` : ""}${esc(x.label)}</button>`).join("")}
@@ -203,7 +224,7 @@
     return state;
   }
   const match = (q, ...fields) => !q || fields.some((f) => String(f || "").toLowerCase().includes(q.toLowerCase()));
-  function setCount(n) { const c = $("#countTag"); if (c) c.textContent = `${n} ENTRI`; }
+  function setCount(n) { const c = $("#countTag"); if (c) c.textContent = `${n} ${S("ENTRI", "ENTRIES")}`; }
 
   // ---------------- BERANDA ----------------
   let kvTimer = null;
@@ -280,7 +301,7 @@
 
       <section class="cta-band">
         <div>
-          <h2>${S("Dukung Arsip Hethereau", "Support Arsip Hethereau")}</h2>
+          <h2>${S("Dukung Arsip Hethereau", "Support Hethereau Archive")}</h2>
           <p>${S("Arsip ini dibuat dan diterjemahkan secara sukarela. Dukunganmu membantu arsip terus diperbarui setiap ada versi baru. Ngobrol dan berbagi tips bareng pemain lain di komunitas NTE Indonesia.", "This archive is built and translated voluntarily. Your support keeps it updated with every new version. Chat and share tips with other players in the NTE Indonesia community.")}</p>
         </div>
         <div class="kv-btns">
@@ -342,23 +363,23 @@
     </a>`;
   }
   async function viewEsperList() {
-    setTitle("Esper");
+    setTitle(S("Esper", "Espers"));
     const list = await load("espers");
     const els = [...new Set(list.map((e) => e.element))];
     const types = [...new Map(list.map((e) => [e.arcType, e.arcTypeIcon])).entries()].filter(([t]) => t);
-    main.innerHTML = head("ESPER", "Esper", "Semua karakter yang bisa dimainkan. Pilih satu untuk membuka berkasnya: skill, awakening, profil, dan cerita.", list.length) + `
+    main.innerHTML = head(S("ESPER", "ESPERS"), S("Esper", "Espers"), S("Semua karakter yang bisa dimainkan. Pilih satu untuk membuka berkasnya: skill, awakening, profil, dan cerita.", "Every playable character. Pick one to open its file: skills, awakenings, profile and story."), list.length) + `
       <div class="toolbar">
-        ${filterBox("Cari nama Esper…")}
+        ${filterBox(S("Cari nama Esper…", "Search Esper names…"))}
         ${chips(els.map((x) => ({ v: x, label: x, dot: true, cls: elClass(x) })), "el")}
         <span class="chip-sep"></span>
         ${chips([{ v: "S", label: "Rank S" }, { v: "A", label: "Rank A" }], "rank")}
         <span class="chip-sep"></span>
-        ${chips(types.map(([t, i]) => ({ v: t, label: t, icon: i })), "type", undefined, "Semua tipe")}
+        ${chips(types.map(([t, i]) => ({ v: t, label: t, icon: i })), "type", undefined, S("Semua tipe", "All types"))}
       </div>
       <div class="esper-grid" id="grid"></div>`;
     useFilters((s) => {
       const out = list.filter((e) => match(s.q, e.name, e.title) && (!s.el || e.element === s.el) && (!s.rank || e.rank === s.rank) && (!s.type || e.arcType === s.type));
-      $("#grid").innerHTML = out.length ? out.map(esperCard).join("") : `<div class="empty">Tidak ada Esper yang cocok.</div>`;
+      $("#grid").innerHTML = out.length ? out.map(esperCard).join("") : `<div class="empty">${S("Tidak ada Esper yang cocok.", "No matching Espers.")}</div>`;
       setCount(out.length);
     });
   }
@@ -410,7 +431,7 @@
     const SD = await load("stats");
     const ST = SD.espers[e.id];
     const outfits = (await load("fashion")).filter((f) => f.char === e.name);
-    const facts = [["Faksi", p.faction], ["Ulang tahun", p.birthday], ["Kemampuan Esper", p.esperAbility], ["Pekerjaan", p.occupation], ["Kesukaan", p.food]].filter(([, v]) => v);
+    const facts = [[S("Faksi", "Faction"), p.faction], [S("Ulang tahun", "Birthday"), p.birthday], [S("Kemampuan Esper", "Esper Ability"), p.esperAbility], [S("Pekerjaan", "Occupation"), p.occupation], [S("Kesukaan", "Favorite"), p.food]].filter(([, v]) => v);
     const looks = outfits.map((f) => ({ name: tx(f.name), src: f.image || f.fallback })).filter((l) => l.src);
     const heroSrc = e.portrait || e.icon;
     if (!looks.some((l) => l.src === heroSrc)) looks.unshift({ name: S("Kostum awal", "Default outfit"), src: heroSrc });
@@ -420,20 +441,20 @@
     const ARCS = await load("arcs");
     const MODS = await load("modules");
     const tabs = [
-      ["skill", "Kemampuan", e.skills.length],
+      ["skill", S("Kemampuan", "Abilities"), e.skills.length],
       ["awakening", "Awakening", e.awakening.length],
       ["affinity", "Affinity", AF ? 1 : 0],
       ["build", "Build", e.console.length],
-      ["kosmetik", "Kostum", outfits.length],
-      ["profil", "Profil", p.intro || p.impression || (p.stories || []).length ? 1 : 0],
+      ["kosmetik", S("Kostum", "Outfits"), outfits.length],
+      ["profil", S("Profil", "Profile"), p.intro || p.impression || (p.stories || []).length ? 1 : 0],
     ].filter(([, , n]) => n);
     main.innerHTML = `
-      <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/esper" data-link>ESPER</a><span>/</span><span>${esc(e.name.toUpperCase())}</span></div>
+      <div class="crumb mono"><a href="/" data-link>${S("ARSIP", "ARCHIVE")}</a><span>/</span><a href="/esper" data-link>${S("ESPER", "ESPERS")}</a><span>/</span><span>${esc(e.name.toUpperCase())}</span></div>
       <article class="dossier ${elClass(e.element)}">
         <div class="dossier-art">
           <span class="stamp rank-${e.rank}">${e.rank}</span>
           <img id="heroImg" src="${img(heroSrc)}" alt="${esc(e.name)}">
-          ${looks.length > 1 ? `<div class="outfit-bar"><span id="lookName"></span><button type="button" id="lookPrev" aria-label="Kostum sebelumnya">‹</button><button type="button" id="lookNext" aria-label="Kostum berikutnya">›</button></div>` : ""}
+          ${looks.length > 1 ? `<div class="outfit-bar"><span id="lookName"></span><button type="button" id="lookPrev" aria-label="${S("Kostum sebelumnya", "Previous outfit")}">‹</button><button type="button" id="lookNext" aria-label="${S("Kostum berikutnya", "Next outfit")}">›</button></div>` : ""}
         </div>
         <div>
           <div class="dossier-head">
@@ -524,7 +545,7 @@
             ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
           </div>`;
         }
-        return html + `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
+        return html + `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Efek tambahan yang terbuka lewat Console (空幕)", "Extra effects unlocked through the Console (空幕)")}</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
       awakening: () => {
         const main6 = e.awakening.slice(0, 6), bonus = e.awakening.slice(6);
@@ -625,21 +646,21 @@
     </a>`;
   }
   async function viewArcList() {
-    setTitle("Arc");
+    setTitle(S("Arc", "Arcs"));
     const list = await load("arcs");
     const types = [...new Map(list.map((a) => [a.type, a.typeIcon])).entries()].filter(([t]) => t);
     const rar = [...new Set(list.map((a) => a.rarity))].sort((a, b) => b - a);
-    main.innerHTML = head("ARC", "Arc", "Senjata para Esper. Buka satu Arc untuk melihat efeknya di setiap tingkat bintang.", list.length) + `
+    main.innerHTML = head(S("ARC", "ARCS"), S("Arc", "Arcs"), S("Senjata para Esper. Buka satu Arc untuk melihat efeknya di setiap tingkat bintang.", "The Espers' weapons. Open an Arc to see its effect at every star level."), list.length) + `
       <div class="toolbar">
-        ${filterBox("Cari nama Arc…")}
+        ${filterBox(S("Cari nama Arc…", "Search Arc names…"))}
         ${chips(rar.map((r) => ({ v: String(r), label: "★".repeat(r) })), "r")}
         <span class="chip-sep"></span>
-        ${chips(types.map(([t, i]) => ({ v: t, label: t, icon: i })), "type", undefined, "Semua tipe")}
+        ${chips(types.map(([t, i]) => ({ v: t, label: t, icon: i })), "type", undefined, S("Semua tipe", "All types"))}
       </div>
       <div class="tile-grid" id="grid"></div>`;
     useFilters((s) => {
       const out = list.filter((a) => match(s.q, a.name) && (!s.r || String(a.rarity) === s.r) && (!s.type || a.type === s.type));
-      $("#grid").innerHTML = out.length ? out.map(arcTile).join("") : `<div class="empty">Tidak ada Arc yang cocok.</div>`;
+      $("#grid").innerHTML = out.length ? out.map(arcTile).join("") : `<div class="empty">${S("Tidak ada Arc yang cocok.", "No matching Arcs.")}</div>`;
       setCount(out.length);
     });
   }
@@ -653,7 +674,7 @@
     const AS = SD.arcs[a.slug];
     const similar = list.filter((x) => x.type === a.type && x.rarity === a.rarity && x.slug !== a.slug).slice(0, 8);
     main.innerHTML = `
-      <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/arc" data-link>ARC</a><span>/</span><span>${esc(a.name.toUpperCase())}</span></div>
+      <div class="crumb mono"><a href="/" data-link>${S("ARSIP", "ARCHIVE")}</a><span>/</span><a href="/arc" data-link>${S("ARC", "ARCS")}</a><span>/</span><span>${esc(a.name.toUpperCase())}</span></div>
       <article class="arc-detail q${a.rarity}">
         <div class="arc-card-img art"><img src="${img(a.icon || a.card)}" alt="${esc(a.name)}"></div>
         <div>
@@ -667,15 +688,15 @@
           ${AS ? levelBox(AS.atk.length, statRow("atk", "ATK", "stAtk") + statRow("atk", "ATK %", "stUp")) : ""}
           ${AS ? matBox(AS.mats, SD.items, S("MATERIAL ASCENSION · LV.1 → " + AS.atk.length, "ASCENSION MATERIALS · LV.1 → " + AS.atk.length)) : ""}
           ${a.effect ? `
-            <div class="group-label">Efek Arc</div>
+            <div class="group-label">${S("Efek Arc", "Arc Effect")}</div>
             <div class="entry">
               <h4>${esc(a.effect.name)}</h4>
-              <div class="mono" style="margin:4px 0 8px">TINGKAT BINTANG (MIXING)</div>
-              <div class="star-pick" role="group" aria-label="Tingkat bintang">${a.effect.values.map((_, i) => `<button type="button" data-s="${i}" aria-pressed="${i === 0}">★${i + 1}</button>`).join("")}</div>
+              <div class="mono" style="margin:4px 0 8px">${S("TINGKAT BINTANG (MIXING)", "STAR LEVEL (MIXING)")}</div>
+              <div class="star-pick" role="group" aria-label="${S("Tingkat bintang", "Star level")}">${a.effect.values.map((_, i) => `<button type="button" data-s="${i}" aria-pressed="${i === 0}">★${i + 1}</button>`).join("")}</div>
               <p class="txt" id="arcFx"></p>
             </div>` : ""}
-          ${similar.length ? `<div class="group-label">Arc sejenis (${esc(a.type)} · ${esc(LABEL.rarity[a.rarity] || "")})</div><div class="tile-grid">${similar.map(arcTile).join("")}</div>` : ""}
-          ${espers.length ? `<div class="group-label">Bisa dipakai oleh (Arc ${esc(a.type)})</div><div class="esper-grid">${espers.map(esperCard).join("")}</div>` : ""}
+          ${similar.length ? `<div class="group-label">${S("Arc sejenis", "Similar Arcs")} (${esc(a.type)} · ${esc(LABEL.rarity[a.rarity] || "")})</div><div class="tile-grid">${similar.map(arcTile).join("")}</div>` : ""}
+          ${espers.length ? `<div class="group-label">${S("Bisa dipakai oleh", "Usable by")} (Arc ${esc(a.type)})</div><div class="esper-grid">${espers.map(esperCard).join("")}</div>` : ""}
         </div>
       </article>`;
     if (a.effect) {
@@ -728,7 +749,8 @@
     }));
     const adj = (x, dir) => (x ? `<a class="ver-adj ${dir}" href="/versi/${esc(x.id)}" data-link><span class="mono">${dir === "prev" ? S("← VERSI SEBELUMNYA", "← PREVIOUS VERSION") : S("VERSI BERIKUTNYA →", "NEXT VERSION →")}</span><b>${esc(x.id)} · ${esc(x.title)}</b></a>` : "<span></span>");
     main.innerHTML = `<div id="verRoot">` + `
-      <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/versi" data-link>VERSI</a><span>/</span><span>${esc(v.id)}</span></div>
+      <div class="crumb mono"><a href="/" data-link>${S("ARSIP", "ARCHIVE")}</a><span>/</span><a href="/versi" data-link>VERSI</a><span>/</span><span>${esc(v.id)}</span></div>
+      ${LANG === "en" ? `<p class="ver-note">This article is written in Indonesian. An English version is not available yet.</p>` : ""}
       <p class="ver-meta mono">${S("ARTIKEL VERSI", "VERSION ARTICLE")} ${esc(v.id)}${v.published ? ` · ${S("DITERBITKAN", "PUBLISHED")} ${esc(v.published)}` : ""}</p>
       <section class="ver-hero${v.art ? " has-art" : ""}">
         <div class="ver-num"><span class="mono">${S("VERSI", "VERSION")}</span><b>${esc(v.id)}</b></div>
@@ -759,6 +781,7 @@
     setTitle(S("Versi & Patch", "Versions & Patches"));
     main.innerHTML = head(S("VERSI", "VERSIONS"), S("Versi & Patch", "Versions & Patches"),
       S("Rangkuman tiap update Neverness to Everness dalam bahasa Indonesia. Setiap versi punya artikelnya sendiri yang bisa dibuka kapan saja.", "A write-up of every Neverness to Everness update. Each version has its own article you can reopen any time."), list.length) + `
+      ${LANG === "en" ? `<p class="ver-note">Version articles are written in Indonesian for now.</p>` : ""}
       <div class="ver-cards">${list.map((v, i) => `<a class="ver-card${i === 0 ? " latest" : ""}" href="/versi/${esc(v.id)}" data-link>
         <figure>${v.cover ? `<img src="${img(v.cover.s)}" alt="" loading="lazy">` : ""}${i === 0 ? `<span class="ver-badge">${S("TERBARU", "LATEST")}</span>` : ""}</figure>
         <div class="ver-card-body">
@@ -906,32 +929,32 @@
 
   // ---------------- MODUL ----------------
   async function viewModules() {
-    setTitle("Modul");
+    setTitle(S("Modul", "Modules"));
     const d = await load("modules");
-    main.innerHTML = head("MODUL", "Modul", "Modul dipasang ke Console (空幕) Esper. Kumpulkan 2 atau 4 keping dari set yang sama untuk bonus tambahan.", d.modules.length) + `
-      <div class="section-title"><h2>Set modul</h2><span class="mono">${d.sets.length} SET</span></div>
+    main.innerHTML = head(S("MODUL", "MODULES"), S("Modul", "Modules"), S("Modul dipasang ke Console (空幕) Esper. Kumpulkan 2 atau 4 keping dari set yang sama untuk bonus tambahan.", "Modules are fitted to an Esper's Console (空幕). Collect 2 or 4 pieces of the same set for extra bonuses."), d.modules.length) + `
+      <div class="section-title"><h2>${S("Set modul", "Module sets")}</h2><span class="mono">${d.sets.length} ${S("SET", "SETS")}</span></div>
       <div class="set-grid">${d.sets.map((s) => `
         <div class="set-card">
-          <header>${s.icon ? `<img src="${img(s.icon)}" alt="">` : ""}<div><h3>${esc(s.name)}</h3><span class="mono">${s.modules.length} MODUL</span></div></header>
-          ${s.bonuses.map((b) => `<div class="bonus"><i>${b.pieces} KEPING</i><p class="txt">${rich(b.text)}</p></div>`).join("")}
+          <header>${s.icon ? `<img src="${img(s.icon)}" alt="">` : ""}<div><h3>${esc(s.name)}</h3><span class="mono">${s.modules.length} ${S("MODUL", "MODULES")}</span></div></header>
+          ${s.bonuses.map((b) => `<div class="bonus"><i>${b.pieces} ${S("KEPING", "PIECES")}</i><p class="txt">${rich(b.text)}</p></div>`).join("")}
         </div>`).join("")}
       </div>
-      <div class="section-title"><h2>Semua modul</h2></div>
-      <div class="toolbar">${filterBox("Cari modul…")}${chips([...new Set(d.modules.map((m) => m.set).filter(Boolean))].map((x) => ({ v: x, label: x })), "set", undefined, "Semua set")}</div>
+      <div class="section-title"><h2>${S("Semua modul", "All modules")}</h2></div>
+      <div class="toolbar">${filterBox(S("Cari modul…", "Search modules…"))}${chips([...new Set(d.modules.map((m) => m.set).filter(Boolean))].map((x) => ({ v: x, label: x })), "set", undefined, S("Semua set", "All sets"))}</div>
       <div class="tile-grid" id="grid"></div>`;
     useFilters((s) => {
       const out = d.modules.filter((m) => match(s.q, m.name, m.set) && (!s.set || m.set === s.set));
       $("#grid").innerHTML = out.map((m) => `<button class="tile q${m.rarity}" type="button" data-id="${esc(m.id)}">
         <div class="tile-img"><img src="${img(m.icon)}" alt="" loading="lazy"></div>
-        <div class="tile-body"><b>${esc(m.name)}</b><small>${m.set ? esc(m.set) : esc(m.kind || "Modul")}${m.core ? " · Inti" : ""}</small></div></button>`).join("") || `<div class="empty">Tidak ada modul yang cocok.</div>`;
+        <div class="tile-body"><b>${esc(m.name)}</b><small>${m.set ? esc(m.set) : esc(m.kind || S("Modul", "Module"))}${m.core ? S(" · Inti", " · Core") : ""}</small></div></button>`).join("") || `<div class="empty">${S("Tidak ada modul yang cocok.", "No matching modules.")}</div>`;
       setCount(out.length);
     });
     $("#grid").addEventListener("click", (ev) => {
       const b = ev.target.closest(".tile"); if (!b) return;
       const m = d.modules.find((x) => x.id === b.dataset.id);
       const set = d.sets.find((x) => x.name === m.set);
-      sheet(m, `<span class="mono">MODUL · ${esc(LABEL.rarity[m.rarity] || "")}${m.slots ? ` · ${esc(m.slots)} PETAK` : ""}</span>`,
-        `${m.desc ? `<p class="txt">${rich(m.desc)}</p>` : ""}${set ? `<div class="group-label">Set ${esc(set.name)}</div>${set.bonuses.map((x) => `<div class="bonus"><i>${x.pieces} KEPING</i><p class="txt">${rich(x.text)}</p></div>`).join("")}` : ""}`);
+      sheet(m, `<span class="mono">${S("MODUL", "MODULE")} · ${esc(LABEL.rarity[m.rarity] || "")}${m.slots ? ` · ${esc(m.slots)} ${S("PETAK", "SLOTS")}` : ""}</span>`,
+        `${m.desc ? `<p class="txt">${rich(m.desc)}</p>` : ""}${set ? `<div class="group-label">${S("Set", "Set")} ${esc(set.name)}</div>${set.bonuses.map((x) => `<div class="bonus"><i>${x.pieces} ${S("KEPING", "PIECES")}</i><p class="txt">${rich(x.text)}</p></div>`).join("")}` : ""}`);
     });
   }
 
@@ -951,23 +974,23 @@
 
   // ---------------- ITEM ----------------
   async function viewItems() {
-    setTitle("Item");
+    setTitle(S("Item", "Items"));
     const d = await load("items");
     const counts = {};
     d.items.forEach((i) => (counts[i.cat] = (counts[i.cat] || 0) + 1));
     const cats = d.categories.filter((c) => counts[c.id]);
     const params = new URLSearchParams(location.search);
     let cat = params.get("kat") || "";
-    main.innerHTML = head("ITEM", "Item", "Semua barang di tas: material pengembangan, hadiah, koleksi, kostum, dan lainnya.", d.items.length) + `
+    main.innerHTML = head(S("ITEM", "ITEMS"), S("Item", "Items"), S("Semua barang di tas: material pengembangan, hadiah, koleksi, kostum, dan lainnya.", "Everything in your bag: development materials, gifts, collectibles, outfits and more."), d.items.length) + `
       <div class="item-layout">
         <div class="cat-side" id="cats">
-          <button type="button" data-c="" aria-pressed="${!cat}">Semua<span>${d.items.length}</span></button>
+          <button type="button" data-c="" aria-pressed="${!cat}">${S("Semua", "All")}<span>${d.items.length}</span></button>
           ${cats.map((c) => `<button type="button" data-c="${c.id}" aria-pressed="${cat === c.id}">${esc(c.name)}<span>${counts[c.id]}</span></button>`).join("")}
         </div>
         <div>
-          <div class="toolbar">${filterBox("Cari item…")}${chips([5, 4, 3, 2, 1].map((r) => ({ v: String(r), label: "★".repeat(r) })), "r")}</div>
+          <div class="toolbar">${filterBox(S("Cari item…", "Search items…"))}${chips([5, 4, 3, 2, 1].map((r) => ({ v: String(r), label: "★".repeat(r) })), "r")}</div>
           <div class="tile-grid" id="grid"></div>
-          <div class="more"><button class="btn ghost" type="button" id="more" hidden>Tampilkan lebih banyak</button></div>
+          <div class="more"><button class="btn ghost" type="button" id="more" hidden>${S("Tampilkan lebih banyak", "Show more")}</button></div>
         </div>
       </div>`;
     let state = {}, limit = 120;
@@ -975,7 +998,7 @@
       const out = d.items.filter((i) => (!cat || i.cat === cat) && match(state.q, i.name, i.desc) && (!state.r || String(i.rarity) === state.r));
       $("#grid").innerHTML = out.slice(0, limit).map((i) => `<button class="tile q${i.rarity}" type="button" data-id="${esc(i.id)}">
         <div class="tile-img"><img src="${img(i.icon)}" alt="" loading="lazy"></div>
-        <div class="tile-body"><b>${esc(i.name)}</b></div></button>`).join("") || `<div class="empty">Tidak ada item yang cocok.</div>`;
+        <div class="tile-body"><b>${esc(i.name)}</b></div></button>`).join("") || `<div class="empty">${S("Tidak ada item yang cocok.", "No matching items.")}</div>`;
       $("#more").hidden = out.length <= limit;
       setCount(out.length);
     };
@@ -993,26 +1016,25 @@
       const b = ev.target.closest(".tile"); if (!b) return;
       const i = d.items.find((x) => x.id === b.dataset.id);
       const c = d.categories.find((x) => x.id === i.cat);
-      sheet(i, `<span class="mono">ITEM · ${esc(c ? c.name : "")}</span>`,
+      sheet(i, `<span class="mono">${S("ITEM", "ITEM")} · ${esc(c ? c.name : "")}</span>`,
         `${i.use ? `<div class="use txt">${rich(i.use)}</div>` : ""}${i.desc ? `<p class="txt">${rich(i.desc)}</p>` : ""}`);
     });
   }
 
   // ---------------- FURNITUR ----------------
-  const FSTAT = { Comfort: "Kenyamanan", Fortune: "Keberuntungan", Love: "Kehangatan", Collect: "Nilai koleksi" };
   async function viewFurniture() {
-    setTitle("Furnitur");
+    setTitle(S("Furnitur", "Furniture"));
     const list = await load("furniture");
-    main.innerHTML = head("FURNITUR", "Furnitur", "Perabot untuk mengisi rumahmu. Tiap furnitur punya nilai kenyamanan, keberuntungan, kehangatan, dan koleksi.", list.length) + `
-      <div class="toolbar">${filterBox("Cari furnitur…")}${chips([5, 4, 3, 2].map((r) => ({ v: String(r), label: "★".repeat(r) })), "r")}</div>
+    main.innerHTML = head(S("FURNITUR", "FURNITURE"), S("Furnitur", "Furniture"), S("Perabot untuk mengisi rumahmu. Tiap furnitur punya nilai kenyamanan, keberuntungan, kehangatan, dan koleksi.", "Furnishings for your home. Each piece has comfort, fortune, warmth and collection values."), list.length) + `
+      <div class="toolbar">${filterBox(S("Cari furnitur…", "Search furniture…"))}${chips([5, 4, 3, 2].map((r) => ({ v: String(r), label: "★".repeat(r) })), "r")}</div>
       <div class="tile-grid" id="grid"></div>
-      <div class="more"><button class="btn ghost" type="button" id="more" hidden>Tampilkan lebih banyak</button></div>`;
+      <div class="more"><button class="btn ghost" type="button" id="more" hidden>${S("Tampilkan lebih banyak", "Show more")}</button></div>`;
     let state = {}, limit = 120;
     const draw = () => {
       const out = list.filter((i) => match(state.q, i.name, i.desc) && (!state.r || String(i.rarity) === state.r));
       $("#grid").innerHTML = out.slice(0, limit).map((i) => `<button class="tile q${i.rarity}" type="button" data-id="${esc(i.id)}">
         <div class="tile-img"><img src="${img(i.icon)}" alt="" loading="lazy"></div>
-        <div class="tile-body"><b>${esc(i.name)}</b>${i.stats && i.stats.Comfort ? `<small>Kenyamanan +${i.stats.Comfort}</small>` : ""}</div></button>`).join("") || `<div class="empty">Tidak ada furnitur yang cocok.</div>`;
+        <div class="tile-body"><b>${esc(i.name)}</b>${i.stats && i.stats.Comfort ? `<small>${S("Kenyamanan", "Comfort")} +${i.stats.Comfort}</small>` : ""}</div></button>`).join("") || `<div class="empty">${S("Tidak ada furnitur yang cocok.", "No matching furniture.")}</div>`;
       $("#more").hidden = out.length <= limit;
       setCount(out.length);
     };
@@ -1022,41 +1044,41 @@
       const b = ev.target.closest(".tile"); if (!b) return;
       const i = list.find((x) => x.id === b.dataset.id);
       const st = Object.entries(i.stats || {}).filter(([, v]) => v);
-      sheet(i, `<span class="mono">FURNITUR</span>`,
-        `${st.length ? `<div class="stat-row">${st.map(([k, v]) => `<div class="fact"><span>${FSTAT[k] || k}</span><b>+${v}</b></div>`).join("")}</div>` : ""}
+      sheet(i, `<span class="mono">${S("FURNITUR", "FURNITURE")}</span>`,
+        `${st.length ? `<div class="stat-row">${st.map(([k, v]) => `<div class="fact"><span>${LABEL.fstat[k] || k}</span><b>+${v}</b></div>`).join("")}</div>` : ""}
          ${i.use ? `<div class="use txt">${rich(i.use)}</div>` : ""}${i.desc ? `<p class="txt">${rich(i.desc)}</p>` : ""}`);
     });
   }
 
   // ---------------- KENDARAAN ----------------
   async function viewVehicles() {
-    setTitle("Kendaraan");
+    setTitle(S("Kendaraan", "Vehicles"));
     const list = await load("vehicles");
     const brands = [...new Set(list.map((v) => v.brand).filter(Boolean))].sort();
-    main.innerHTML = head("KENDARAAN", "Kendaraan", "Mobil dan motor yang bisa kamu kendarai keliling Hethereau.", list.length) + `
-      <div class="toolbar">${filterBox("Cari kendaraan…")}${chips(brands.map((b) => ({ v: b, label: b })), "brand", undefined, "Semua merek")}</div>
+    main.innerHTML = head(S("KENDARAAN", "VEHICLES"), S("Kendaraan", "Vehicles"), S("Mobil dan motor yang bisa kamu kendarai keliling Hethereau.", "Cars and bikes you can ride around Hethereau."), list.length) + `
+      <div class="toolbar">${filterBox(S("Cari kendaraan…", "Search vehicles…"))}${chips(brands.map((b) => ({ v: b, label: b })), "brand", undefined, S("Semua merek", "All brands"))}</div>
       <div class="wide-grid" id="grid"></div>`;
     useFilters((s) => {
       const out = list.filter((v) => match(s.q, v.name, v.brand) && (!s.brand || v.brand === s.brand));
       $("#grid").innerHTML = out.map((v) => `<button class="wcard" type="button" data-id="${esc(v.id)}">
         <div class="wcard-img">${v.icon ? `<img src="${img(v.icon)}" alt="" loading="lazy">` : ""}</div>
-        <div class="wcard-body"><small>${esc(v.brand || "")}</small><b>${esc(v.name)}</b><p>${rich(v.desc).replace(/<[^>]+>/g, "")}</p></div></button>`).join("") || `<div class="empty">Tidak ada kendaraan yang cocok.</div>`;
+        <div class="wcard-body"><small>${esc(v.brand || "")}</small><b>${esc(v.name)}</b><p>${rich(v.desc).replace(/<[^>]+>/g, "")}</p></div></button>`).join("") || `<div class="empty">${S("Tidak ada kendaraan yang cocok.", "No matching vehicles.")}</div>`;
       setCount(out.length);
     });
     $("#grid").addEventListener("click", (ev) => {
       const b = ev.target.closest(".wcard"); if (!b) return;
       const v = list.find((x) => x.id === b.dataset.id);
-      sheet(v, `<span class="mono">KENDARAAN · ${esc(v.brand || "")}</span>`,
-        `<div class="stat-row">${v.kind ? `<div class="fact"><span>Jenis</span><b>${esc(LABEL.vehicleKind[v.kind] || v.kind)}</b></div>` : ""}${v.source ? `<div class="fact"><span>Didapat dari</span><b>${esc(LABEL.source[v.source] || v.source)}</b></div>` : ""}</div>
+      sheet(v, `<span class="mono">${S("KENDARAAN", "VEHICLE")} · ${esc(v.brand || "")}</span>`,
+        `<div class="stat-row">${v.kind ? `<div class="fact"><span>${S("Jenis", "Type")}</span><b>${esc(LABEL.vehicleKind[v.kind] || v.kind)}</b></div>` : ""}${v.source ? `<div class="fact"><span>${S("Didapat dari", "Obtained from")}</span><b>${esc(LABEL.source[v.source] || v.source)}</b></div>` : ""}</div>
          <p class="txt">${rich(v.desc)}</p>`);
     });
   }
 
   // ---------------- PROPERTI ----------------
   async function viewProperty() {
-    setTitle("Properti");
+    setTitle(S("Properti", "Property"));
     const list = await load("property");
-    main.innerHTML = head("PROPERTI", "Properti", "Apartemen dan hunian yang bisa kamu beli di Hethereau.", list.length) + `
+    main.innerHTML = head(S("PROPERTI", "PROPERTY"), S("Properti", "Property"), S("Apartemen dan hunian yang bisa kamu beli di Hethereau.", "Apartments and homes you can buy in Hethereau."), list.length) + `
       <div class="wide-grid">${list.map((p) => `
         <button class="wcard" type="button" data-id="${esc(p.id)}">
           <div class="wcard-img">${p.image ? `<img src="${img(p.image)}" alt="" loading="lazy">` : ""}</div>
@@ -1066,9 +1088,9 @@
     main.querySelector(".wide-grid").addEventListener("click", (ev) => {
       const b = ev.target.closest(".wcard"); if (!b) return;
       const p = list.find((x) => x.id === b.dataset.id);
-      sheet(p, `<span class="mono">PROPERTI · ${esc(p.area)}</span>`,
+      sheet(p, `<span class="mono">${S("PROPERTI", "PROPERTY")} · ${esc(p.area)}</span>`,
         `${p.slogan ? `<p class="lede txt" style="margin-top:12px">${rich(p.slogan)}</p>` : ""}
-         ${p.address ? `<div class="use"><b>Alamat:</b> ${esc(p.address)}</div>` : ""}
+         ${p.address ? `<div class="use"><b>${S("Alamat", "Address")}:</b> ${esc(p.address)}</div>` : ""}
          ${p.desc ? `<p class="txt">${rich(p.desc)}</p>` : ""}`);
     });
   }
@@ -1079,7 +1101,53 @@
   const S = (id, en) => (LANG === "en" ? en : id);
   const strip = (s) => String(s || "").replace(/<[^>]+>/g, "");
   const paras = (s) => rich(s).split(/\n+/).filter(Boolean).map((p) => `<p class="txt" style="margin-top:10px">${p}</p>`).join("");
-  const syncLangBtn = () => { if (langBtn) { langBtn.textContent = LANG.toUpperCase(); langBtn.setAttribute("aria-label", S("Ganti bahasa (sekarang Indonesia)", "Switch language (now English)")); } document.documentElement.lang = LANG; };
+
+  // ---------------- teks statis di index.html mengikuti bahasa ----------------
+  const ST_TEXT = {
+    "Lewati ke konten": "Skip to content", "Database NTE": "NTE Database", "Beranda": "Home",
+    "Esper": "Espers", "Arc": "Arcs", "Modul": "Modules", "Item": "Items", "Furnitur": "Furniture", "Kendaraan": "Vehicles", "Properti": "Property",
+    "Cerita": "Story", "Anomali": "Anomalies", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
+    "MENU · INDEKS ARSIP": "MENU · ARCHIVE INDEX", "LAINNYA": "MORE",
+    "Portofolio Febry Coeg": "Febry Coeg's Portfolio", "Profil, sosial media, game, dan video YouTube": "Profile, socials, games and YouTube videos",
+    "Join Discord NTE Indonesia ↗": "Join the NTE Indonesia Discord ↗", "Donate lewat Trakteer ↗": "Donate via Trakteer ↗",
+    "Guide NTE di YouTube ↗": "NTE guides on YouTube ↗", "Top up di Febry Store ↗": "Top up at Febry Store ↗",
+    "Arsip Hethereau": "Hethereau Archive",
+    "Fan-site tidak resmi, dibuat oleh": "Unofficial fan site, made by",
+    ". Tidak berafiliasi dengan Hotta Studio atau Perfect World.": ". Not affiliated with Hotta Studio or Perfect World.",
+    "Data dan gambar bersumber dari": "Data and images sourced from",
+    ". Hak cipta Neverness to Everness milik Hotta Studio / Perfect World.": ". Neverness to Everness is © Hotta Studio / Perfect World.",
+    "Data & gambar game © Hotta Studio / Perfect World.": "Game data & images © Hotta Studio / Perfect World.",
+  };
+  const ST_ATTR = {
+    "Kategori": "Categories", "Cari (Ctrl+K)": "Search (Ctrl+K)", "Donate lewat Trakteer": "Donate via Trakteer", "Buka menu": "Open menu",
+    "Tutup menu": "Close menu", "Menu utama": "Main menu", "Pencarian": "Search", "Cari Esper, Arc, Item, Kendaraan…": "Search Espers, Arcs, Items, Vehicles…",
+    "Detail": "Details", "Tutup": "Close",
+  };
+  const stOrig = new WeakMap();
+  function applyStatic() {
+    const en = LANG === "en";
+    const roots = $$(".skip, header.top, .drawer, .search-box, footer.foot");
+    roots.forEach((root) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (nd) => (nd.parentElement && nd.parentElement.closest("#searchResults") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      let n;
+      while ((n = walker.nextNode())) {
+        const raw = n.nodeValue, key = raw.replace(/\s+/g, " ").trim();
+        if (!stOrig.has(n)) { if (ST_TEXT[key]) stOrig.set(n, raw); else continue; }
+        const orig = stOrig.get(n), k = orig.replace(/\s+/g, " ").trim();
+        n.nodeValue = en && ST_TEXT[k] ? orig.replace(k, ST_TEXT[k]) : orig;
+      }
+      [root, ...root.querySelectorAll("[aria-label],[placeholder]")].forEach((el) => {
+        ["aria-label", "placeholder"].forEach((at) => {
+          const v = el.getAttribute(at); if (v == null) return;
+          const store = (el.__stAttr ||= {});
+          if (!(at in store)) { if (ST_ATTR[v]) store[at] = v; else return; }
+          el.setAttribute(at, en && ST_ATTR[store[at]] ? ST_ATTR[store[at]] : store[at]);
+        });
+      });
+    });
+    const nav = $(".top-nav"); if (nav) nav.setAttribute("aria-label", en ? "Categories" : "Kategori");
+  }
+  const syncLangBtn = () => { if (langBtn) { langBtn.textContent = LANG.toUpperCase(); langBtn.setAttribute("aria-label", S("Ganti bahasa (sekarang Indonesia)", "Switch language (now English)")); } document.documentElement.lang = LANG; applyStatic(); };
   if (langBtn) langBtn.onclick = () => {
     LANG = LANG === "id" ? "en" : "id";
     try { localStorage.setItem("nte-lang", LANG); } catch (e) {}
@@ -1526,12 +1594,12 @@
     if (index) return index;
     const [es, ar, md, it, fu, ve, st, an, gl, ac, fa, fo] = await Promise.all(["espers", "arcs", "modules", "items", "furniture", "vehicles", "story", "anomalies", "glossary", "achievements", "fashion", "food"].map(load));
     index = [
-      ...es.map((x) => ({ g: "Esper", n: x.name, s: `${x.element} · Rank ${x.rank}`, i: x.icon, href: `/esper/${x.slug}` })),
+      ...es.map((x) => ({ g: S("Esper", "Esper"), n: x.name, s: `${x.element} · Rank ${x.rank}`, i: x.icon, href: `/esper/${x.slug}` })),
       ...ar.map((x) => ({ g: "Arc", n: x.name, s: x.type, i: x.icon, href: `/arc/${x.slug}` })),
-      ...md.modules.map((x) => ({ g: "Modul", n: x.name, s: x.set || "Modul", i: x.icon, href: `/modul?q=${encodeURIComponent(x.name)}` })),
+      ...md.modules.map((x) => ({ g: S("Modul", "Module"), n: x.name, s: x.set || S("Modul", "Module"), i: x.icon, href: `/modul?q=${encodeURIComponent(x.name)}` })),
       ...it.items.map((x) => ({ g: "Item", n: x.name, s: (it.categories.find((c) => c.id === x.cat) || {}).name, i: x.icon, href: `/item?q=${encodeURIComponent(x.name)}` })),
-      ...fu.map((x) => ({ g: "Furnitur", n: x.name, s: "Furnitur", i: x.icon, href: `/furnitur?q=${encodeURIComponent(x.name)}` })),
-      ...ve.map((x) => ({ g: "Kendaraan", n: x.name, s: x.brand, i: x.icon, href: `/kendaraan?q=${encodeURIComponent(x.name)}` })),
+      ...fu.map((x) => ({ g: S("Furnitur", "Furniture"), n: x.name, s: S("Furnitur", "Furniture"), i: x.icon, href: `/furnitur?q=${encodeURIComponent(x.name)}` })),
+      ...ve.map((x) => ({ g: S("Kendaraan", "Vehicle"), n: x.name, s: x.brand, i: x.icon, href: `/kendaraan?q=${encodeURIComponent(x.name)}` })),
       ...st.map((x) => ({ g: S("Cerita", "Story"), n: tx(x.title), s: x.chapter ? tx(x.chapter) : "Spinoff", href: `/cerita?q=${encodeURIComponent(tx(x.title))}` })),
       ...an.anomalies.map((x) => ({ g: S("Anomali", "Anomaly"), n: x.name, s: x.code, href: `/anomali?q=${encodeURIComponent(x.name)}` })),
       ...gl.map((x) => ({ g: S("Istilah", "Glossary"), n: tx(x.name), s: "", href: `/istilah?q=${encodeURIComponent(x.name.en)}` })),
@@ -1545,7 +1613,7 @@
     openLayer($("#search"));
     const inp = $("#searchInput");
     inp.value = "";
-    $("#searchResults").innerHTML = `<p class="hint">Ketik nama Esper, Arc, item, furnitur, atau kendaraan.</p>`;
+    $("#searchResults").innerHTML = `<p class="hint">${S("Ketik nama Esper, Arc, item, furnitur, atau kendaraan.", "Type the name of an Esper, Arc, item, furniture or vehicle.")}</p>`;
     buildIndex();
   }
   $(".search-open").onclick = openSearch;
@@ -1553,10 +1621,10 @@
   $("#searchInput").addEventListener("input", async (e) => {
     const q = e.target.value.trim().toLowerCase();
     const box = $("#searchResults");
-    if (!q) { box.innerHTML = `<p class="hint">Ketik nama Esper, Arc, item, furnitur, atau kendaraan.</p>`; return; }
+    if (!q) { box.innerHTML = `<p class="hint">${S("Ketik nama Esper, Arc, item, furnitur, atau kendaraan.", "Type the name of an Esper, Arc, item, furniture or vehicle.")}</p>`; return; }
     const idx = await buildIndex();
     const hits = idx.filter((x) => x.n.toLowerCase().includes(q)).sort((a, b) => a.n.toLowerCase().indexOf(q) - b.n.toLowerCase().indexOf(q)).slice(0, 40);
-    if (!hits.length) { box.innerHTML = `<p class="hint">Tidak ada hasil untuk "${esc(q)}".</p>`; return; }
+    if (!hits.length) { box.innerHTML = `<p class="hint">${S("Tidak ada hasil untuk", "No results for")} "${esc(q)}".</p>`; return; }
     const groups = {};
     hits.forEach((h) => (groups[h.g] ||= []).push(h));
     sel = 0;

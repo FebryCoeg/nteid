@@ -95,6 +95,8 @@ LABELS = [
 
 def label_id(t):
     t = re.sub(r"<[^>]+>", "", t or "").strip()
+    if B.LANG_BUILD == "en":
+        return t
     for rx, fn in LABELS:
         m = re.fullmatch(rx, t)
         if m:

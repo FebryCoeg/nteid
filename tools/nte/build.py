@@ -131,6 +131,7 @@ def plain(s):
 I18N_FILE = TOOLS / "i18n_id.json"
 I18N = json.loads(I18N_FILE.read_text(encoding="utf-8")) if I18N_FILE.exists() else {}
 PENDING = {}  # teks Inggris yang belum diterjemahkan -> konteks
+LANG_BUILD = os.environ.get("NTE_LANG", "id")  # "en" = bangun versi bahasa Inggris (dipakai build_en.py)
 
 def T(s, ctx=""):
     """Terjemahkan teks (efek, deskripsi, story). Kembalikan teks Indonesia bila ada."""
@@ -138,6 +139,8 @@ def T(s, ctx=""):
     if not s:
         return ""
     if re.fullmatch(r"[\d\s.,%+\-*/:{}()sx]+", s):
+        return s
+    if LANG_BUILD == "en":
         return s
     if s in I18N and I18N[s]:
         return I18N[s]
@@ -486,6 +489,10 @@ ITEM_CATS = [
     ("lainnya", "Lainnya", lambda r, tags, t: True),
 ]
 
+ITEM_CAT_EN = {"material": "Development Materials", "karakter": "Characters", "hadiah": "Affinity Gifts", "masak": "Food & Ingredients",
+               "profil": "Profile Customization", "koleksi": "Collectibles", "kostum": "Outfits & Style", "paket": "Boxes & Packs",
+               "penting": "Key Items", "misi": "Quest Items", "lainnya": "Other"}
+
 def build_items():
     items = table("DataTable/Inventory/DT_ItemConfig.json")
     fattr = table("DataTable/RealEstate/DT_FurnitureAttributeDataTable.json")
@@ -515,7 +522,7 @@ def build_items():
         cat = next(c for c, _, f in ITEM_CATS if f(r, tags, t))
         base["cat"] = cat
         out.append(base)
-    save("items", {"categories": [{"id": c, "name": n} for c, n, _ in ITEM_CATS], "items": sorted(out, key=lambda x: (-x["rarity"], x["name"]))})
+    save("items", {"categories": [{"id": c, "name": (ITEM_CAT_EN[c] if LANG_BUILD == "en" else n)} for c, n, _ in ITEM_CATS], "items": sorted(out, key=lambda x: (-x["rarity"], x["name"]))})
     save("furniture", sorted(furn, key=lambda x: (-x["rarity"], x["name"])))
 
 def build_vehicles():

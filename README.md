@@ -21,7 +21,7 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 ## Fitur
 
 - **Berbahasa Indonesia**: efek, deskripsi, dan cerita diterjemahkan. Nama karakter, item, skill, dan istilah game tetap memakai nama aslinya.
-- **Dua bahasa**: tombol ID/EN untuk beralih ke teks bahasa Inggris aslinya.
+- **Dua bahasa**: tombol ID/EN tersedia di semua halaman dan mengubah menu, judul, label, serta isi data (Esper, Arc, modul, item, furnitur, kendaraan, properti, dan lainnya) ke bahasa Inggris aslinya. Versi Inggris data dibuat oleh `tools/nte/build_en.py` ke `nte/data/en/`. Artikel Versi & Patch saat ini hanya berbahasa Indonesia.
 - **Beranda bergaya key visual** dengan latar ilustrasi kota Hethereau yang berganti otomatis dan etalase Esper.
 - **Pencarian cepat** ke seluruh isi database.
 - **Filter** per rarity, elemen, tipe, dan kategori yang tersimpan di URL.
