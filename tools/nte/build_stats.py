@@ -104,6 +104,11 @@ def label_id(t):
     return t
 
 
+# Tabel tips game untuk karakter ini menunjuk ke baris damage karakter lain (placeholder salinan, mis. Exe -> Shinku
+# pada data 1.5.4). Tabel rasio disembunyikan supaya tidak menampilkan angka yang salah.
+TIPS_WRONG = {"1074"}
+
+
 def skill_levels(char_id, cfg, tips, dmg):
     """Material tiap level skill (kumulatif dihitung di browser) dan tabel rasio DMG per level."""
     out = {}
@@ -119,7 +124,7 @@ def skill_levels(char_id, cfg, tips, dmg):
         for g in (tips.get(key, {}).get("GALevelUpArray") or []):
             lu = g.get("LevelUpData") or {}
             ges = lu.get("DamageGEList") or []
-            if not ges or any(x not in dmg for x in ges):
+            if char_id in TIPS_WRONG or not ges or any(x not in dmg for x in ges):
                 continue
             fmt = (g.get("DescValue") or {}).get("LocalizedString") or "{0}%"
             pct = "%" in fmt
