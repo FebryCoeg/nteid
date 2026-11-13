@@ -1284,3 +1284,17 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 @media (max-width: 560px) { .bd-arcs { grid-template-columns: 1fr; } .bd-ref { width: 100%; text-align: center; } }
 .bd-awks .bd-awk-row.nopick { opacity: 0.55; }
 .bd-awks .bd-awk-row.nopick i { background: var(--panel-3, #444); }
+/* hasil simulasi di tab Build */
+.bd-calc { margin: 6px 0 12px; padding: 10px 14px; border-radius: 14px; background: var(--panel); box-shadow: var(--ring); border-left: 5px solid var(--pink); font-size: 0.78rem; color: var(--text-2); }
+.bd-calc b { color: var(--pink); font: 800 0.66rem var(--mono); letter-spacing: 0.06em; }
+.bd-pct { display: inline-flex; align-items: baseline; gap: 4px; margin-left: auto; flex: none; padding: 6px 10px; border-radius: 12px; background: var(--panel-2); box-shadow: var(--ring); white-space: nowrap; }
+.bd-pct b { font: 800 1.05rem var(--display); color: var(--text); }
+.bd-pct b.solo { margin-left: 6px; color: var(--text-2); font-size: 0.9rem; }
+.bd-pct small { font: 700 0.52rem var(--mono); letter-spacing: 0.06em; color: var(--muted); }
+.bd-set .bd-pct { align-self: center; }
+.bd-setnote { font-size: 0.72rem; color: var(--text-2); font-style: italic; }
+@media (max-width: 560px) { .bd-arc { flex-wrap: wrap; } .bd-pct { margin-left: 0; } }
+.bd-arc { flex-wrap: wrap; }
+.bd-arc > span:not(.bd-pct) { flex: 1 1 140px; min-width: 0; }
+.bd-arc .bd-pct { flex-basis: 100%; margin: 4px 0 0; justify-content: flex-start; width: 100%; }
+.bd-set .bd-pct { margin: 6px 0 0; }

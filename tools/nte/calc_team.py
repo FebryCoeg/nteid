@@ -21,11 +21,13 @@ import dmgformula as F  # noqa: E402
 
 D = Path(__file__).resolve().parents[2] / "nte" / "data"
 SHINKU = 1076
-LOG = Path(sys.argv[1]) if len(sys.argv) > 1 else None
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+EXPORT = "--export" in sys.argv
+LOG = Path(ARGS[0]) if ARGS else None
 STATS = json.loads((D / "en" / "stats.json").read_text(encoding="utf-8"))
 ARCS = {a["slug"]: a for a in json.loads((D / "en" / "arcs.json").read_text(encoding="utf-8"))}
 ARC_ID = {a["slug"]: a["id"] for a in json.loads((D / "arcs.json").read_text(encoding="utf-8"))}
-CACHE = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(os.environ.get("NTE_CACHE", "."))
+CACHE = Path(ARGS[1]) if len(ARGS) > 1 else Path(os.environ.get("NTE_CACHE", "."))
 
 CHAR_LV, ENEMY_LV, ENEMY_RES = 80, 90, 0.20
 CONSOLE_CD = 0.32
@@ -156,6 +158,7 @@ def main():
     ref_eff = build_effects("blushing-mirage", "Lost Radiance (4)")
     ref = (ref_eff, arc_secondary("blushing-mirage"), STATS["arcs"]["blushing-mirage"]["atk"][-1])
     syn = [s for s, a in ARCS.items() if a["type"] == "Synthesis" and a["rarity"] >= 4]
+    agg = {"arcs": {}, "sets": {}}
     for name, sc in SCENARIOS.items():
         base, base_s = team_total("blushing-mirage", "Lost Radiance (4)", sc, rows, ults, skills, ref)
         print(f"\n=== Skenario {name}: acuan 100% = Blushing Mirage + Lost Radiance (tim {base:,.0f}) ===")
@@ -163,10 +166,38 @@ def main():
         res = sorted(((team_total(s, "Lost Radiance (4)", sc, rows, ults, skills, ref), s) for s in syn), key=lambda x: -x[0][0])
         for (tot, sh), s in res:
             print(f"  {ARCS[s]['name']:<30} tim {100 * tot / base:6.1f}%   Shinku saja {100 * sh / base_s:6.1f}%")
+            agg["arcs"].setdefault(s, []).append((100 * tot / base, 100 * sh / base_s))
         print("-- Set cartridge Shinku (Arc Blushing Mirage)")
         res = sorted(((team_total("blushing-mirage", n, sc, rows, ults, skills, ref), n) for n in SETS), key=lambda x: -x[0][0])
         for (tot, sh), n in res:
             print(f"  {n:<40} tim {100 * tot / base:6.1f}%   Shinku saja {100 * sh / base_s:6.1f}%")
+            agg["sets"].setdefault(n, []).append((100 * tot / base, 100 * sh / base_s))
+    if EXPORT:
+        export(agg, rows, ults, skills)
+
+
+SET_ID = {"Lost Radiance (4)": "Suit6", "Shadow Creed (4)": "Suit8", "Fireflies and the Forest (4)": "Suit2",
+          "Street Boxer (4)": "Suit5", "Speedy Hedgehog (4) + buff tim": "Suit11"}
+EXCLUDE_ARCS = {"what-s-desired"}  # uptime efek belum terverifikasi (peringkat terlalu tinggi dibanding sumber pembanding)
+
+
+def export(agg, rows, ults, skills):
+    avg = lambda xs, i: round(sum(x[i] for x in xs) / len(xs))  # noqa: E731
+    arcs = {s: (avg(v, 0), avg(v, 1)) for s, v in agg["arcs"].items() if s not in EXCLUDE_ARCS}
+    top_arcs = sorted(arcs, key=lambda s: -arcs[s][0])[:4]
+    sets = {SET_ID[n]: (avg(v, 0), avg(v, 1)) for n, v in agg["sets"].items() if n in SET_ID and n != "Speedy Hedgehog (4) + buff tim"}
+    top_sets = sorted(sets, key=lambda i: -sets[i][0])[:3]
+    out = {"shinku": {
+        "team": ["shinku", "elyms", "akane-rin", "iroi"], "basis": {"arc": "blushing-mirage", "set": "Suit6"},
+        "arcs": top_arcs, "arcPct": {s: {"team": arcs[s][0], "solo": arcs[s][1]} for s in top_arcs},
+        "sets": [{"id": i, "pieces": 4} for i in top_sets], "setPct": {i: {"team": sets[i][0], "solo": sets[i][1]} for i in top_sets},
+        "setNote": {"Suit5": {"id": "Naik ke sekitar 100% jika tim memicu Remora atau Stain.", "en": "Rises to about 100% if the team triggers Remora or Stain."}},
+        "note": {"id": "Hasil simulasi ulang rekaman pertarungan nyata (Shinku, Elyms, Akane Rin, Iroi, Beyond the Rails lantai 12). Persentase relatif terhadap Blushing Mirage + Lost Radiance; gear dasar dan buff tim adalah asumsi, peringkatnya diuji di tiga skenario.",
+                 "en": "Result of replaying a real recorded fight (Shinku, Elyms, Akane Rin, Iroi, Beyond the Rails floor 12). Percentages are relative to Blushing Mirage + Lost Radiance; base gear and team buffs are assumptions, ranking tested across three scenarios."},
+    }}
+    path = D / "builds_calc.json"
+    path.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print("diekspor ->", path)
 
 
 if __name__ == "__main__":

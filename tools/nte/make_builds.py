@@ -22,6 +22,7 @@ arcs = jl(EN / "arcs.json")
 mods = jl(EN / "modules.json")
 stats = jl(D / "stats.json")
 set_ids = {s["id"] for s in mods["sets"]}
+ARCS_BY_SLUG = {a["slug"]: a for a in arcs}
 
 ELEMENT_SET = {"Chaos": "Suit1", "Anima": "Suit2", "Psyche": "Suit3", "Incantation": "Suit4",
                "Lakshana": "Suit5", "Cosmos": "Suit6", "Mental": "Suit12"}
@@ -155,6 +156,23 @@ for e in espers:
         "draft": True, "kind": k, "arcs": a_slugs, "arcWhy": a_why, "sets": sets, "setWhy": s_why,
         "stats": main, "sub": sub, "awks": awk_order(e, k), "skills": skill_order(e, tags, k),
     }
+
+# hasil simulasi (builds_calc.json) menggantikan urutan Arc/set draf untuk Esper yang sudah dihitung
+calc_path = D / "builds_calc.json"
+if calc_path.exists():
+    by_slug = {e["slug"]: e for e in espers}
+    for slug, c in jl(calc_path).items():
+        e = by_slug[slug]
+        tags = (stats["espers"].get(e["id"]) or {}).get("tags") or []
+        d = out[slug]
+        d["arcs"] = c["arcs"]
+        d["arcWhy"] = {a: ["type"] + arc_codes(ARCS_BY_SLUG[a], e, tags) + (["rare"] if ARCS_BY_SLUG[a]["rarity"] == 5 else []) for a in c["arcs"]}
+        d["arcPct"] = c["arcPct"]
+        d["sets"] = c["sets"]
+        d["setPct"] = c["setPct"]
+        d["setWhy"] = {i: w for i, w in {"Suit6": "element", "Suit8": "atk"}.items() if any(x["id"] == i for x in c["sets"])}
+        d["setNote"] = c.get("setNote", {})
+        d["calc"] = {"team": c["team"], "basis": c["basis"], "note": c["note"]}
 
 (D / "builds_draft.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print("draf build:", len(out), "Esper ->", D / "builds_draft.json")
