@@ -485,8 +485,9 @@
       affinity: () => {
         const it = (id) => SD.items[id];
         const price = (id) => {
-          const pr = (SD.prices || {})[id]; if (!pr || !pr.length) return "";
+          const pr = (SD.prices || {})[id]; if (!pr || !pr.length) return `<span class="mat-price none" title="${esc(S("Tidak dijual di toko, biasanya hadiah event atau misi", "Not sold in shops, usually an event or quest reward"))}">${S("Tidak dijual", "Not sold")}</span>`;
           const [cur, v] = pr[0], c = (SD.currencies || {})[cur] || { name: cur, icon: "" };
+          if (c.event) return `<span class="mat-price event" title="${esc(S("Didapat dari event / mode khusus", "From an event / special mode"))}">${S("Dari event", "From event")}</span>`;
           return `<span class="mat-price" title="${esc(S("Harga di toko: ", "Shop price: ") + nf(v) + " " + c.name)}">${c.icon ? `<img src="${img(c.icon)}" alt="">` : ""}${nf(v)}<em>${esc(c.name)}</em></span>`;
         };
         const tile = (id, n, heart) => it(id) ? `<div class="mat q${it(id).rarity || 1}" title="${esc(it(id).name)}"><img src="${img(it(id).icon)}" alt="${esc(it(id).name)}" loading="lazy"><small>${esc(it(id).name)}</small><b>${heart ? ICO.heart : ""}${nf(n)}</b>${heart ? price(id) : ""}</div>` : "";

@@ -16,6 +16,8 @@ import build as B  # noqa: E402
 
 P = "DataTable/PackData/ModifyData/"
 MAXLV = 80
+# mata uang koin event/mode khusus: harganya tampil sebagai "Dari event"
+EVENT_CURRENCIES = {"BattleRaceCoin", "HideSeekCoin", "GingerbreadCoin", "DefendTowerCoin", "TankBattleCoin"}
 
 
 def mods(tab, key):
@@ -286,6 +288,8 @@ if __name__ == "__main__":
         name = "Fons" if cid == "Fons" else (B.plain(B.loc_text(r.get("ItemName"))) if r and r.get("ItemName") else re.sub(r"(?<=[a-z])(?=[A-Z])|_", " ", cid).strip())
         icon = B.asset(r.get("ItemIcon"), "item", 64) if r else ""
         data["currencies"][cid] = {"name": name, "icon": icon}
+        if cid in EVENT_CURRENCIES:
+            data["currencies"][cid]["event"] = True
     miss = sorted(k for k in used if k not in data["items"] and k != "gold")
     if miss:
         print("item tidak ada di items.json:", miss)

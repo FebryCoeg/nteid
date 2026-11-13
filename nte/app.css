@@ -1109,3 +1109,5 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 
 /* lebar kotak material mengikuti kolom grid */
 .matrow > .mat { width: auto; }
+.mat-price.event { background: color-mix(in srgb, var(--pink) 18%, transparent); color: var(--pink); font: 800 0.68rem var(--display); text-transform: uppercase; letter-spacing: .04em; }
+.mat-price.none { background: transparent; border: 1px dashed color-mix(in srgb, var(--text-2) 45%, transparent); color: var(--text-2); font: 600 0.62rem var(--mono); text-transform: uppercase; letter-spacing: .04em; }
