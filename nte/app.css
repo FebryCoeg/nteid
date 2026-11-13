@@ -1314,3 +1314,24 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-rx em { font: 700 0.7rem var(--display); font-style: normal; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--pink) 18%, var(--panel-2)); text-transform: uppercase; }
 .bd-rx .mono { font-size: 0.6rem; color: var(--text-2); }
 .bd-teamnote { margin-top: 10px; font-size: 0.78rem; color: var(--text-2); }
+/* rekomendasi tim */
+.bd-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.bd-tm { padding: 14px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); }
+.bd-tm.best { border-left: 6px solid var(--pink); }
+.bd-tm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.bd-tm-head b { font: 800 0.92rem var(--display); text-transform: uppercase; }
+.bd-tm-head em { flex: none; font: 700 0.56rem var(--mono); font-style: normal; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--pink) 20%, var(--panel-2)); }
+.bd-tm-mem { display: flex; gap: 10px; margin: 12px 0 8px; }
+.bd-tm-mem a { display: grid; justify-items: center; gap: 4px; text-decoration: none; color: inherit; width: 62px; }
+.bd-tm-mem img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--edge); }
+.bd-tm-mem a.me img { box-shadow: 0 0 0 3px var(--pink); }
+.bd-tm-mem small { font: 700 0.58rem var(--display); text-transform: uppercase; text-align: center; line-height: 1.15; }
+.bd-tm-metric { margin: 4px 0 6px; font: 700 0.74rem var(--mono); color: var(--pink); }
+.bd-tm-why { margin: 6px 0 8px 16px; padding: 0; font-size: 0.78rem; color: var(--text-2); }
+.bd-tm-why li { margin-bottom: 4px; }
+.bd-tm-src { display: block; font: 600 0.6rem var(--mono); color: var(--muted); }
+.bd-tm-src a, .bd-srcline a { color: var(--text-2); }
+.bd-gain { color: var(--text-2) !important; text-transform: none !important; letter-spacing: 0 !important; font-weight: 600 !important; margin-top: 2px; }
+.bd-skillnote { font-size: 0.78rem; color: var(--text-2); margin: 4px 0 8px; }
+.bd-srcline { margin: 14px 0; font-size: 0.62rem; color: var(--muted); }
+@media (max-width: 560px) { .bd-teams { grid-template-columns: 1fr; } }

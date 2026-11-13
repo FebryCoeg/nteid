@@ -186,5 +186,14 @@ if calc_path.exists():
             have.add("discord")
         d["calc"]["reactions"] = sorted(have)
 
+# kurasi manual (builds_curated.json): urutan Awakening, catatan, tim rekomendasi dari sumber yang dikreditkan
+cur_path = D / "builds_curated.json"
+if cur_path.exists():
+    for slug, c in jl(cur_path).items():
+        d = out[slug]
+        for k in ("awks", "awkGain", "skills", "skillNote", "src", "teams"):
+            if k in c:
+                d[k] = c[k]
+
 (D / "builds_draft.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print("draf build:", len(out), "Esper ->", D / "builds_draft.json")
