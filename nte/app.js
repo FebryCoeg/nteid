@@ -26,7 +26,9 @@
 
   // ---------------- data ----------------
   const cache = {};
-  const load = (name) => (cache[name] ||= fetch(`${BASE}data/${name}.json`).then((r) => {
+  // versi file data mengikuti ?v= pada app.js, supaya data lama di cache browser tidak terpakai
+  const DATA_V = (() => { try { return new URL(document.querySelector('script[src*="app.js"]').src).searchParams.get("v") || ""; } catch (e) { return ""; } })();
+  const load = (name) => (cache[name] ||= fetch(`${BASE}data/${name}.json${DATA_V ? "?v=" + DATA_V : ""}`).then((r) => {
     if (!r.ok) throw new Error(r.status);
     return r.json();
   }));
