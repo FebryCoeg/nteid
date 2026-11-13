@@ -493,7 +493,7 @@
       build: () => {
         const bd = BUILDS[e.slug];
         let html = "";
-        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length || bd.awk || (bd.skills || []).length)) {
+        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length || (bd.awks || []).length || (bd.skills || []).length)) {
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
           html += `<div class="af-sec"><h4>${S("Build rekomendasi", "Recommended build")}</h4>
             ${bd.arcs.length ? `<p class="mono">${S("ARC (URUTAN PRIORITAS)", "ARC (BY PRIORITY)")}</p><div class="tile-grid">${bd.arcs.map(arcOf).filter(Boolean).map(arcTile).join("")}</div>` : ""}
@@ -502,14 +502,32 @@
               const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
               return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
             }).join("")}` : ""}
-            ${bd.awk ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN", "RECOMMENDED AWAKENING")}</p><div class="bd-awk"><span class="bd-awk-n">★${bd.awk}</span><div>${e.awakening.slice(0, bd.awk).map((a, i) => `<div class="bd-awk-row"><i>★${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span>${esc(a.name)}</span></div>`).join("")}</div></div>` : ""}
+            ${(bd.awks || []).length ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN (URUTAN PRIORITAS)", "RECOMMENDED AWAKENINGS (BY PRIORITY)")}</p><div class="bd-awks">${bd.awks.map((n, i) => { const a = e.awakening[n - 1]; return a ? `<div class="bd-awk-row"><i>${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${n}</small></span></div>` : ""; }).join("")}
+              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row bonus"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("RESONANSI AKTIF", "RESONANCE ACTIVE")} · ${need} AWAKENING</small></span></div>` : "").join("")}</div>` : ""}
             ${(bd.skills || []).length ? `<p class="mono" style="margin-top:14px">${S("URUTAN NAIK LEVEL SKILL", "SKILL UPGRADE ORDER")}</p><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div>` : ""}
             ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
           </div>`;
         }
         return html + `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
-      awakening: () => e.awakening.map((a, i) => `<div class="entry"><h4>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span class="lv">★${i + 1}</span>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
+      awakening: () => {
+        const main6 = e.awakening.slice(0, 6), bonus = e.awakening.slice(6);
+        const need = [3, 6];
+        const card = (a, i, bn) => `<section class="skillcard awk${bn ? " bonus locked" : ""}" data-i="${i}">
+          <button class="skill-top" type="button" aria-expanded="false">
+            <span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="" loading="lazy">` : ""}</span>
+            <span class="skill-title"><b>${esc(a.name)}</b><small>${bn ? S(`RESONANSI · AKTIF JIKA ${need[i - 6]} AWAKENING AKTIF`, `RESONANCE · NEEDS ${need[i - 6]} ACTIVE AWAKENINGS`) : `AWAKENING ${i + 1}`}</small></span>
+            ${bn ? `<span class="awk-lock mono"></span>` : `<span class="awk-pick" role="checkbox" aria-checked="false" aria-label="${S("Aktifkan", "Activate")}"></span>`}
+            <span class="skill-chev">${ICO.chev}</span>
+          </button>
+          <div class="skill-body"><div class="sk"><p class="txt">${rich(a.desc)}</p></div></div>
+        </section>`;
+        return `<div class="awk-head"><p class="txt">${S("Di game ini ada 6 Awakening yang boleh kamu aktifkan dalam urutan bebas. Aktifkan 3 Awakening untuk membuka Resonansi pertama, dan 6 untuk Resonansi kedua. Coba klik lingkaran di kanan tiap kartu.", "There are 6 Awakenings you can activate in any order. Activate 3 to unlock the first Resonance and 6 for the second. Try the circle on each card.")}</p>
+          <div class="awk-count"><b id="awkN">0</b><span>/ 6 ${S("aktif", "active")}</span></div></div>
+          ${main6.map((a, i) => card(a, i, false)).join("")}
+          <div class="group-label">${S("Bonus Resonansi", "Resonance bonus")}</div>
+          ${bonus.map((a, i) => card(a, 6 + i, true)).join("")}`;
+      },
       profil: () => {
         const cards = [];
         if (p.intro || p.quote) cards.push({ title: S("Ringkasan", "Summary"), sub: S("PROFIL", "PROFILE"), open: true, body: `${p.quote ? `<p class="lede txt" style="font-style:italic">${rich(p.quote)}</p>` : ""}${p.intro ? `<p class="txt" style="margin-top:10px">${rich(p.intro)}</p>` : ""}` });
@@ -548,6 +566,16 @@
     $("#tabBody").addEventListener("input", (ev) => { const box = ev.target.closest(".sklv"); if (box) drawSk(box); });
     $(".tabs", main).addEventListener("click", () => setTimeout(initSk, 0));
     $("#tabBody").addEventListener("click", (ev) => {
+      const pk = ev.target.closest(".awk-pick");
+      if (pk) {
+        ev.stopPropagation();
+        const on = pk.getAttribute("aria-checked") !== "true";
+        pk.setAttribute("aria-checked", on); pk.closest(".skillcard").classList.toggle("active", on);
+        const n = $$(".awk-pick[aria-checked=true]", main).length;
+        $("#awkN").textContent = n;
+        $$(".skillcard.bonus", main).forEach((c, i) => { const ok = n >= [3, 6][i]; c.classList.toggle("locked", !ok); c.classList.toggle("active", ok); });
+        return;
+      }
       const tg = ev.target.closest(".sklv-toggle");
       if (tg) {
         const box = tg.nextElementSibling, open = box.hidden;
@@ -679,7 +707,7 @@
       const j = await r.json(); builds = JSON.parse(unb64(j.content) || "{}"); sha = j.sha; return "ok";
     }
     const SD = await load("stats");
-    const fresh = () => ({ arcs: [], sets: [], stats: [], awk: 0, skills: [] });
+    const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
     const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
     const SKG = ["basic", "redirect", "ultimate", "support"];
     function render(msg) {
@@ -705,9 +733,9 @@
           <div class="adm-chips">${working.sets.map((x, i) => { const st = mods.sets.find((m) => m.id === x.id); return st ? `<button type="button" class="on" data-rm-set="${i}">${esc(st.name)} · ${x.pieces} ✕</button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
           <div class="adm-row"><select id="admSet">${mods.sets.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select>
             <select id="admPcs"><option value="4">4 keping</option><option value="2">2 keping</option></select><button class="btn" id="admAddSet" type="button">Tambah set</button></div>
-          <label>Awakening yang disarankan</label>
-          <div class="adm-row"><select id="admAwk"><option value="0">Tidak ada rekomendasi</option>${e.awakening.map((a, i) => `<option value="${i + 1}"${working.awk === i + 1 ? " selected" : ""}>Sampai ★${i + 1}</option>`).join("")}</select></div>
-          <div class="adm-awk">${e.awakening.map((a, i) => `<div class="${i < working.awk ? "on" : ""}">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><i>★${i + 1}</i>${esc(a.name)}</span></div>`).join("")}</div>
+          <label>Awakening yang disarankan (bebas pilih, klik berurutan sesuai prioritas)</label>
+          <div class="adm-chips adm-awks">${e.awakening.slice(0, 6).map((a, i) => { const k = working.awks.indexOf(i + 1); return `<button type="button" class="adm-sk ${k >= 0 ? "on" : ""}" data-awk="${i + 1}"><span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}</span><span>${k >= 0 ? `<i>${k + 1}</i>` : ""}${esc(a.name)}<small>Awakening ${i + 1}</small></span></button>`; }).join("")}</div>
+          <p class="mono adm-note" style="margin:4px 0 0">${working.awks.length >= 6 ? "RESONANSI 3 DAN 6 TERBUKA" : working.awks.length >= 3 ? "RESONANSI 3 TERBUKA · BUTUH 6 AWAKENING UNTUK RESONANSI 6" : "PILIH 3 AWAKENING UNTUK MEMBUKA RESONANSI 3, 6 UNTUK RESONANSI 6"}</p>
           <label>Urutan naik level skill (klik berurutan, klik lagi untuk mencabut)</label>
           <div class="adm-chips adm-skills">${SKG.filter((g) => e.skills.some((x) => x.group === g)).map((g) => { const i = working.skills.indexOf(g); const sk = e.skills.find((x) => x.group === g); const ic = ((SD.espers[e.id] || {}).icons || {})[g]; return `<button type="button" class="adm-sk ${i >= 0 ? "on" : ""}" data-skill="${g}"><span class="skill-ico">${ic ? `<img src="${img(ic)}" alt="">` : ""}</span><span>${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(sk.name)}<small>${esc(LABEL.group[g] || g)}</small></span></button>`; }).join("")}</div>
           <label>Stat prioritas (klik berurutan, klik lagi untuk mencabut)</label>
@@ -743,14 +771,14 @@
       if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
       if (t.id === "admAddSet") { working.sets.push({ id: $("#admSet").value, pieces: +$("#admPcs").value }); render(); return; }
       if (t.dataset.rmSet) { working.sets.splice(+t.dataset.rmSet, 1); render(); return; }
+      if (t.dataset.awk) { const n = +t.dataset.awk, i = working.awks.indexOf(n); if (i >= 0) working.awks.splice(i, 1); else working.awks.push(n); render(); return; }
       if (t.dataset.skill) { const i = working.skills.indexOf(t.dataset.skill); if (i >= 0) working.skills.splice(i, 1); else working.skills.push(t.dataset.skill); render(); return; }
       if (t.dataset.stat) { const i = working.stats.indexOf(t.dataset.stat); if (i >= 0) working.stats.splice(i, 1); else working.stats.push(t.dataset.stat); render(); return; }
-      if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length || working.awk || working.skills.length ? working : null, "perbarui"); return; }
+      if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length || working.awks.length || working.skills.length ? working : null, "perbarui"); return; }
       if (t.id === "admDel") { if (await ask("Hapus build ini?", "Hapus", "Batal")) await save(null, "hapus"); }
     });
     main.addEventListener("change", (ev) => {
       if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); }
-      if (ev.target.id === "admAwk") { working.awk = +ev.target.value; render(); }
       if (ev.target.id === "admAllArcs") { showAllArcs = ev.target.checked; render(); }
     });
   }

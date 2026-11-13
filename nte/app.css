@@ -1063,3 +1063,31 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .adm-fit b { color: var(--pink); }
 .adm-box label.adm-chk { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: var(--text-2); text-transform: none; font: 600 0.72rem var(--display); cursor: pointer; }
 .adm-chk input { width: auto; min-height: 0; accent-color: var(--pink); }
+
+/* ---- awakening: 6 pilihan bebas + resonansi ---- */
+.awk-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 14px; }
+.awk-head .txt { flex: 1 1 280px; color: var(--text-2); font-size: 0.86rem; }
+.awk-count { display: flex; align-items: baseline; gap: 6px; padding: 8px 18px; border-radius: 999px; background: var(--panel); box-shadow: var(--ring); }
+.awk-count b { font: 800 1.6rem var(--display); color: var(--pink); }
+.awk-count span { font: 700 0.7rem var(--mono); color: var(--text-2); }
+.awk .skill-top { grid-template-columns: 62px 1fr 34px 38px; }
+.awk-pick { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--text-2); background: transparent; cursor: pointer; position: relative; transition: .15s; }
+.awk-pick:hover { border-color: var(--pink); }
+.awk-pick[aria-checked="true"] { background: var(--pink); border-color: var(--pink); box-shadow: 0 0 0 3px var(--edge); }
+.awk-pick[aria-checked="true"]::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 800 0.9rem var(--display); }
+.awk.active { box-shadow: 0 0 0 3px var(--pink); }
+.awk.active .skill-ico { border-color: var(--cream); }
+.awk.bonus .skill-top { grid-template-columns: 62px 1fr 74px 38px; }
+.awk.bonus.locked { opacity: .62; }
+.awk.bonus.locked .skill-ico img { filter: grayscale(1) brightness(.7); }
+.awk-lock { font: 800 0.6rem var(--mono); text-align: center; letter-spacing: .06em; }
+.awk.bonus .awk-lock::after { content: "AKTIF"; color: var(--pink); }
+.awk.bonus.locked .awk-lock::after { content: "TERKUNCI"; color: var(--text-2); }
+/* build publik & admin */
+.bd-awks { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; margin-top: 8px; }
+.bd-awks .bd-awk-row { position: relative; padding: 8px 12px 8px 10px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); gap: 10px; }
+.bd-awks .bd-awk-row img { width: 40px; height: 40px; }
+.bd-awks .bd-awk-row i { display: grid; place-items: center; width: 24px; height: 24px; flex: none; border-radius: 50%; background: var(--pink); color: #fff; font: 800 0.74rem var(--display); margin: 0; }
+.bd-awks .bd-awk-row b { display: block; font: 800 0.82rem var(--display); text-transform: uppercase; }
+.bd-awks .bd-awk-row small { font: 600 0.58rem var(--mono); color: var(--pink); letter-spacing: .06em; text-transform: uppercase; }
+.bd-awks .bd-awk-row.bonus { background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border: 2px dashed var(--pink); box-shadow: none; }
