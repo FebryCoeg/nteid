@@ -286,11 +286,16 @@ def esper_skills(ns, name):
         g = next((g for g, rx in SKILL_GROUPS if rx.match(base[7:] if evolve else base)), None)
         if not g:
             continue
-        des = d.get(P + base + "_des") or d.get(P + base + "_des_tidy") or ""
+        base0 = re.sub(r"\d+$", "", base).rstrip("_")
+        # beberapa Ultimate (Elyms, Linko, Blackbird) menyimpan deskripsi di kunci tanpa angka atau bersufiks _tidy
+        des = (d.get(P + base + "_des") or d.get(P + base + "_des_tidy") or d.get(P + base0 + "_des")
+               or d.get(P + base0 + "_des_tidy") or d.get(P + base0 + "_tidy") or "")
         if not des:
             continue
         bgk = P + re.sub(r"\d+$", "", base).rstrip("_") + "_background"
         bg = d.get(P + base + "_background") or (d.get(bgk) if not re.search(r"\d$", base) else "")
+        if not bg and base0.startswith("Utra"):  # ejaan "Utra" pada nama kunci, kutipan memakai "Ultra"
+            bg = d.get(P + base0.replace("Utra", "Ultra") + "_background") or ""
         order = int(re.search(r"(\d+)$", base).group(1)) if re.search(r"(\d+)$", base) else 0
         groups[g].append({"o": order + (100 if evolve else 0), "name": plain(v),"desc": T(des, f"skill:{name}"), "quote": T(bg, f"kutipan-skill:{name}") if bg else ""})
     skills = []

@@ -7,6 +7,9 @@ Dijalankan manual, hasilnya digabung oleh make_builds.py.   python tools/nte/mak
 """
 import json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent))
 
 D = Path(__file__).resolve().parents[2] / "nte" / "data"
 RAD = "Beware the Raddish"
@@ -76,5 +79,8 @@ out = {
         ],
     },
 }
+import curated_round2  # noqa: E402
+
+curated_round2.apply(out)
 (D / "builds_curated.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print("builds_curated.json:", {k: len(v.get("teams", [])) for k, v in out.items()}, "tim")
