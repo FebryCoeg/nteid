@@ -1005,3 +1005,28 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .af-no small { font: 600 0.6rem var(--mono); color: var(--text-2); }
 .mat b svg { width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; fill: var(--pink); stroke: none; }
 @media (max-width: 640px) { .af-lv { grid-template-columns: 1fr; } .af-no { display: flex; align-items: center; gap: 10px; text-align: left; } .af-no i { margin: 0; width: 44px; height: 44px; font-size: 1.1rem; } .info div { flex-direction: column; gap: 0; } .info dd { text-align: left; } }
+
+/* ---- build publik ---- */
+.bd-set { display: flex; gap: 14px; align-items: flex-start; margin-top: 8px; padding: 12px 14px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); }
+.bd-set img { width: 54px; height: 54px; object-fit: contain; flex: none; }
+.bd-set b { font: 800 0.92rem var(--display); text-transform: uppercase; }
+.bd-set em { font: 700 0.62rem var(--mono); font-style: normal; color: var(--pink); margin-left: 6px; }
+.bd-stats { display: flex; flex-wrap: wrap; gap: 8px; }
+.bd-stats span { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 6px; border-radius: 999px; background: var(--panel-2); border: 2px solid var(--edge); font: 700 0.78rem var(--display); }
+.bd-stats i { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--pink); color: #fff; font: 800 0.72rem var(--display); font-style: normal; }
+
+/* ---- admin build ---- */
+.adm-h { font: 800 clamp(1.6rem, 4vw, 2.4rem) var(--display); text-transform: uppercase; margin: 6px 0; }
+.adm-note { color: var(--text-2); font-size: 0.66rem; letter-spacing: 0.06em; margin: 6px 0 14px; }
+.adm-box { margin-bottom: 14px; padding: 16px 18px; border-radius: 22px; background: var(--panel); box-shadow: var(--ring); }
+.adm-box label { display: block; margin: 12px 0 6px; font: 700 0.7rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--pink); }
+.adm-box label:first-child { margin-top: 0; }
+.adm-box input, .adm-box select { width: 100%; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--edge); background: var(--panel-2); color: var(--text); font: 600 0.85rem var(--display); }
+.adm-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.adm-row input, .adm-row select { flex: 1 1 160px; width: auto; }
+.adm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.adm-chips em { color: var(--text-2); font-size: 0.8rem; }
+.adm-chips button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--edge); background: var(--panel-2); color: var(--text); font: 700 0.74rem var(--display); cursor: pointer; }
+.adm-chips button.on { background: var(--cream); color: var(--ink); }
+.adm-chips button i { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--pink); color: #fff; font: 800 0.66rem var(--display); font-style: normal; }
+.adm-box button:disabled { opacity: .45; cursor: not-allowed; }

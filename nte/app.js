@@ -66,6 +66,7 @@
   // ---------------- router ----------------
   const routes = [
     [/^\/$/, viewHome],
+    [/^\/admin\/319bc261be073d2a\/?$/, viewAdmin],
     [/^\/esper\/?$/, viewEsperList],
     [/^\/esper\/([\w-]+)\/?$/, viewEsper],
     [/^\/arc\/?$/, viewArcList],
@@ -405,6 +406,9 @@
     if (!looks.some((l) => l.src === heroSrc)) looks.unshift({ name: S("Kostum awal", "Default outfit"), src: heroSrc });
     let lookIdx = Math.max(0, looks.findIndex((l) => l.src === heroSrc));
     const AF = ST && ST.affinity;
+    const BUILDS = await load("builds").catch(() => ({}));
+    const ARCS = await load("arcs");
+    const MODS = await load("modules");
     const tabs = [
       ["skill", "Kemampuan", e.skills.length],
       ["awakening", "Awakening", e.awakening.length],
@@ -486,7 +490,23 @@
           <div class="af-sec"><h4>${S("Level Affinity", "Affinity levels")}</h4>
           ${AF.levels.map((l, i) => `<div class="af-lv"><div class="af-no"><i>${i + 1}</i><small>${nf(l.max)} ${S("poin", "pts")}</small></div><div class="matrow">${l.items.map(([id, n]) => tile(id, n, false)).join("")}</div></div>`).join("")}</div>`;
       },
-      build: () => `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`,
+      build: () => {
+        const bd = BUILDS[e.slug];
+        let html = "";
+        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length)) {
+          const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
+          html += `<div class="af-sec"><h4>${S("Build rekomendasi", "Recommended build")}</h4>
+            ${bd.arcs.length ? `<p class="mono">${S("ARC (URUTAN PRIORITAS)", "ARC (BY PRIORITY)")}</p><div class="tile-grid">${bd.arcs.map(arcOf).filter(Boolean).map(arcTile).join("")}</div>` : ""}
+            ${bd.sets.length ? `<p class="mono" style="margin-top:14px">${S("SET MODUL", "MODULE SETS")}</p>${bd.sets.map((x) => {
+              const st = MODS.sets.find((m) => m.id === x.id); if (!st) return "";
+              const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
+              return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
+            }).join("")}` : ""}
+            ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
+          </div>`;
+        }
+        return html + `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
+      },
       awakening: () => e.awakening.map((a, i) => `<div class="entry"><h4>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span class="lv">★${i + 1}</span>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
       profil: () => {
         const cards = [];
@@ -630,6 +650,93 @@
       $("#lvRange").addEventListener("input", upd);
       upd();
     }
+  }
+
+  // ---------------- ADMIN BUILD (link rahasia) ----------------
+  async function viewAdmin() {
+    setTitle("Admin Build");
+    let meta = document.querySelector('meta[name="robots"]');
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.content = "noindex,nofollow";
+    const [es, arcs, mods] = await Promise.all([load("espers"), load("arcs"), load("modules")]);
+    const REPO = "FebryCoeg/nteid", PATH = "nte/data/builds.json";
+    const KEY = "nte-admin-token";
+    let token = ""; try { token = localStorage.getItem(KEY) || ""; } catch (e) {}
+    let builds = {}, sha = null, cur = es[0].slug, working = null;
+    const STATS = ["ATK %", "HP %", "DEF %", "CRIT Rate", "CRIT DMG", "DMG Bonus", "ATK", "HP", "DEF", "Energy Regen", "Healing Bonus", "Break"];
+    const api = (method, body) => fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}${method === "GET" ? "?ref=main&t=" + Date.now() : ""}`, {
+      method, headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }, body: body ? JSON.stringify(body) : undefined,
+    });
+    const b64 = (str) => btoa(unescape(encodeURIComponent(str)));
+    const unb64 = (b) => decodeURIComponent(escape(atob(b.replace(/\n/g, ""))));
+    async function pull() {
+      if (!token) { builds = await (await fetch(`${BASE}data/builds.json?t=${Date.now()}`)).json().catch(() => ({})); sha = null; return "view"; }
+      const r = await api("GET");
+      if (r.status === 404) { builds = {}; sha = null; return "ok"; }
+      if (!r.ok) return r.status;
+      const j = await r.json(); builds = JSON.parse(unb64(j.content) || "{}"); sha = j.sha; return "ok";
+    }
+    const fresh = () => ({ arcs: [], sets: [], stats: [] });
+    const pick = () => { working = JSON.parse(JSON.stringify(builds[cur] || fresh())); };
+    function render(msg) {
+      const e = es.find((x) => x.slug === cur);
+      main.innerHTML = `
+        <div class="crumb mono"><span>ADMIN</span><span>/</span><span>BUILD</span></div>
+        <h1 class="adm-h">Admin Build</h1>
+        <p class="mono adm-note">${token ? "TOKEN TERSIMPAN DI BROWSER INI" : "TANPA TOKEN: HANYA BISA MELIHAT"}${msg ? " · " + esc(msg) : ""}</p>
+        <div class="adm-box">
+          <label>Token GitHub (fine-grained, akses Contents: Read and write hanya ke repo ${REPO})</label>
+          <div class="adm-row"><input type="password" id="admTok" placeholder="github_pat_..." value="${esc(token)}" autocomplete="off"><button class="btn" id="admSaveTok" type="button">Simpan token</button><button class="btn ghost" id="admClrTok" type="button">Hapus token</button></div>
+        </div>
+        <div class="adm-box">
+          <label>Esper</label>
+          <select id="admEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
+          <label>Arc (klik untuk menambah, urutan = prioritas)</label>
+          <div class="adm-chips" id="admArcSel">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="on" data-rm-arc="${i}"><i>${i + 1}</i>${esc(a.name)} ✕</button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
+          <input type="search" id="admArcQ" placeholder="Cari Arc…" autocomplete="off">
+          <div class="adm-chips" id="admArcList"></div>
+          <label>Set modul</label>
+          <div class="adm-chips">${working.sets.map((x, i) => { const st = mods.sets.find((m) => m.id === x.id); return st ? `<button type="button" class="on" data-rm-set="${i}">${esc(st.name)} · ${x.pieces} ✕</button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
+          <div class="adm-row"><select id="admSet">${mods.sets.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select>
+            <select id="admPcs"><option value="4">4 keping</option><option value="2">2 keping</option></select><button class="btn" id="admAddSet" type="button">Tambah set</button></div>
+          <label>Stat prioritas (klik berurutan, klik lagi untuk mencabut)</label>
+          <div class="adm-chips" id="admStats">${STATS.map((t) => { const i = working.stats.indexOf(t); return `<button type="button" class="${i >= 0 ? "on" : ""}" data-stat="${esc(t)}">${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(t)}</button>`; }).join("")}</div>
+          <div class="adm-row" style="margin-top:16px"><button class="btn" id="admSave" type="button"${token ? "" : " disabled"}>Simpan ke GitHub</button><button class="btn ghost" id="admDel" type="button"${token && builds[cur] ? "" : " disabled"}>Hapus build ${esc(e.name)}</button></div>
+          <p class="mono adm-note">Build tampil untuk semua pengunjung di tab Build tiap Esper setelah situs diperbarui (sekitar 1 menit).</p>
+        </div>`;
+      const drawArcs = () => {
+        const q = ($("#admArcQ").value || "").toLowerCase();
+        $("#admArcList").innerHTML = arcs.filter((a) => !working.arcs.includes(a.slug) && (!q || a.name.toLowerCase().includes(q))).slice(0, 24).map((a) => `<button type="button" data-add-arc="${a.slug}">${esc(a.name)}</button>`).join("");
+      };
+      drawArcs();
+      $("#admArcQ").oninput = drawArcs;
+    }
+    async function save(next, label) {
+      const copy = { ...builds };
+      if (next) copy[cur] = next; else delete copy[cur];
+      const body = { message: `build: ${label} ${cur}`, content: b64(JSON.stringify(copy, null, 1) + "\n"), branch: "main" };
+      if (sha) body.sha = sha;
+      const r = await api("PUT", body);
+      if (r.status === 409 || r.status === 422) { await pull(); toast("Data berubah di GitHub, muat ulang lalu simpan lagi."); pick(); render(); return; }
+      if (r.status === 401 || r.status === 403) { toast("Token ditolak atau tidak punya izin tulis."); return; }
+      if (!r.ok) { toast("Gagal menyimpan (" + r.status + ")."); return; }
+      const j = await r.json(); sha = j.content.sha; builds = copy; pick(); render("TERSIMPAN"); toast("Tersimpan. Situs diperbarui sekitar 1 menit.");
+    }
+    const st = await pull();
+    pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
+    main.addEventListener("click", async (ev) => {
+      const t = ev.target.closest("button"); if (!t) return;
+      if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN OK" : "TOKEN GAGAL (" + r + ")"); return; }
+      if (t.id === "admClrTok") { token = ""; try { localStorage.removeItem(KEY); } catch (e) {} await pull(); pick(); render("TOKEN DIHAPUS"); return; }
+      if (t.dataset.addArc) { working.arcs.push(t.dataset.addArc); render(); return; }
+      if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
+      if (t.id === "admAddSet") { working.sets.push({ id: $("#admSet").value, pieces: +$("#admPcs").value }); render(); return; }
+      if (t.dataset.rmSet) { working.sets.splice(+t.dataset.rmSet, 1); render(); return; }
+      if (t.dataset.stat) { const i = working.stats.indexOf(t.dataset.stat); if (i >= 0) working.stats.splice(i, 1); else working.stats.push(t.dataset.stat); render(); return; }
+      if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length ? working : null, "perbarui"); return; }
+      if (t.id === "admDel") { if (await ask("Hapus build ini?", "Hapus", "Batal")) await save(null, "hapus"); }
+    });
+    main.addEventListener("change", (ev) => { if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); } });
   }
 
   // ---------------- MODUL ----------------
