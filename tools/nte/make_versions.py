@@ -91,10 +91,10 @@ V15 = {
                 {"t": "Exe", "img": [E("exe")], "tag": "Esper baru · S-Class · Limited (Fase 2)", "link": "/esper/exe",
                  "date": "2 Des – 23 Des 2026",
                  "d": "Esper Chaos dengan peran Damage, Main DPS, dan Summoner (sesuai data game). Debut di fase 2 lewat Limited Board miliknya."},
-                {"t": "Shinku (rerun)", "img": [E("crimson")], "tag": "Rerun · S-Class · Limited", "link": "/esper/crimson",
+                {"t": "Shinku (rerun)", "img": [E("shinku")], "tag": "Rerun · S-Class · Limited", "link": "/esper/shinku",
                  "date": "11 Nov – 2 Des 2026",
                  "d": "Kembali lewat Limited Board \"Before the Dawn\" bersama Mint, Edgar, dan Adler. Ada livery glider \"Overcast Canopy\", "
-                      "livery Blizzard-V4 \"Hidden Dragon\", dan kostum \"Student of Terrasea\". Di data game Esper ini tercatat sebagai Crimson. "
+                      "livery Blizzard-V4 \"Hidden Dragon\", dan kostum \"Student of Terrasea\". Di data game, Esper ini sempat tercatat dengan nama Crimson. "
                       "Hanya roll di board yang sama yang dihitung untuk Resolve Perks, dan tiap board dihitung terpisah."},
                 {"t": "Syarat membuka banner", "tag": "Info",
                  "d": "Selesaikan quest utama \"Prologue - A New Destination - Head to Eibon Antique Shop\" untuk bisa memakai board karakter baru."},
@@ -204,7 +204,7 @@ V15 = {
             "id": "bug", "title": "Perbaikan Bug", "open": False,
             "items": [
                 {"t": "Akane Rin", "img": [E("akane-rin")], "tag": "Bug", "d": "Dodge dan Critical Riposte tidak bisa tersambung ke serangan dasar berikutnya saat Basic Attack ditahan. Sudah diperbaiki."},
-                {"t": "Shinku", "img": [E("crimson")], "tag": "Bug",
+                {"t": "Shinku", "img": [E("shinku")], "tag": "Bug",
                  "d": "Animasi meluncur yang kadang janggal diperbaiki. Pasif \"Menacing Gaze\" di Beyond the Rails kini mulai dari stack penuh saat masuk atau mengulang stage."},
                 {"t": "Anomaly Hunt: Black Tome", "tag": "Bug",
                  "d": "Kombinasi Redirect Linko dengan Synced Strike Xiaozhen saat karakter terbelenggu boss tidak lagi memberi lonjakan damage yang tidak wajar."},

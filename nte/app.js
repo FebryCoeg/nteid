@@ -238,7 +238,7 @@
     setTitle("");
     const home = await load("home");
     const espers = home.roster, N = home.counts;
-    const picks = ["elyms", "exe", "chaos", "linko", "iroi", "crimson"].map((s) => espers.find((e) => e.slug === s)).filter(Boolean).slice(0, 3);
+    const picks = ["elyms", "exe", "chaos", "linko", "iroi", "shinku"].map((s) => espers.find((e) => e.slug === s)).filter(Boolean).slice(0, 3);
     while (picks.length < 3 && espers[picks.length]) picks.push(espers[picks.length]);
     const thumbs = (k) => (home.thumbs[k] || []).map((x) => `<img src="${img(x)}" alt="" loading="lazy">`).join("");
     const cats = [
@@ -430,6 +430,7 @@
 
   async function viewEsper(slug) {
     const list = await load("espers");
+    if (slug === "crimson") slug = "shinku";
     const e = list.find((x) => x.slug === slug);
     if (!e) return notFound();
     setTitle(e.name);

@@ -102,7 +102,7 @@ def build_story():
         x["image"] = pic(row.get("SectionImage"), "story", 1280) if row else ""
         role = roles.get(str(row.get("RoleIndex"))) if row and row.get("RoleIndex") else None
         if role:
-            x["role"] = B.loc_text(role["RoleDes"])
+            x["role"] = B.NAME_FIX.get(B.loc_text(role["RoleDes"]), B.loc_text(role["RoleDes"]))
             x["roleIcon"] = pic(role.get("RoleSmallHeadImage"), "esper", 256)
     out.sort(key=lambda x: x["group"] != "utama")  # stabil: urutan bab tetap, utama dulu
     return out
@@ -230,7 +230,7 @@ def build_fashion():
         # entri placeholder seperti "Fashion 2 Name" bukan kostum sungguhan
         if n and not re.fullmatch(r"Fashion \d+ Name", n) and "Test Fashion" not in n:
             cid = m.group(1)
-            char = names.get(cid) or B.L("ST_Player", f"Role_Name_{cid[-3:]}") or cid
+            char = names.get(cid) or B.NAME_FIX.get(B.L("ST_Player", f"Role_Name_{cid[-3:]}"), B.L("ST_Player", f"Role_Name_{cid[-3:]}")) or cid
             out.append({"id": f"{m.group(1)}_{m.group(2)}", "char": char,
                         "name": name(n), "desc": pair(d, "deskripsi-fashion") if d and "Test Fashion" not in d else None})
     # ilustrasi kostum dari tabel penampilan game

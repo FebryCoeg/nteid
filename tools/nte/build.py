@@ -227,6 +227,10 @@ for k, r in table("DataTable/Fork/DT_ForkTypeData.json").items():
     FORK_TYPES[int(k)] = {"name": loc_text(r.get("TypeName")), "icon": asset(r.get("TypeIcon"), "ui", 96)}
 
 # ------------------------------------------------------------------ ESPER
+# nama Inggris resmi yang berbeda dari teks di data game
+NAME_FIX = {"Crimson": "Shinku"}
+
+
 def esper_profile(name):
     """Profil & arsip dari ST_File (dicocokkan lewat nama)."""
     f = LOC.get("ST_File", {})
@@ -347,8 +351,8 @@ def build_espers():
             gender = "♂" if cid == "1046" else "♀"
         out.append({
             "id": cid,
-            "slug": slug(name + ("-" + cid if cid in ("1046", "1051") else "")),
-            "name": name + (f" ({gender})" if gender else ""),
+            "slug": slug(NAME_FIX.get(name, name) + ("-" + cid if cid in ("1046", "1051") else "")),
+            "name": NAME_FIX.get(name, name) + (f" ({gender})" if gender else ""),
             "rank": "S" if quality(r) >= 5 else "A",
             "element": ELEMENT.get(el, el.title()),
             "arcType": FORK_TYPES.get(grp, {}).get("name", ""),
