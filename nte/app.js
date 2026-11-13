@@ -545,6 +545,7 @@
         let html = "";
         const SRC = (x) => (x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.by)} · ${esc(x.title)} ↗</a>` : esc(x.by + " · " + x.title));
         if (bd) {
+          if (bd.role) html += `<p class="bd-roleline"><b>${esc(bd.role.rank)}-${S("RANK", "RANK")}</b><span>${esc(bd.role.role)}</span><em>${esc(bd.role.tier)}</em></p>`;
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
           const WHY = {
             type: S("Tipe Arc cocok", "Arc type match"), rare: S("Bintang 5", "5-star"), element: S(`Bonus ${e.element}`, `${e.element} bonus`), crit: "CRIT", atk: "ATK",
@@ -592,6 +593,7 @@
             ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small>${(bd.awkGain || {})["b" + need] ? `<small class="bd-gain">${esc(tx(bd.awkGain["b" + need]))}</small>` : ""}</span></div>` : "").join("")}</div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
+        if (bd && bd.faq) html += `<div class="af-sec"><h4>${S("Catatan", "Notes")}</h4><p class="txt">${esc(tx(bd.faq))}</p></div>`;
         if (bd && (bd.src || []).length) html += `<p class="mono bd-srcline">${S("SUMBER: ", "SOURCES: ")}${bd.src.map(SRC).join(" · ")}</p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
