@@ -52,6 +52,10 @@ def S_(title):  # gambar bab cerita
     return {"s": _ok(_STORY[title]["image"]), "k": "wide", "n": title}
 
 
+def K(name):   # key visual resmi / ilustrasi event (nte/img/versi, dibuat make_versi_images.py)
+    return {"s": _ok(f"img/versi/{name}.webp"), "k": "wide", "n": name}
+
+
 def I(iid):    # ikon item
     return {"s": _ok(_ITEMS[iid]["icon"]), "k": "ico", "n": _ITEMS[iid]["name"]}
 
@@ -222,6 +226,30 @@ V15 = {
         },
     ],
 }
+
+
+# Gambar tambahan per (id bagian, judul butir); menimpa "img" bawaan butir itu.
+EXTRA = {
+    ("esper", "Elyms"): [K("elyms-kv")],
+    ("esper", "Exe"): [K("exe-kv")],
+    ("esper", "Syarat membuka banner"): [K("v15-kv")],
+    ("fitur", "City Logistics"): [I("Avatar_Logistics"), I("BusinessCard_Logistics"), V("C001")],
+    ("fitur", "Full Tank Ahead"): [V("Iron Ogre")],
+    ("event", "City Logistics"): [I("Avatar_Logistics"), I("BusinessCard_Logistics"), I("LogisticsExp")],
+    ("event", "Full Tank Ahead"): [K("event-tank")],
+    ("event", "Fishing Frenzy"): [K("event-fishing")],
+    ("event", "Pixel Surge"): [I("Stamina"), I("BackupStamina")],
+    ("update", "Maintenance"): [K("v15-maintenance")],
+    ("update", "Pengingat"): [E("akane-rin")],
+    ("fitur", "Going, Going, Gone!"): [E("elyms")],
+    ("qol", "Penyimpanan melimpah"): [I("Stamina"), I("BackupStamina")],
+    ("qol", "Resource Overview"): [I("Annulith_x10"), I("Dicelimite"), I("DiceNormal"), I("WeaponGacha")],
+}
+for _sec in V15["sections"]:
+    for _it in _sec["items"]:
+        _k = (_sec["id"], _it["t"])
+        if _k in EXTRA:
+            _it["img"] = EXTRA[_k]
 
 VERSIONS = [V15]
 
