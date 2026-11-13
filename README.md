@@ -4,8 +4,8 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 
 | Kategori | Isi |
 |---|---|
-| **Esper** | 26 karakter dengan halaman detail: peran tempur, statistik HP/ATK/DEF per level (geser level 1-80), skill per kelompok, Awakening, Console, profil, arsip cerita, dan galeri kostum. |
-| **Arc** | 53 senjata/Fork dengan statistik ATK dan ATK% per level, efek yang nilainya berubah sesuai bintang (1 sampai 5), dan daftar Arc sejenis. |
+| **Esper** | 26 karakter dengan halaman detail: peran tempur, statistik HP/ATK/DEF per level (geser level 1-80), material Ascension beserta ikon dan jumlahnya, kemampuan dengan ikon skill yang bisa dibuka-tutup, Awakening, Console, profil, arsip cerita, dan galeri kostum. |
+| **Arc** | 53 senjata/Fork dengan statistik ATK dan ATK% per level, material Ascension, efek yang nilainya berubah sesuai bintang (1 sampai 5), dan daftar Arc sejenis. |
 | **Modul** | Modul beserta set bonusnya (efek 2 dan 4 bagian). |
 | **Item** | 1.500+ item yang dikelompokkan ke 11 kategori. |
 | **Furnitur** | 300+ furnitur dengan nilai Kenyamanan dan Koleksi. |

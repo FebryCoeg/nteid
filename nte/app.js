@@ -351,22 +351,46 @@
       setCount(out.length);
     });
   }
+  const ICO = {
+    hp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"/></svg>',
+    atk: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15l7-8 7 8M5 20l7-8 7 8"/></svg>',
+    def: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l7 2.6v5.6c0 4.2-2.9 7.3-7 8.8-4.1-1.5-7-4.6-7-8.8V6.1z"/></svg>',
+    crit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 6.2 6.4.6-4.9 4.3 1.5 6.4L12 17l-5.6 3.5 1.5-6.4L3 9.8l6.4-.6z"/></svg>',
+    chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  };
+  const nf = (n) => Number(n).toLocaleString("id-ID");
+  const statRow = (k, label, id, val) => `<div class="srow"><i>${ICO[k]}</i><span>${label}</span><b${id ? ` id="${id}"` : ""}>${val === undefined ? "" : val}</b></div>`;
+  function levelBox(len, rows) {
+    return `<div class="statbox">
+      <div class="stat-lv"><span class="mono">LEVEL</span><b id="lvNum">${len}</b><input type="range" id="lvRange" min="1" max="${len}" value="${len}" aria-label="Level"></div>
+      <div class="srows">${rows}</div></div>`;
+  }
+  function matBox(mats, items, title) {
+    const list = (mats || []).filter(([id]) => items[id]);
+    if (!list.length) return "";
+    return `<div class="matbox"><span class="mono">${title}</span><div class="matrow">${list.map(([id, n]) => {
+      const it = items[id];
+      return `<div class="mat q${it.rarity || 1}" title="${esc(it.name)}"><img src="${img(it.icon)}" alt="${esc(it.name)}" loading="lazy"><b>x${nf(n)}</b><small>${esc(it.name)}</small></div>`;
+    }).join("")}</div></div>`;
+  }
+
   async function viewEsper(slug) {
     const list = await load("espers");
     const e = list.find((x) => x.slug === slug);
     if (!e) return notFound();
     setTitle(e.name);
     const p = e.profile || {};
-    const ST = (await load("stats")).espers[e.id];
+    const SD = await load("stats");
+    const ST = SD.espers[e.id];
     const outfits = (await load("fashion")).filter((f) => f.char === e.name);
-    const facts = [["Ulang tahun", p.birthday], ["Faksi", p.faction], ["Kemampuan Esper", p.esperAbility], ["Pekerjaan", p.occupation], ["Kesukaan", p.food]].filter(([, v]) => v);
+    const facts = [["Faksi", p.faction], ["Ulang tahun", p.birthday], ["Kemampuan Esper", p.esperAbility], ["Pekerjaan", p.occupation], ["Kesukaan", p.food]].filter(([, v]) => v);
     const tabs = [
-      ["skill", "Skill", e.skills.length],
+      ["skill", "Kemampuan", e.skills.length],
       ["awakening", "Awakening", e.awakening.length],
       ["console", "Console", e.console.length],
+      ["kosmetik", "Kostum", outfits.length],
       ["profil", "Profil", p.intro || p.impression ? 1 : 0],
       ["cerita", "Arsip Cerita", (p.stories || []).length],
-      ["kosmetik", "Kostum", outfits.length],
     ].filter(([, , n]) => n);
     main.innerHTML = `
       <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/esper" data-link>ESPER</a><span>/</span><span>${esc(e.name.toUpperCase())}</span></div>
@@ -385,36 +409,47 @@
             <span class="tag">${e.arcTypeIcon ? `<img src="${img(e.arcTypeIcon)}" alt="">` : ""}Arc ${esc(e.arcType)}</span>
             <span class="tag">Rank ${e.rank}</span>
           </div>
-          ${ST && ST.tags.length ? `<div class="roles"><span class="mono">PERAN TEMPUR</span>${ST.tags.map((t) => `<b>${esc(t)}</b>`).join("")}</div>` : ""}
           ${e.desc ? `<p class="lede txt">${rich(e.desc)}</p>` : ""}
-          ${ST ? `<div class="statbox" id="statbox">
-            <div class="stat-lv"><span class="mono">LEVEL</span><b id="lvNum">80</b><input type="range" id="lvRange" min="1" max="${ST.hp.length}" value="${ST.hp.length}" aria-label="Level"></div>
-            <div class="stat-grid">
-              <div><span>HP</span><b id="stHp"></b></div><div><span>ATK</span><b id="stAtk"></b></div><div><span>DEF</span><b id="stDef"></b></div>
-              <div><span>CRIT Rate</span><b>${Math.round(ST.crit * 100)}%</b></div><div><span>CRIT DMG</span><b>${Math.round(ST.critDmg * 100)}%</b></div>
-            </div></div>` : ""}
+          ${ST && ST.tags.length ? `<div class="roles"><span class="mono">PERAN TEMPUR</span>${ST.tags.map((t) => `<b>${esc(t)}</b>`).join("")}</div>` : ""}
           ${facts.length ? `<div class="facts">${facts.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>` : ""}
+          ${ST ? levelBox(ST.hp.length, statRow("hp", "HP", "stHp") + statRow("atk", "ATK", "stAtk") + statRow("def", "DEF", "stDef") + statRow("crit", "CRIT Rate", "", Math.round(ST.crit * 100) + "%") + statRow("crit", "CRIT DMG", "", Math.round(ST.critDmg * 100) + "%")) : ""}
+          ${ST ? matBox(ST.mats, SD.items, S("MATERIAL ASCENSION · LV.1 → 80", "ASCENSION MATERIALS · LV.1 → 80")) : ""}
           <div class="tabs" role="tablist">${tabs.map(([id, t], i) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${i === 0}">${t}</button>`).join("")}</div>
           <div id="tabBody" class="tab-panel"></div>
         </div>
       </article>`;
+    const icons = (ST && ST.icons) || {};
+    const skillCards = () => {
+      const order = [];
+      e.skills.filter((s) => !/^Deskripsi /.test(s.desc)).forEach((s) => {
+        let g = order.find((x) => x.k === s.group);
+        if (!g) order.push((g = { k: s.group, list: [] }));
+        g.list.push(s);
+      });
+      const cards = [];
+      order.forEach((g) => {
+        const type = LABEL.group[g.k] || g.k;
+        if (g.k === "passive") {
+          g.list.forEach((s, i) => cards.push({ icon: (icons.passive || [])[i], name: s.name, type, body: [s] , single: true }));
+          return;
+        }
+        const first = g.list[0];
+        const sum = g.list.length > 1 && /^[^\n]{1,48}:/.test(first.desc) && first.desc.includes("\n");
+        if (sum) cards.push({ icon: icons[g.k], name: first.name, type, body: g.list.slice(1) });
+        else if (g.list.length === 1) cards.push({ icon: icons[g.k], name: first.name, type, body: [first], single: true });
+        else cards.push({ icon: icons[g.k], name: first.name, type, body: g.list });
+      });
+      return cards.map((c, i) => `<section class="skillcard${i === 0 ? " open" : ""}">
+        <button class="skill-top" type="button" aria-expanded="${i === 0}">
+          <span class="skill-ico">${c.icon ? `<img src="${img(c.icon)}" alt="" loading="lazy">` : ""}</span>
+          <span class="skill-title"><b>${esc(c.name)}</b><small>${esc(c.type)}</small></span>
+          <span class="skill-chev">${ICO.chev}</span>
+        </button>
+        <div class="skill-body">${c.body.map((s) => `<div class="sk">${c.single ? "" : `<h5>${esc(s.name)}</h5>`}<p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}</div>
+      </section>`).join("");
+    };
     const panels = {
-      skill: () => {
-        const order = [];
-        e.skills.filter((s) => !/^Deskripsi /.test(s.desc)).forEach((s) => {
-          let g = order.find((x) => x.k === s.group);
-          if (!g) order.push((g = { k: s.group, list: [] }));
-          g.list.push(s);
-        });
-        return order.map((g) => {
-          const first = g.list[0];
-          const sum = g.list.length > 1 && g.k !== "passive" && /^[^\n]{1,48}:/.test(first.desc) && first.desc.includes("\n");
-          const subs = sum ? g.list.slice(1) : g.list;
-          return `<section class="skillgrp"><div class="group-label">${LABEL.group[g.k] || g.k}</div>
-            ${sum ? `<div class="skill-head"><h4>${esc(first.name)}</h4><details><summary>Ringkasan semua varian</summary><p class="txt">${rich(first.desc)}</p></details></div>` : ""}
-            ${subs.map((s) => `<div class="entry${sum ? " sub" : ""}"><h4>${esc(s.name)}</h4><p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}</section>`;
-        }).join("");
-      },
+      skill: skillCards,
       kosmetik: () => `<div class="outfit-grid">${outfits.map((f) => `<figure class="outfit"><img src="${img(f.image || f.fallback)}" alt="" loading="lazy"><figcaption><b>${esc(tx(f.name))}</b><small>${esc(strip(tx(f.desc)))}</small></figcaption></figure>`).join("")}</div>`,
       awakening: () => e.awakening.map((a, i) => `<div class="entry"><h4>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span class="lv">★${i + 1}</span>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
       console: () => `<p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
@@ -428,13 +463,16 @@
       $("#tabBody").innerHTML = panels[id]();
     };
     $(".tabs", main).addEventListener("click", (ev) => { const t = ev.target.closest(".tab"); if (t) show(t.dataset.tab); });
+    $("#tabBody").addEventListener("click", (ev) => {
+      const b = ev.target.closest(".skill-top"); if (!b) return;
+      const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open"));
+    });
     if (tabs.length) show(tabs[0][0]);
     if (ST) {
-      const fmt = (n) => n.toLocaleString("id-ID");
       const upd = () => {
         const i = +$("#lvRange").value - 1;
         $("#lvNum").textContent = i + 1;
-        $("#stHp").textContent = fmt(ST.hp[i]); $("#stAtk").textContent = fmt(ST.atk[i]); $("#stDef").textContent = fmt(ST.def[i]);
+        $("#stHp").textContent = nf(ST.hp[i]); $("#stAtk").textContent = nf(ST.atk[i]); $("#stDef").textContent = nf(ST.def[i]);
       };
       $("#lvRange").addEventListener("input", upd);
       upd();
@@ -473,12 +511,13 @@
     if (!a) return notFound();
     setTitle(a.name);
     const espers = (await load("espers")).filter((e) => e.arcType === a.type);
-    const AS = (await load("stats")).arcs[a.slug];
-    const similar = (await load("arcs")).filter((x) => x.type === a.type && x.rarity === a.rarity && x.slug !== a.slug).slice(0, 8);
+    const SD = await load("stats");
+    const AS = SD.arcs[a.slug];
+    const similar = list.filter((x) => x.type === a.type && x.rarity === a.rarity && x.slug !== a.slug).slice(0, 8);
     main.innerHTML = `
       <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/arc" data-link>ARC</a><span>/</span><span>${esc(a.name.toUpperCase())}</span></div>
       <article class="arc-detail q${a.rarity}">
-        <div class="arc-card-img"><img src="${img(a.card || a.icon)}" alt="${esc(a.name)}"></div>
+        <div class="arc-card-img art"><img src="${img(a.icon || a.card)}" alt="${esc(a.name)}"></div>
         <div>
           <span class="mono">ARC · ${esc(LABEL.rarity[a.rarity] || "")}</span>
           <div class="dossier-head"><h1>${esc(a.name)}</h1></div>
@@ -487,14 +526,13 @@
             <span class="tag">${a.typeIcon ? `<img src="${img(a.typeIcon)}" alt="">` : ""}${esc(a.type)}</span>
           </div>
           ${a.desc ? `<p class="lede txt" style="font-style:italic">${rich(a.desc)}</p>` : ""}
-          ${AS ? `<div class="statbox" id="statbox">
-            <div class="stat-lv"><span class="mono">LEVEL</span><b id="lvNum">${AS.atk.length}</b><input type="range" id="lvRange" min="1" max="${AS.atk.length}" value="${AS.atk.length}" aria-label="Level"></div>
-            <div class="stat-grid"><div><span>ATK</span><b id="stAtk"></b></div><div><span>ATK %</span><b id="stUp"></b></div></div>
-          </div>` : ""}
+          ${AS ? levelBox(AS.atk.length, statRow("atk", "ATK", "stAtk") + statRow("atk", "ATK %", "stUp")) : ""}
+          ${AS ? matBox(AS.mats, SD.items, S("MATERIAL ASCENSION · LV.1 → " + AS.atk.length, "ASCENSION MATERIALS · LV.1 → " + AS.atk.length)) : ""}
           ${a.effect ? `
             <div class="group-label">Efek Arc</div>
             <div class="entry">
               <h4>${esc(a.effect.name)}</h4>
+              <div class="mono" style="margin:4px 0 8px">TINGKAT BINTANG (MIXING)</div>
               <div class="star-pick" role="group" aria-label="Tingkat bintang">${a.effect.values.map((_, i) => `<button type="button" data-s="${i}" aria-pressed="${i === 0}">★${i + 1}</button>`).join("")}</div>
               <p class="txt" id="arcFx"></p>
             </div>` : ""}
@@ -514,7 +552,7 @@
       const upd = () => {
         const i = +$("#lvRange").value - 1;
         $("#lvNum").textContent = i + 1;
-        $("#stAtk").textContent = AS.atk[i].toLocaleString("id-ID");
+        $("#stAtk").textContent = nf(AS.atk[i]);
         $("#stUp").textContent = `${+(AS.up[i] * 100).toFixed(1)}%`;
       };
       $("#lvRange").addEventListener("input", upd);
