@@ -511,7 +511,7 @@
               return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
             }).join("")}` : ""}
             ${(bd.awks || []).length ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN (URUTAN PRIORITAS)", "RECOMMENDED AWAKENINGS (BY PRIORITY)")}</p><div class="bd-awks">${bd.awks.map((n, i) => { const a = e.awakening[n - 1]; return a ? `<div class="bd-awk-row"><i>${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${n}</small></span></div>` : ""; }).join("")}
-              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row bonus"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>` : ""}
+              ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>` : ""}
             ${(bd.skills || []).length ? `<p class="mono" style="margin-top:14px">${S("URUTAN NAIK LEVEL SKILL", "SKILL UPGRADE ORDER")}</p><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div>` : ""}
             ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
           </div>`;
@@ -521,7 +521,7 @@
       awakening: () => {
         const main6 = e.awakening.slice(0, 6), bonus = e.awakening.slice(6);
         const need = [3, 6];
-        const card = (a, i, bn) => `<section class="skillcard awk${bn ? " bonus locked" : ""}" data-i="${i}">
+        const card = (a, i, bn) => `<section class="skillcard awk${bn ? " extra locked" : ""}" data-i="${i}">
           <button class="skill-top" type="button" aria-expanded="false">
             <span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="" loading="lazy">` : ""}</span>
             <span class="skill-title"><b>${esc(a.name)}</b><small>${bn ? S(`BONUS ${need[i - 6]} AWAKENING AKTIF`, `BONUS: ${need[i - 6]} AWAKENINGS ACTIVE`) : `AWAKENING ${i + 1}`}</small></span>
@@ -581,7 +581,7 @@
         pk.setAttribute("aria-checked", on); pk.closest(".skillcard").classList.toggle("active", on);
         const n = $$(".awk-pick[aria-checked=true]", main).length;
         $("#awkN").textContent = n;
-        $$(".skillcard.bonus", main).forEach((c, i) => { const ok = n >= [3, 6][i]; c.classList.toggle("locked", !ok); c.classList.toggle("active", ok); });
+        $$(".skillcard.extra", main).forEach((c, i) => { const ok = n >= [3, 6][i]; c.classList.toggle("locked", !ok); c.classList.toggle("active", ok); });
         return;
       }
       const tg = ev.target.closest(".sklv-toggle");

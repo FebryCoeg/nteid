@@ -1077,12 +1077,12 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .awk-pick[aria-checked="true"]::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font: 800 0.9rem var(--display); }
 .awk.active { box-shadow: 0 0 0 3px var(--pink); }
 .awk.active .skill-ico { border-color: var(--cream); }
-.awk.bonus .skill-top { grid-template-columns: 62px 1fr 74px 38px; }
-.awk.bonus.locked { opacity: .62; }
-.awk.bonus.locked .skill-ico img { filter: grayscale(1) brightness(.7); }
+.awk.extra .skill-top { grid-template-columns: 62px 1fr 74px 38px; }
+.awk.extra.locked { opacity: .62; }
+.awk.extra.locked .skill-ico img { filter: grayscale(1) brightness(.7); }
 .awk-lock { font: 800 0.6rem var(--mono); text-align: center; letter-spacing: .06em; }
-.awk.bonus .awk-lock::after { content: "AKTIF"; color: var(--pink); }
-.awk.bonus.locked .awk-lock::after { content: "TERKUNCI"; color: var(--text-2); }
+.awk.extra .awk-lock::after { content: "AKTIF"; color: var(--pink); }
+.awk.extra.locked .awk-lock::after { content: "TERKUNCI"; color: var(--text-2); }
 /* build publik & admin */
 .bd-awks { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; margin-top: 8px; }
 .bd-awks .bd-awk-row { position: relative; padding: 8px 12px 8px 10px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); gap: 10px; }
@@ -1090,7 +1090,7 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-awks .bd-awk-row i { display: grid; place-items: center; width: 24px; height: 24px; flex: none; border-radius: 50%; background: var(--pink); color: #fff; font: 800 0.74rem var(--display); margin: 0; }
 .bd-awks .bd-awk-row b { display: block; font: 800 0.82rem var(--display); text-transform: uppercase; }
 .bd-awks .bd-awk-row small { font: 600 0.58rem var(--mono); color: var(--pink); letter-spacing: .06em; text-transform: uppercase; }
-.bd-awks .bd-awk-row.bonus { background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border: 2px dashed var(--pink); box-shadow: none; }
+.bd-awks .bd-awk-row.extra { background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border: 2px dashed var(--pink); box-shadow: none; }
 
 /* ---- hadiah affinity: harga dan tampilan HP ---- */
 .gift-row { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
@@ -1111,3 +1111,15 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .matrow > .mat { width: auto; }
 .mat-price.event { background: color-mix(in srgb, var(--pink) 18%, transparent); color: var(--pink); font: 800 0.68rem var(--display); text-transform: uppercase; letter-spacing: .04em; }
 .mat-price.none { background: transparent; border: 1px dashed color-mix(in srgb, var(--text-2) 45%, transparent); color: var(--text-2); font: 600 0.62rem var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+
+/* awakening di HP: kolom judul lebih lega */
+@media (max-width: 640px) {
+  .awk .skill-top { grid-template-columns: 48px minmax(0, 1fr) 30px 32px; gap: 8px; padding: 10px 12px; }
+  .awk .skill-ico { width: 48px; height: 48px; }
+  .awk.extra .skill-top { grid-template-columns: 48px minmax(0, 1fr) 32px; }
+  .awk.extra .awk-lock { display: none; }
+  .awk .skill-title b { font-size: 0.9rem; overflow-wrap: anywhere; }
+  .awk .skill-title small { font-size: 0.6rem; letter-spacing: 0.04em; }
+  .awk-pick { width: 26px; height: 26px; }
+  .awk-pick[aria-checked="true"]::after { font-size: 0.78rem; }
+}
