@@ -493,7 +493,7 @@
       build: () => {
         const bd = BUILDS[e.slug];
         let html = "";
-        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length)) {
+        if (bd && (bd.arcs.length || bd.sets.length || bd.stats.length || bd.awk || (bd.skills || []).length)) {
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
           html += `<div class="af-sec"><h4>${S("Build rekomendasi", "Recommended build")}</h4>
             ${bd.arcs.length ? `<p class="mono">${S("ARC (URUTAN PRIORITAS)", "ARC (BY PRIORITY)")}</p><div class="tile-grid">${bd.arcs.map(arcOf).filter(Boolean).map(arcTile).join("")}</div>` : ""}
@@ -502,6 +502,8 @@
               const bn = st.bonuses.find((b) => b.pieces === x.pieces) || st.bonuses[0];
               return `<div class="bd-set">${st.icon ? `<img src="${img(st.icon)}" alt="">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b><p class="txt">${rich(bn ? bn.text : "")}</p></div></div>`;
             }).join("")}` : ""}
+            ${bd.awk ? `<p class="mono" style="margin-top:14px">${S("AWAKENING YANG DISARANKAN", "RECOMMENDED AWAKENING")}</p><div class="bd-awk"><span class="bd-awk-n">★${bd.awk}</span><div>${e.awakening.slice(0, bd.awk).map((a, i) => `<div class="bd-awk-row"><i>★${i + 1}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span>${esc(a.name)}</span></div>`).join("")}</div></div>` : ""}
+            ${(bd.skills || []).length ? `<p class="mono" style="margin-top:14px">${S("URUTAN NAIK LEVEL SKILL", "SKILL UPGRADE ORDER")}</p><div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div>` : ""}
             ${bd.stats.length ? `<p class="mono" style="margin-top:14px">${S("STAT PRIORITAS", "PRIORITY STATS")}</p><div class="bd-stats">${bd.stats.map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("")}</div>` : ""}
           </div>`;
         }
@@ -676,8 +678,10 @@
       if (!r.ok) return r.status;
       const j = await r.json(); builds = JSON.parse(unb64(j.content) || "{}"); sha = j.sha; return "ok";
     }
-    const fresh = () => ({ arcs: [], sets: [], stats: [] });
-    const pick = () => { working = JSON.parse(JSON.stringify(builds[cur] || fresh())); };
+    const SD = await load("stats");
+    const fresh = () => ({ arcs: [], sets: [], stats: [], awk: 0, skills: [] });
+    const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
+    const SKG = ["basic", "redirect", "ultimate", "support"];
     function render(msg) {
       const e = es.find((x) => x.slug === cur);
       main.innerHTML = `
@@ -692,13 +696,18 @@
           <label>Esper</label>
           <select id="admEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
           <label>Arc (klik untuk menambah, urutan = prioritas)</label>
-          <div class="adm-chips" id="admArcSel">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="on" data-rm-arc="${i}"><i>${i + 1}</i>${esc(a.name)} ✕</button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
+          <div class="adm-chips" id="admArcSel">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="adm-arc on q${a.rarity}" data-rm-arc="${i}"><img src="${img(a.icon)}" alt=""><span><i>${i + 1}</i>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity} · klik untuk hapus</small></span></button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
           <input type="search" id="admArcQ" placeholder="Cari Arc…" autocomplete="off">
           <div class="adm-chips" id="admArcList"></div>
           <label>Set modul</label>
           <div class="adm-chips">${working.sets.map((x, i) => { const st = mods.sets.find((m) => m.id === x.id); return st ? `<button type="button" class="on" data-rm-set="${i}">${esc(st.name)} · ${x.pieces} ✕</button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
           <div class="adm-row"><select id="admSet">${mods.sets.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select>
             <select id="admPcs"><option value="4">4 keping</option><option value="2">2 keping</option></select><button class="btn" id="admAddSet" type="button">Tambah set</button></div>
+          <label>Awakening yang disarankan</label>
+          <div class="adm-row"><select id="admAwk"><option value="0">Tidak ada rekomendasi</option>${e.awakening.map((a, i) => `<option value="${i + 1}"${working.awk === i + 1 ? " selected" : ""}>Sampai ★${i + 1}</option>`).join("")}</select></div>
+          <div class="adm-awk">${e.awakening.map((a, i) => `<div class="${i < working.awk ? "on" : ""}">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><i>★${i + 1}</i>${esc(a.name)}</span></div>`).join("")}</div>
+          <label>Urutan naik level skill (klik berurutan, klik lagi untuk mencabut)</label>
+          <div class="adm-chips adm-skills">${SKG.filter((g) => e.skills.some((x) => x.group === g)).map((g) => { const i = working.skills.indexOf(g); const sk = e.skills.find((x) => x.group === g); const ic = ((SD.espers[e.id] || {}).icons || {})[g]; return `<button type="button" class="adm-sk ${i >= 0 ? "on" : ""}" data-skill="${g}"><span class="skill-ico">${ic ? `<img src="${img(ic)}" alt="">` : ""}</span><span>${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(sk.name)}<small>${esc(LABEL.group[g] || g)}</small></span></button>`; }).join("")}</div>
           <label>Stat prioritas (klik berurutan, klik lagi untuk mencabut)</label>
           <div class="adm-chips" id="admStats">${STATS.map((t) => { const i = working.stats.indexOf(t); return `<button type="button" class="${i >= 0 ? "on" : ""}" data-stat="${esc(t)}">${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(t)}</button>`; }).join("")}</div>
           <div class="adm-row" style="margin-top:16px"><button class="btn" id="admSave" type="button"${token ? "" : " disabled"}>Simpan ke GitHub</button><button class="btn ghost" id="admDel" type="button"${token && builds[cur] ? "" : " disabled"}>Hapus build ${esc(e.name)}</button></div>
@@ -706,7 +715,7 @@
         </div>`;
       const drawArcs = () => {
         const q = ($("#admArcQ").value || "").toLowerCase();
-        $("#admArcList").innerHTML = arcs.filter((a) => !working.arcs.includes(a.slug) && (!q || a.name.toLowerCase().includes(q))).slice(0, 24).map((a) => `<button type="button" data-add-arc="${a.slug}">${esc(a.name)}</button>`).join("");
+        $("#admArcList").innerHTML = arcs.filter((a) => !working.arcs.includes(a.slug) && (!q || a.name.toLowerCase().includes(q))).slice(0, 40).map((a) => `<button type="button" class="adm-arc q${a.rarity}" data-add-arc="${a.slug}"><img src="${img(a.icon)}" alt="" loading="lazy"><span>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>`).join("");
       };
       drawArcs();
       $("#admArcQ").oninput = drawArcs;
@@ -732,11 +741,15 @@
       if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
       if (t.id === "admAddSet") { working.sets.push({ id: $("#admSet").value, pieces: +$("#admPcs").value }); render(); return; }
       if (t.dataset.rmSet) { working.sets.splice(+t.dataset.rmSet, 1); render(); return; }
+      if (t.dataset.skill) { const i = working.skills.indexOf(t.dataset.skill); if (i >= 0) working.skills.splice(i, 1); else working.skills.push(t.dataset.skill); render(); return; }
       if (t.dataset.stat) { const i = working.stats.indexOf(t.dataset.stat); if (i >= 0) working.stats.splice(i, 1); else working.stats.push(t.dataset.stat); render(); return; }
-      if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length ? working : null, "perbarui"); return; }
+      if (t.id === "admSave") { await save(working.arcs.length || working.sets.length || working.stats.length || working.awk || working.skills.length ? working : null, "perbarui"); return; }
       if (t.id === "admDel") { if (await ask("Hapus build ini?", "Hapus", "Batal")) await save(null, "hapus"); }
     });
-    main.addEventListener("change", (ev) => { if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); } });
+    main.addEventListener("change", (ev) => {
+      if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); }
+      if (ev.target.id === "admAwk") { working.awk = +ev.target.value; render(); }
+    });
   }
 
   // ---------------- MODUL ----------------
