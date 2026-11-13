@@ -80,11 +80,63 @@ def skill_icons(prefix):
     return {k: v for k, v in out.items() if v}
 
 
+SKILL_GROUP = {"melee": "basic", "skill": "redirect", "ultraskill": "ultimate", "qte": "support"}
+LABELS = [
+    (r"(\d+)(?:st|nd|rd|th) Instance Ratio", lambda m: f"Rasio Hit ke-{m.group(1)}"),
+    (r"Plunge DMG Ratio", lambda m: "Rasio DMG Plunge"),
+    (r"Critical Riposte Ratio", lambda m: "Rasio Critical Riposte"),
+    (r"Press Ratio", lambda m: "Rasio Tekan"),
+    (r"Hold Ratio", lambda m: "Rasio Tahan"),
+    (r"(.*) Ratio", lambda m: f"Rasio {m.group(1)}"),
+]
+
+
+def label_id(t):
+    t = re.sub(r"<[^>]+>", "", t or "").strip()
+    for rx, fn in LABELS:
+        m = re.fullmatch(rx, t)
+        if m:
+            return fn(m)
+    return t
+
+
+def skill_levels(char_id, cfg, tips, dmg):
+    """Material tiap level skill (kumulatif dihitung di browser) dan tabel rasio DMG per level."""
+    out = {}
+    for ab in (cfg.get(char_id) or {}).get("CharacterAbilityList", []):
+        key = ab["Key"]
+        group = SKILL_GROUP.get(key.rsplit("_", 1)[-1].lower())
+        if not group:
+            continue
+        costs = []
+        for lv in ab["Value"].get("LevelsCostItems", []):
+            costs.append({it["ID"]: it["Number"] for it in lv["CostItems"]})
+        rows = []
+        for g in (tips.get(key, {}).get("GALevelUpArray") or []):
+            lu = g.get("LevelUpData") or {}
+            ges = lu.get("DamageGEList") or []
+            if not ges or any(x not in dmg for x in ges):
+                continue
+            fmt = (g.get("DescValue") or {}).get("LocalizedString") or "{0}%"
+            pct = "%" in fmt
+            arrs = [dmg[x]["AtkRateBaseArray"] or dmg[x].get("DefRateBaseArray") or dmg[x].get("HPRateBaseArray") or [] for x in ges]
+            n = min(len(costs) + 1, *(len(a) for a in arrs)) if all(arrs) else 0
+            if not n:
+                continue
+            vals = [[int(a[i] * 100 + 1e-6) if pct else round(a[i], 2) for a in arrs] for i in range(n)]
+            rows.append({"l": label_id((g.get("Desc") or {}).get("LocalizedString")), "f": fmt, "v": vals})
+        out[group] = {"cost": costs, "rows": rows}
+    return out
+
+
 def esper_stats():
     char = B.table("DataTable/Character/DT_Character.json")
     base = lower(B.table("DataTable/PackData/DT_PlayerPackData.json"))
     lvl = lower(B.table(P + "DT_PlayerModifyPackData.json"))
     brk = lower(B.table("DataTable/Character/DT_CharacterBreakthroughDataTable.json"))
+    cfg = B.table("DataTable/Character/DT_CharacterAbilityConfig.json")
+    tips = B.table("DataTable/Skill/DT_GameplayAbilityTipsData.json")
+    dmg = B.table("DataTable/Skill/DT_SkillDamageData.json")
     espers = json.loads((B.OUT_DATA / "espers.json").read_text(encoding="utf-8"))
     out = {}
     for e in espers:
@@ -114,7 +166,8 @@ def esper_stats():
         if "basic" not in icons:
             icons = skill_icons(e["name"])
         out[e["id"]] = {"hp": hp, "atk": atk, "def": df, "crit": b["CritBase"], "critDmg": b["CritDamageBase"], "tags": tags,
-                        "mats": mat_list(parse_items(*tot_items, *tot_gold)), "icons": icons}
+                        "mats": mat_list(parse_items(*tot_items, *tot_gold)), "icons": icons,
+                        "skills": skill_levels(e["id"], cfg, tips, dmg)}
     return out
 
 
@@ -164,7 +217,11 @@ if __name__ == "__main__":
     data = {"espers": esper_stats(), "arcs": arc_stats()}
     items = {x["id"]: x for x in json.loads((B.OUT_DATA / "items.json").read_text(encoding="utf-8"))["items"]}
     used = {m[0] for d in (*data["espers"].values(), *data["arcs"].values()) for m in d["mats"]}
+    used |= {k for d in data["espers"].values() for sk in d["skills"].values() for c in sk["cost"] for k in c}
     data["items"] = {k: {"name": items[k]["name"], "icon": items[k]["icon"], "rarity": items[k]["rarity"]} for k in used if k in items}
+    miss = sorted(k for k in used if k not in data["items"] and k != "gold")
+    if miss:
+        print("item tidak ada di items.json:", miss)
     data["items"]["gold"] = {"name": "Beetle Coin", "icon": "img/item/item_coin_beetle.webp", "rarity": 3}
     s = data["espers"].get("1003")
     assert (s["hp"][79], s["atk"][79], s["def"][79]) == (9955, 386, 549), s

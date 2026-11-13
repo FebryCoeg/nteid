@@ -365,12 +365,18 @@
       <div class="stat-lv"><span class="mono">LEVEL</span><b id="lvNum">${len}</b><input type="range" id="lvRange" min="1" max="${len}" value="${len}" aria-label="Level"></div>
       <div class="srows">${rows}</div></div>`;
   }
+  function matTiles(list, items) {
+    return `<div class="matrow">${list.filter(([id]) => items[id]).map(([id, n]) => {
+      const it = items[id];
+      return `<div class="mat q${it.rarity || 1}" title="${esc(it.name)}"><img src="${img(it.icon)}" alt="${esc(it.name)}" loading="lazy"><small>${esc(it.name)}</small><b>${nf(n)}</b></div>`;
+    }).join("")}</div>`;
+  }
   function matBox(mats, items, title) {
     const list = (mats || []).filter(([id]) => items[id]);
     if (!list.length) return "";
     return `<div class="matbox"><span class="mono">${title}</span><div class="matrow">${list.map(([id, n]) => {
       const it = items[id];
-      return `<div class="mat q${it.rarity || 1}" title="${esc(it.name)}"><img src="${img(it.icon)}" alt="${esc(it.name)}" loading="lazy"><b>x${nf(n)}</b><small>${esc(it.name)}</small></div>`;
+      return `<div class="mat q${it.rarity || 1}" title="${esc(it.name)}"><img src="${img(it.icon)}" alt="${esc(it.name)}" loading="lazy"><small>${esc(it.name)}</small><b>${nf(n)}</b></div>`;
     }).join("")}</div></div>`;
   }
 
@@ -427,6 +433,7 @@
         g.list.push(s);
       });
       const cards = [];
+      const SK = (ST && ST.skills) || {};
       order.forEach((g) => {
         const type = LABEL.group[g.k] || g.k;
         if (g.k === "passive") {
@@ -435,9 +442,10 @@
         }
         const first = g.list[0];
         const sum = g.list.length > 1 && /^[^\n]{1,48}:/.test(first.desc) && first.desc.includes("\n");
-        if (sum) cards.push({ icon: icons[g.k], name: first.name, type, body: g.list.slice(1) });
-        else if (g.list.length === 1) cards.push({ icon: icons[g.k], name: first.name, type, body: [first], single: true });
-        else cards.push({ icon: icons[g.k], name: first.name, type, body: g.list });
+        const lv = SK[g.k];
+        if (sum) cards.push({ g: g.k, lv, icon: icons[g.k], name: first.name, type, body: g.list.slice(1) });
+        else if (g.list.length === 1) cards.push({ g: g.k, lv, icon: icons[g.k], name: first.name, type, body: [first], single: true });
+        else cards.push({ g: g.k, lv, icon: icons[g.k], name: first.name, type, body: g.list });
       });
       return cards.map((c, i) => `<section class="skillcard${i === 0 ? " open" : ""}">
         <button class="skill-top" type="button" aria-expanded="${i === 0}">
@@ -445,7 +453,10 @@
           <span class="skill-title"><b>${esc(c.name)}</b><small>${esc(c.type)}</small></span>
           <span class="skill-chev">${ICO.chev}</span>
         </button>
-        <div class="skill-body">${c.body.map((s) => `<div class="sk">${c.single ? "" : `<h5>${esc(s.name)}</h5>`}<p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}</div>
+        <div class="skill-body">${c.lv ? `<div class="sklv" data-g="${c.g}">
+          <div class="sklv-top"><span class="mono">${S("LEVEL SKILL", "SKILL LEVEL")}</span><b class="sklv-num"></b><input type="range" min="1" max="${c.lv.cost.length + 1}" value="${c.lv.cost.length + 1}" aria-label="Level skill"><em class="sklv-max">MAX</em></div>
+          <div class="sklv-mats"></div>
+          <div class="sklv-rows"></div></div>` : ""}${c.body.map((s) => `<div class="sk">${c.single ? "" : `<h5>${esc(s.name)}</h5>`}<p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}</div>
       </section>`).join("");
     };
     const panels = {
@@ -463,11 +474,26 @@
       $("#tabBody").innerHTML = panels[id]();
     };
     $(".tabs", main).addEventListener("click", (ev) => { const t = ev.target.closest(".tab"); if (t) show(t.dataset.tab); });
+    const drawSk = (box) => {
+      const lv = ((ST && ST.skills) || {})[box.dataset.g]; if (!lv) return;
+      const inp = $("input", box), L = +inp.value, max = lv.cost.length + 1;
+      $(".sklv-num", box).textContent = L;
+      $(".sklv-max", box).style.visibility = L === max ? "visible" : "hidden";
+      const tot = {};
+      lv.cost.slice(0, L - 1).forEach((c) => Object.entries(c).forEach(([k, v]) => { tot[k] = (tot[k] || 0) + v; }));
+      const mats = Object.entries(tot).sort((a, b) => (a[0] === "gold") - (b[0] === "gold") || (a[0] > b[0] ? 1 : -1));
+      $(".sklv-mats", box).innerHTML = mats.length ? matTiles(mats, SD.items) : `<p class="mono sklv-none">${S("Level 1: tanpa material.", "Level 1: no materials.")}</p>`;
+      $(".sklv-rows", box).innerHTML = lv.rows.map((r) => `<div class="ratio"><span>${esc(r.l)}</span><b>${esc(r.f.replace(/\{(\d+)\}/g, (_, i) => (r.v[L - 1] || r.v[r.v.length - 1])[+i] ?? ""))}</b></div>`).join("");
+    };
+    const initSk = () => $$(".sklv", main).forEach(drawSk);
+    $("#tabBody").addEventListener("input", (ev) => { const box = ev.target.closest(".sklv"); if (box) drawSk(box); });
+    $(".tabs", main).addEventListener("click", () => setTimeout(initSk, 0));
     $("#tabBody").addEventListener("click", (ev) => {
       const b = ev.target.closest(".skill-top"); if (!b) return;
       const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open"));
     });
     if (tabs.length) show(tabs[0][0]);
+    initSk();
     if (ST) {
       const upd = () => {
         const i = +$("#lvRange").value - 1;
