@@ -664,7 +664,7 @@
     const REPO = "FebryCoeg/nteid", PATH = "nte/data/builds.json";
     const KEY = "nte-admin-token";
     let token = ""; try { token = localStorage.getItem(KEY) || ""; } catch (e) {}
-    let builds = {}, sha = null, cur = es[0].slug, working = null;
+    let builds = {}, sha = null, cur = es[0].slug, working = null, showAllArcs = false;
     const STATS = ["ATK %", "HP %", "DEF %", "CRIT Rate", "CRIT DMG", "DMG Bonus", "ATK", "HP", "DEF", "Energy Regen", "Healing Bonus", "Break"];
     const api = (method, body) => fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}${method === "GET" ? "?ref=main&t=" + Date.now() : ""}`, {
       method, headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }, body: body ? JSON.stringify(body) : undefined,
@@ -696,6 +696,8 @@
           <label>Esper</label>
           <select id="admEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
           <label>Arc (klik untuk menambah, urutan = prioritas)</label>
+          <div class="adm-fit"><span><img src="${img(e.arcTypeIcon || "")}" alt="" ${e.arcTypeIcon ? "" : "hidden"}>${esc(e.name)} memakai Arc <b>${esc(e.arcType)}</b>: <b>${arcs.filter((a) => a.type === e.arcType).length}</b> Arc cocok</span>
+            <label class="adm-chk"><input type="checkbox" id="admAllArcs"${showAllArcs ? " checked" : ""}> Tampilkan semua tipe</label></div>
           <div class="adm-chips" id="admArcSel">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="adm-arc on q${a.rarity}" data-rm-arc="${i}"><img src="${img(a.icon)}" alt=""><span><i>${i + 1}</i>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity} · klik untuk hapus</small></span></button>` : ""; }).join("") || '<em>Belum ada</em>'}</div>
           <input type="search" id="admArcQ" placeholder="Cari Arc…" autocomplete="off">
           <div class="adm-chips" id="admArcList"></div>
@@ -715,7 +717,7 @@
         </div>`;
       const drawArcs = () => {
         const q = ($("#admArcQ").value || "").toLowerCase();
-        $("#admArcList").innerHTML = arcs.filter((a) => !working.arcs.includes(a.slug) && (!q || a.name.toLowerCase().includes(q))).slice(0, 40).map((a) => `<button type="button" class="adm-arc q${a.rarity}" data-add-arc="${a.slug}"><img src="${img(a.icon)}" alt="" loading="lazy"><span>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>`).join("");
+        $("#admArcList").innerHTML = arcs.filter((a) => (showAllArcs || a.type === e.arcType) && !working.arcs.includes(a.slug) && (!q || a.name.toLowerCase().includes(q))).sort((x, y) => y.rarity - x.rarity || x.name.localeCompare(y.name)).slice(0, 60).map((a) => `<button type="button" class="adm-arc q${a.rarity}" data-add-arc="${a.slug}"><img src="${img(a.icon)}" alt="" loading="lazy"><span>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>`).join("");
       };
       drawArcs();
       $("#admArcQ").oninput = drawArcs;
@@ -749,6 +751,7 @@
     main.addEventListener("change", (ev) => {
       if (ev.target.id === "admEsper") { cur = ev.target.value; pick(); render(); }
       if (ev.target.id === "admAwk") { working.awk = +ev.target.value; render(); }
+      if (ev.target.id === "admAllArcs") { showAllArcs = ev.target.checked; render(); }
     });
   }
 

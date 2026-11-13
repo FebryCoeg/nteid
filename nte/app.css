@@ -1056,3 +1056,10 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-skill .skill-ico { width: 46px; height: 46px; flex: none; }
 .bd-skill b { display: block; font: 800 0.82rem var(--display); text-transform: uppercase; }
 .bd-skill small { font: 600 0.6rem var(--mono); color: var(--pink); text-transform: uppercase; letter-spacing: .06em; }
+
+.adm-fit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 4px 0 8px; padding: 8px 14px; border-radius: 16px; background: var(--panel-2); border: 2px dashed color-mix(in srgb, var(--pink) 50%, transparent); font: 600 0.78rem var(--display); }
+.adm-fit span { display: inline-flex; align-items: center; gap: 8px; }
+.adm-fit img { width: 22px; height: 22px; object-fit: contain; }
+.adm-fit b { color: var(--pink); }
+.adm-box label.adm-chk { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: var(--text-2); text-transform: none; font: 600 0.72rem var(--display); cursor: pointer; }
+.adm-chk input { width: auto; min-height: 0; accent-color: var(--pink); }
