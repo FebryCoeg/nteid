@@ -85,5 +85,8 @@ curated_round2.apply(out)
 import curated_round3  # noqa: E402
 
 curated_round3.apply(out)
+import curated_round4  # noqa: E402
+
+curated_round4.apply(out)
 (D / "builds_curated.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print("builds_curated.json:", {k: len(v.get("teams", [])) for k, v in out.items()}, "tim")
