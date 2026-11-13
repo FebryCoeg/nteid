@@ -357,7 +357,17 @@
     def: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l7 2.6v5.6c0 4.2-2.9 7.3-7 8.8-4.1-1.5-7-4.6-7-8.8V6.1z"/></svg>',
     crit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 6.2 6.4.6-4.9 4.3 1.5 6.4L12 17l-5.6 3.5 1.5-6.4L3 9.8l6.4-.6z"/></svg>',
     chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"/></svg>',
   };
+  const accordion = (cards) => cards.map((c, i) => `<section class="skillcard pf${c.open ? " open" : ""}">
+        <button class="skill-top" type="button" aria-expanded="${!!c.open}">
+          <span class="skill-ico">${c.icon || ICO.chat}</span>
+          <span class="skill-title"><b>${esc(c.title)}</b>${c.sub ? `<small>${esc(c.sub)}</small>` : ""}</span>
+          <span class="skill-chev">${ICO.chev}</span>
+        </button>
+        <div class="skill-body">${c.body}</div>
+      </section>`).join("");
   const nf = (n) => Number(n).toLocaleString("id-ID");
   const statRow = (k, label, id, val) => `<div class="srow"><i>${ICO[k]}</i><span>${label}</span><b${id ? ` id="${id}"` : ""}>${val === undefined ? "" : val}</b></div>`;
   function levelBox(len, rows) {
@@ -390,20 +400,26 @@
     const ST = SD.espers[e.id];
     const outfits = (await load("fashion")).filter((f) => f.char === e.name);
     const facts = [["Faksi", p.faction], ["Ulang tahun", p.birthday], ["Kemampuan Esper", p.esperAbility], ["Pekerjaan", p.occupation], ["Kesukaan", p.food]].filter(([, v]) => v);
+    const looks = outfits.map((f) => ({ name: tx(f.name), src: f.image || f.fallback })).filter((l) => l.src);
+    const heroSrc = e.portrait || e.icon;
+    if (!looks.some((l) => l.src === heroSrc)) looks.unshift({ name: S("Kostum awal", "Default outfit"), src: heroSrc });
+    let lookIdx = Math.max(0, looks.findIndex((l) => l.src === heroSrc));
+    const AF = ST && ST.affinity;
     const tabs = [
       ["skill", "Kemampuan", e.skills.length],
       ["awakening", "Awakening", e.awakening.length],
-      ["console", "Console", e.console.length],
+      ["affinity", "Affinity", AF ? 1 : 0],
+      ["build", "Build", e.console.length],
       ["kosmetik", "Kostum", outfits.length],
-      ["profil", "Profil", p.intro || p.impression ? 1 : 0],
-      ["cerita", "Arsip Cerita", (p.stories || []).length],
+      ["profil", "Profil", p.intro || p.impression || (p.stories || []).length ? 1 : 0],
     ].filter(([, , n]) => n);
     main.innerHTML = `
       <div class="crumb mono"><a href="/" data-link>ARSIP</a><span>/</span><a href="/esper" data-link>ESPER</a><span>/</span><span>${esc(e.name.toUpperCase())}</span></div>
       <article class="dossier ${elClass(e.element)}">
         <div class="dossier-art">
           <span class="stamp rank-${e.rank}">${e.rank}</span>
-          <img src="${img(e.portrait || e.icon)}" alt="${esc(e.name)}">
+          <img id="heroImg" src="${img(heroSrc)}" alt="${esc(e.name)}">
+          ${looks.length > 1 ? `<div class="outfit-bar"><span id="lookName"></span><button type="button" id="lookPrev" aria-label="Kostum sebelumnya">‹</button><button type="button" id="lookNext" aria-label="Kostum berikutnya">›</button></div>` : ""}
         </div>
         <div>
           <div class="dossier-head">
@@ -417,7 +433,7 @@
           </div>
           ${e.desc ? `<p class="lede txt">${rich(e.desc)}</p>` : ""}
           ${ST && ST.tags.length ? `<div class="roles"><span class="mono">PERAN TEMPUR</span>${ST.tags.map((t) => `<b>${esc(t)}</b>`).join("")}</div>` : ""}
-          ${facts.length ? `<div class="facts">${facts.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>` : ""}
+          ${facts.length ? `<dl class="info">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : ""}
           ${ST ? levelBox(ST.hp.length, statRow("hp", "HP", "stHp") + statRow("atk", "ATK", "stAtk") + statRow("def", "DEF", "stDef") + statRow("crit", "CRIT Rate", "", Math.round(ST.crit * 100) + "%") + statRow("crit", "CRIT DMG", "", Math.round(ST.critDmg * 100) + "%")) : ""}
           ${ST ? matBox(ST.mats, SD.items, S("MATERIAL ASCENSION · LV.1 → 80", "ASCENSION MATERIALS · LV.1 → 80")) : ""}
           <div class="tabs" role="tablist">${tabs.map(([id, t], i) => `<button class="tab" role="tab" data-tab="${id}" aria-selected="${i === 0}">${t}</button>`).join("")}</div>
@@ -453,27 +469,48 @@
           <span class="skill-title"><b>${esc(c.name)}</b><small>${esc(c.type)}</small></span>
           <span class="skill-chev">${ICO.chev}</span>
         </button>
-        <div class="skill-body">${c.lv ? `<div class="sklv" data-g="${c.g}">
+        <div class="skill-body">${c.body.map((s) => `<div class="sk">${c.single ? "" : `<h5>${esc(s.name)}</h5>`}<p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}${c.lv ? `<button type="button" class="sklv-toggle" aria-expanded="false"><span>${S("Tampilkan skala DMG & material", "Show DMG scaling & materials")}</span>${ICO.chev}</button><div class="sklv" data-g="${c.g}" hidden>
           <div class="sklv-top"><span class="mono">${S("LEVEL SKILL", "SKILL LEVEL")}</span><b class="sklv-num"></b><input type="range" min="1" max="${c.lv.cost.length + 1}" value="${c.lv.cost.length + 1}" aria-label="Level skill"><em class="sklv-max">MAX</em></div>
           <div class="sklv-mats"></div>
-          <div class="sklv-rows"></div></div>` : ""}${c.body.map((s) => `<div class="sk">${c.single ? "" : `<h5>${esc(s.name)}</h5>`}<p class="txt">${rich(s.desc)}</p>${s.quote ? `<p class="quote">${rich(s.quote)}</p>` : ""}</div>`).join("")}</div>
+          <div class="sklv-rows"></div></div>` : ""}</div>
       </section>`).join("");
     };
     const panels = {
       skill: skillCards,
-      kosmetik: () => `<div class="outfit-grid">${outfits.map((f) => `<figure class="outfit"><img src="${img(f.image || f.fallback)}" alt="" loading="lazy"><figcaption><b>${esc(tx(f.name))}</b><small>${esc(strip(tx(f.desc)))}</small></figcaption></figure>`).join("")}</div>`,
+      kosmetik: () => `<div class="outfit-grid">${outfits.map((f, i) => `<figure class="outfit" data-i="${looks.findIndex((l) => l.src === (f.image || f.fallback))}" tabindex="0"><img src="${img(f.image || f.fallback)}" alt="" loading="lazy"><figcaption><b>${esc(tx(f.name))}</b><small>${esc(strip(tx(f.desc)))}</small></figcaption></figure>`).join("")}</div>`,
+      affinity: () => {
+        const it = (id) => SD.items[id];
+        const tile = (id, n, heart) => it(id) ? `<div class="mat q${it(id).rarity || 1}" title="${esc(it(id).name)}"><img src="${img(it(id).icon)}" alt="${esc(it(id).name)}" loading="lazy"><small>${esc(it(id).name)}</small><b>${heart ? ICO.heart : ""}${nf(n)}</b></div>` : "";
+        return `${AF.bonus.length ? `<div class="af-bonus"><span class="mono">${S("BONUS AFFINITY", "AFFINITY BONUS")}</span>${AF.bonus.map(([k, v]) => `<b>${esc(k)} +${v}%</b>`).join("")}</div>` : ""}
+          ${AF.gifts.length ? `<div class="af-sec"><h4>${S("Hadiah favorit", "Favorite gifts")}</h4><p class="mono">${S("Poin Affinity yang didapat per hadiah", "Affinity points per gift")}</p><div class="matrow">${AF.gifts.map(([id, n]) => tile(id, n, true)).join("")}</div></div>` : ""}
+          <div class="af-sec"><h4>${S("Level Affinity", "Affinity levels")}</h4>
+          ${AF.levels.map((l, i) => `<div class="af-lv"><div class="af-no"><i>${i + 1}</i><small>${nf(l.max)} ${S("poin", "pts")}</small></div><div class="matrow">${l.items.map(([id, n]) => tile(id, n, false)).join("")}</div></div>`).join("")}</div>`;
+      },
+      build: () => `<div class="af-sec"><h4>${S("Efek Console", "Console effects")}</h4><p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`,
       awakening: () => e.awakening.map((a, i) => `<div class="entry"><h4>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span class="lv">★${i + 1}</span>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
-      console: () => `<p class="mono" style="margin-bottom:10px">Efek tambahan yang terbuka lewat Console (空幕)</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join(""),
-      profil: () => `${p.quote ? `<p class="lede txt" style="font-style:italic">${rich(p.quote)}</p>` : ""}
-        ${p.intro ? `<div class="entry" style="margin-top:14px"><h4>Ringkasan</h4><p class="txt">${rich(p.intro)}</p></div>` : ""}
-        ${p.impression ? `<div class="entry"><h4>Kesan pertama</h4><p class="txt">${rich(p.impression)}</p></div>` : ""}`,
-      cerita: () => (p.stories || []).map((s, i) => `<div class="story" data-n="ARSIP ${String(i + 1).padStart(2, "0")}">${s.title ? `<h4>${esc(s.title)}</h4>` : ""}<p class="txt">${rich(s.text)}</p></div>`).join(""),
+      profil: () => {
+        const cards = [];
+        if (p.intro || p.quote) cards.push({ title: S("Ringkasan", "Summary"), sub: S("PROFIL", "PROFILE"), open: true, body: `${p.quote ? `<p class="lede txt" style="font-style:italic">${rich(p.quote)}</p>` : ""}${p.intro ? `<p class="txt" style="margin-top:10px">${rich(p.intro)}</p>` : ""}` });
+        if (p.impression) cards.push({ title: S("Kesan pertama", "First impression"), sub: S("PROFIL", "PROFILE"), body: `<p class="txt">${rich(p.impression)}</p>` });
+        (p.stories || []).forEach((st, i) => cards.push({ title: st.title || "Intel", sub: `${S("ARSIP", "FILE")} ${String(i + 1).padStart(2, "0")}`, body: `<p class="txt prose">${rich(st.text)}</p>` }));
+        return accordion(cards);
+      },
     };
     const show = (id) => {
       $$(".tab", main).forEach((t) => t.setAttribute("aria-selected", t.dataset.tab === id));
       $("#tabBody").innerHTML = panels[id]();
     };
     $(".tabs", main).addEventListener("click", (ev) => { const t = ev.target.closest(".tab"); if (t) show(t.dataset.tab); });
+    const setLook = () => {
+      const l = looks[lookIdx];
+      $("#heroImg").src = img(l.src);
+      const nm = $("#lookName"); if (nm) nm.textContent = l.name;
+    };
+    if (looks.length > 1) {
+      $("#lookPrev").onclick = () => { lookIdx = (lookIdx - 1 + looks.length) % looks.length; setLook(); };
+      $("#lookNext").onclick = () => { lookIdx = (lookIdx + 1) % looks.length; setLook(); };
+    }
+    setLook();
     const drawSk = (box) => {
       const lv = ((ST && ST.skills) || {})[box.dataset.g]; if (!lv) return;
       const inp = $("input", box), L = +inp.value, max = lv.cost.length + 1;
@@ -489,6 +526,15 @@
     $("#tabBody").addEventListener("input", (ev) => { const box = ev.target.closest(".sklv"); if (box) drawSk(box); });
     $(".tabs", main).addEventListener("click", () => setTimeout(initSk, 0));
     $("#tabBody").addEventListener("click", (ev) => {
+      const tg = ev.target.closest(".sklv-toggle");
+      if (tg) {
+        const box = tg.nextElementSibling, open = box.hidden;
+        box.hidden = !open; tg.setAttribute("aria-expanded", open);
+        tg.firstElementChild.textContent = open ? S("Sembunyikan skala DMG & material", "Hide DMG scaling & materials") : S("Tampilkan skala DMG & material", "Show DMG scaling & materials");
+        return;
+      }
+      const fig = ev.target.closest(".outfit[data-i]");
+      if (fig) { lookIdx = +fig.dataset.i; setLook(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
       const b = ev.target.closest(".skill-top"); if (!b) return;
       const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open"));
     });

@@ -965,3 +965,43 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .ratio { flex-direction: column; align-items: flex-start; gap: 2px; }
   .ratio b { text-align: left; }
 }
+
+/* ---- info ringkas ---- */
+.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 4px 22px; margin: 12px 0 4px; padding: 10px 16px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); }
+.info div { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 4px 0; border-bottom: 1px dashed color-mix(in srgb, var(--text-2) 30%, transparent); }
+.info dt { font: 600 0.62rem var(--mono); color: var(--pink); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.info dd { margin: 0; font: 700 0.82rem var(--display); text-align: right; }
+
+/* ---- ganti kostum di hero ---- */
+.dossier-art { position: relative; }
+.outfit-bar { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 14px; border-radius: 999px; background: rgba(5,5,6,.78); backdrop-filter: blur(4px); box-shadow: 0 0 0 2px var(--edge); }
+.outfit-bar span { flex: 1; min-width: 0; font: 700 0.74rem var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.outfit-bar button { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--cream); color: var(--ink); font: 800 1.1rem/1 var(--display); cursor: pointer; }
+.outfit-bar button:hover { background: var(--pink); color: #fff; }
+.outfit { cursor: pointer; transition: transform .15s; }
+.outfit:hover { transform: translateY(-3px); }
+
+/* ---- skala DMG: tombol buka/tutup di bawah deskripsi ---- */
+.sklv-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 16px; padding: 10px 16px; border-radius: 999px; border: 2px solid var(--edge); background: var(--panel-2); color: var(--text); font: 700 0.76rem var(--mono); letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+.sklv-toggle:hover { border-color: var(--pink); }
+.sklv-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.sklv-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.sklv[hidden] { display: none; }
+
+/* ---- profil: akordeon ---- */
+.skillcard.pf .skill-ico svg { width: 56%; height: 56%; fill: none; stroke: var(--cream); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.prose { white-space: pre-line; line-height: 1.7; }
+
+/* ---- affinity ---- */
+.af-bonus { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.af-bonus .mono { color: var(--text-2); font-size: 0.66rem; letter-spacing: 0.1em; }
+.af-bonus b { padding: 5px 14px; border-radius: 999px; background: var(--pink); color: #fff; font: 800 0.78rem var(--display); }
+.af-sec { margin-bottom: 18px; }
+.af-sec h4 { font: 800 1rem var(--display); text-transform: uppercase; margin-bottom: 4px; }
+.af-sec > .mono { color: var(--text-2); font-size: 0.64rem; margin-bottom: 10px; display: block; }
+.af-lv { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: start; padding: 12px 14px; margin-top: 10px; border-radius: 20px; background: var(--panel); box-shadow: var(--ring); }
+.af-no { text-align: center; }
+.af-no i { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 4px; border-radius: 50%; background: var(--cream); color: var(--ink); font: 800 1.4rem var(--display); font-style: normal; box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink); }
+.af-no small { font: 600 0.6rem var(--mono); color: var(--text-2); }
+.mat b svg { width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px; fill: var(--pink); stroke: none; }
+@media (max-width: 640px) { .af-lv { grid-template-columns: 1fr; } .af-no { display: flex; align-items: center; gap: 10px; text-align: left; } .af-no i { margin: 0; width: 44px; height: 44px; font-size: 1.1rem; } .info div { flex-direction: column; gap: 0; } .info dd { text-align: left; } }

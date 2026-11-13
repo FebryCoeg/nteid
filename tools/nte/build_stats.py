@@ -129,6 +129,32 @@ def skill_levels(char_id, cfg, tips, dmg):
     return out
 
 
+BONUS_NAMES = {"AtkUp": "ATK", "HPMaxUp": "HP", "DefUp": "DEF", "CritBase": "CRIT Rate", "CritDamageBase": "CRIT DMG"}
+
+
+def affinity(cid, role, drops, gifts, mod):
+    """Level Affinity (poin, hadiah), bonus stat, dan hadiah yang disukai."""
+    levels = []
+    for i, lv in enumerate(role["LevelInfo"], 1):
+        items = []
+        for k in sorted(k for k in drops if re.fullmatch(rf"droplist_Likeability_{cid}_lv{i}_\d+_\d+", k)):
+            items.append([drops[k]["ItemID"], drops[k]["Num"]])
+        levels.append({"max": lv["MaxValue"], "items": items})
+    bonus = []
+    m = mod.get(f"likeatt_{cid}")
+    if m:
+        bonus = [[BONUS_NAMES.get(x["PropName"], x["PropName"]), round(x["PropValue"] * 100, 2)] for x in m["ModifyData"]]
+    loved = []
+    for gid, g in gifts.items():
+        sp = [x["LikeabilityValue"] for x in g.get("SpeicalGiftDatas", []) if x["RoleId"] == cid]
+        if sp:
+            loved.append([gid, max(sp)])
+        elif g.get("ExclusiveLikeabilityID") == cid:
+            loved.append([gid, g["DefaultLikeabilityValue"]])
+    loved.sort(key=lambda x: -x[1])
+    return {"levels": levels, "bonus": bonus, "gifts": loved}
+
+
 def esper_stats():
     char = B.table("DataTable/Character/DT_Character.json")
     base = lower(B.table("DataTable/PackData/DT_PlayerPackData.json"))
@@ -137,6 +163,10 @@ def esper_stats():
     cfg = B.table("DataTable/Character/DT_CharacterAbilityConfig.json")
     tips = B.table("DataTable/Skill/DT_GameplayAbilityTipsData.json")
     dmg = B.table("DataTable/Skill/DT_SkillDamageData.json")
+    roles = B.table("DataTable/LikeabilitySystem/DT_LikeabilityRoleData.json")
+    gifts = B.table("DataTable/LikeabilitySystem/DT_LikeabilityGiftData.json")
+    mod = B.table(P + "DT_LikeabilityModifyData.json")
+    drops = B.table("DataTable/Drop/DropSequenceDataTable.json")
     espers = json.loads((B.OUT_DATA / "espers.json").read_text(encoding="utf-8"))
     out = {}
     for e in espers:
@@ -167,7 +197,8 @@ def esper_stats():
             icons = skill_icons(e["name"])
         out[e["id"]] = {"hp": hp, "atk": atk, "def": df, "crit": b["CritBase"], "critDmg": b["CritDamageBase"], "tags": tags,
                         "mats": mat_list(parse_items(*tot_items, *tot_gold)), "icons": icons,
-                        "skills": skill_levels(e["id"], cfg, tips, dmg)}
+                        "skills": skill_levels(e["id"], cfg, tips, dmg),
+                        "affinity": affinity(e["id"], roles[e["id"]], drops, gifts, mod) if e["id"] in roles else None}
     return out
 
 
@@ -218,7 +249,23 @@ if __name__ == "__main__":
     items = {x["id"]: x for x in json.loads((B.OUT_DATA / "items.json").read_text(encoding="utf-8"))["items"]}
     used = {m[0] for d in (*data["espers"].values(), *data["arcs"].values()) for m in d["mats"]}
     used |= {k for d in data["espers"].values() for sk in d["skills"].values() for c in sk["cost"] for k in c}
+    used |= {i[0] for d in data["espers"].values() if d["affinity"] for lv in d["affinity"]["levels"] for i in lv["items"]}
+    used |= {g[0] for d in data["espers"].values() if d["affinity"] for g in d["affinity"]["gifts"]}
     data["items"] = {k: {"name": items[k]["name"], "icon": items[k]["icon"], "rarity": items[k]["rarity"]} for k in used if k in items}
+    cfg_items = B.table("DataTable/Inventory/DT_ItemConfig.json")
+    food_items = B.table("DataTable/Food/DT_FoodItemData.json")
+    alias = {"Annulith": ("Annulith_x10", "Annulith"), "Gold": ("gold_1000", "Beetle Coin")}
+    for k in sorted(used - set(data["items"])):
+        r = cfg_items.get(k) or food_items.get(k)
+        fixed = None
+        if k in alias:
+            r, fixed = cfg_items.get(alias[k][0]), alias[k][1]
+        if not r:
+            continue
+        name = fixed or B.plain(B.loc_text(r.get("ItemName")))
+        icon = B.asset(r.get("ItemIcon"), "item", 160)
+        if name and icon and not re.search(r"[㐀-鿿]", name):
+            data["items"][k] = {"name": name, "icon": icon, "rarity": B.quality(r)}
     miss = sorted(k for k in used if k not in data["items"] and k != "gold")
     if miss:
         print("item tidak ada di items.json:", miss)
