@@ -1091,3 +1091,21 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-awks .bd-awk-row b { display: block; font: 800 0.82rem var(--display); text-transform: uppercase; }
 .bd-awks .bd-awk-row small { font: 600 0.58rem var(--mono); color: var(--pink); letter-spacing: .06em; text-transform: uppercase; }
 .bd-awks .bd-awk-row.bonus { background: color-mix(in srgb, var(--pink) 14%, var(--panel)); border: 2px dashed var(--pink); box-shadow: none; }
+
+/* ---- hadiah affinity: harga dan tampilan HP ---- */
+.gift-row { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.mat small { -webkit-line-clamp: 3; min-height: 3.6em; font-size: 0.64rem; letter-spacing: 0; overflow-wrap: anywhere; hyphens: auto; }
+.mat b { display: inline-flex; align-items: center; justify-content: center; gap: 2px; font-size: 0.8rem; padding: 3px 9px; max-width: 100%; }
+.mat-price { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; width: 100%; padding: 4px 6px; border-radius: 12px; background: color-mix(in srgb, var(--cream) 10%, transparent); font: 700 0.74rem var(--display); font-variant-numeric: tabular-nums; }
+.mat-price img { width: 16px; height: 16px; object-fit: contain; }
+.mat-price em { flex-basis: 100%; font: 600 0.54rem var(--mono); font-style: normal; color: var(--text-2); letter-spacing: .04em; text-transform: uppercase; text-align: center; }
+@media (max-width: 640px) {
+  .gift-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gift-row .mat { padding: 10px 8px; }
+  .gift-row .mat img { width: 56px; height: 56px; }
+  .gift-row .mat small { font-size: 0.7rem; }
+  .gift-row .mat b { font-size: 0.9rem; }
+}
+
+/* lebar kotak material mengikuti kolom grid */
+.matrow > .mat { width: auto; }

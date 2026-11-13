@@ -484,9 +484,14 @@
       kosmetik: () => `<div class="outfit-grid">${outfits.map((f, i) => `<figure class="outfit" data-i="${looks.findIndex((l) => l.src === (f.image || f.fallback))}" tabindex="0"><img src="${img(f.image || f.fallback)}" alt="" loading="lazy"><figcaption><b>${esc(tx(f.name))}</b><small>${esc(strip(tx(f.desc)))}</small></figcaption></figure>`).join("")}</div>`,
       affinity: () => {
         const it = (id) => SD.items[id];
-        const tile = (id, n, heart) => it(id) ? `<div class="mat q${it(id).rarity || 1}" title="${esc(it(id).name)}"><img src="${img(it(id).icon)}" alt="${esc(it(id).name)}" loading="lazy"><small>${esc(it(id).name)}</small><b>${heart ? ICO.heart : ""}${nf(n)}</b></div>` : "";
+        const price = (id) => {
+          const pr = (SD.prices || {})[id]; if (!pr || !pr.length) return "";
+          const [cur, v] = pr[0], c = (SD.currencies || {})[cur] || { name: cur, icon: "" };
+          return `<span class="mat-price" title="${esc(S("Harga di toko: ", "Shop price: ") + nf(v) + " " + c.name)}">${c.icon ? `<img src="${img(c.icon)}" alt="">` : ""}${nf(v)}<em>${esc(c.name)}</em></span>`;
+        };
+        const tile = (id, n, heart) => it(id) ? `<div class="mat q${it(id).rarity || 1}" title="${esc(it(id).name)}"><img src="${img(it(id).icon)}" alt="${esc(it(id).name)}" loading="lazy"><small>${esc(it(id).name)}</small><b>${heart ? ICO.heart : ""}${nf(n)}</b>${heart ? price(id) : ""}</div>` : "";
         return `${AF.bonus.length ? `<div class="af-bonus"><span class="mono">${S("BONUS AFFINITY", "AFFINITY BONUS")}</span>${AF.bonus.map(([k, v]) => `<b>${esc(k)} +${v}%</b>`).join("")}</div>` : ""}
-          ${AF.gifts.length ? `<div class="af-sec"><h4>${S("Hadiah favorit", "Favorite gifts")}</h4><p class="mono">${S("Poin Affinity yang didapat per hadiah", "Affinity points per gift")}</p><div class="matrow">${AF.gifts.map(([id, n]) => tile(id, n, true)).join("")}</div></div>` : ""}
+          ${AF.gifts.length ? `<div class="af-sec"><h4>${S("Hadiah favorit", "Favorite gifts")}</h4><p class="mono">${S("Poin Affinity yang didapat per hadiah", "Affinity points per gift")}</p><div class="matrow gift-row">${AF.gifts.map(([id, n]) => tile(id, n, true)).join("")}</div></div>` : ""}
           <div class="af-sec"><h4>${S("Level Affinity", "Affinity levels")}</h4>
           ${AF.levels.map((l, i) => `<div class="af-lv"><div class="af-no"><i>${i + 1}</i><small>${nf(l.max)} ${S("poin", "pts")}</small></div><div class="matrow">${l.items.map(([id, n]) => tile(id, n, false)).join("")}</div></div>`).join("")}</div>`;
       },

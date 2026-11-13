@@ -266,6 +266,26 @@ if __name__ == "__main__":
         icon = B.asset(r.get("ItemIcon"), "item", 160)
         if name and icon and not re.search(r"[㐀-鿿]", name):
             data["items"][k] = {"name": name, "icon": icon, "rarity": B.quality(r)}
+    # harga hadiah di toko (GoodsDataTable): harga termurah per mata uang
+    goods = B.table("DataTable/Shop/GoodsDataTable.json")
+    gifts = {g[0] for d in data["espers"].values() if d["affinity"] for g in d["affinity"]["gifts"]}
+    prices = {}
+    for v in goods.values():
+        if v["ItemID"] in gifts:
+            pr = v["OffPrice"] if v.get("bUseOff") else v["Price"]
+            cur = v["CurrencyID"]
+            prices.setdefault(v["ItemID"], {})
+            prices[v["ItemID"]][cur] = min(prices[v["ItemID"]].get(cur, 10**9), pr)
+    order = lambda kv: (kv[0] != "Fons", kv[1], kv[0])
+    data["prices"] = {i: [[c, p] for c, p in sorted(d.items(), key=order)] for i, d in prices.items()}
+    cur_ids = {c for d in prices.values() for c in d}
+    data["currencies"] = {}
+    for cid in sorted(cur_ids):
+        src = {"Fons": "fons_1000"}.get(cid, cid)
+        r = cfg_items.get(src)
+        name = "Fons" if cid == "Fons" else (B.plain(B.loc_text(r.get("ItemName"))) if r and r.get("ItemName") else re.sub(r"(?<=[a-z])(?=[A-Z])|_", " ", cid).strip())
+        icon = B.asset(r.get("ItemIcon"), "item", 64) if r else ""
+        data["currencies"][cid] = {"name": name, "icon": icon}
     miss = sorted(k for k in used if k not in data["items"] and k != "gold")
     if miss:
         print("item tidak ada di items.json:", miss)
