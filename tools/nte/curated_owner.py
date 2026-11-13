@@ -87,7 +87,7 @@ def parse_team(rest, tname, slug, unknown):
         members.append(sl)
         roles.append(T(role, tr(role)))
     tn = T(*TEAMNAME[tname]) if tname in TEAMNAME else T(tname, tname)
-    return [{"name": tn, "members": members, "roles": roles, "tag": T("REKOMENDASI", "RECOMMENDED"), "src": OWN, "why": []}]
+    return [{"name": tn, "members": members, "roles": roles, "tag": T("REKOMENDASI", "RECOMMENDED"), "why": []}]
 
 
 def apply(out):
@@ -102,7 +102,7 @@ def apply(out):
         if not slug:
             unknown.append(("karakter", blk["name"]))
             continue
-        b = {"teams": [], "src": [OWN]}
+        b = {"teams": []}
         awk_rows, mats, mode = [], [], ""
         for line in blk["lines"]:
             s = line.rstrip()
@@ -145,8 +145,6 @@ def apply(out):
         if awk_rows:
             b["awks"] = [n for n, _ in awk_rows]
             b["awkDesc"] = {str(n): d for n, d in awk_rows}
-        if mats:
-            b["mats"] = mats
         out[slug] = b
     if "zero-1051" in out:
         out["zero-1046"] = json.loads(json.dumps(out["zero-1051"]))  # Zero satu karakter dengan dua gender

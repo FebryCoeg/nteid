@@ -562,8 +562,7 @@
           if ((bd.teams || []).length) {
             html += `<div class="af-sec"><h4>${S("Rekomendasi tim", "Team recommendations")}</h4><p class="mono">${S("SUSUNAN TIM DARI SUMBER YANG DIKREDITKAN DAN HASIL UJI", "TEAMS FROM CREDITED SOURCES AND TEST RESULTS")}</p><div class="bd-teams">${bd.teams.map((t, ti) => `<div class="bd-tm${ti === 0 ? " best" : ""}"><div class="bd-tm-head"><b>${esc(tx(t.name))}</b><em>${esc(tx(t.tag))}</em></div>
               <div class="bd-tm-mem">${t.members.map((sl, mi) => { const m = list.find((x) => x.slug === sl); const rl = (t.roles || [])[mi]; return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === e.slug ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small>${rl && tx(rl) ? `<small class="bd-tm-role">${esc(tx(rl))}</small>` : ""}</a>` : ""; }).join("")}</div>
-              ${t.metric ? `<p class="bd-tm-metric">${esc(tx(t.metric))}</p>` : ""}${(t.why || []).length ? `<ul class="bd-tm-why">${t.why.map((w) => `<li>${esc(tx(w))}</li>`).join("")}</ul>` : ""}
-              <small class="bd-tm-src">${S("Sumber", "Source")}: ${SRC(t.src)}</small></div>`).join("")}</div></div>`;
+              ${t.metric ? `<p class="bd-tm-metric">${esc(tx(t.metric))}</p>` : ""}${(t.why || []).length ? `<ul class="bd-tm-why">${t.why.map((w) => `<li>${esc(tx(w))}</li>`).join("")}</ul>` : ""}</div>`).join("")}</div></div>`;
           }
           const RX = { blossom: ["Blossom", "Blossom"], remora: ["Remora", "Remora"], charge: ["Charge", "Charge"], hexed: ["Hexed", "Hexed"], nova: ["Nova", "Nova"], scorch: ["Scorch", "Scorch"], stain: ["Stain", "Stain"], discord: ["Discord", "Discord"] };
           if (bd.calc && (bd.calc.members || []).length) {
@@ -600,8 +599,6 @@
             ${[3, 6].map((need, i) => bd.awks.length >= need && e.awakening[6 + i] ? `<div class="bd-awk-row extra"><i>✦</i>${e.awakening[6 + i].icon ? `<img src="${img(e.awakening[6 + i].icon)}" alt="">` : ""}<span><b>${esc(e.awakening[6 + i].name)}</b><small>${S("BONUS", "BONUS:")} ${need} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</small></span></div>` : "").join("")}</div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
-        if (bd && (bd.mats || []).length) html += `<div class="af-sec"><h4>${S("Material dan hadiah", "Materials and gifts")}</h4><div class="bd-mats">${bd.mats.map((x) => `<div class="bd-mat"><b>${esc(tx(x.label))}</b><p>${esc(tx(x.text))}</p></div>`).join("")}</div></div>`;
-        if (bd && (bd.src || []).length) html += `<p class="mono bd-srcline">${S("SUMBER: ", "SOURCES: ")}${bd.src.map(SRC).join(" · ")}</p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
       awakening: () => {
