@@ -157,41 +157,12 @@ for e in espers:
         "stats": main, "sub": sub, "awks": awk_order(e, k), "skills": skill_order(e, tags, k),
     }
 
-# hasil simulasi (builds_calc.json) menggantikan urutan Arc/set draf untuk Esper yang sudah dihitung
-calc_path = D / "builds_calc.json"
-if calc_path.exists():
-    by_slug = {e["slug"]: e for e in espers}
-    for slug, c in jl(calc_path).items():
-        e = by_slug[slug]
-        tags = (stats["espers"].get(e["id"]) or {}).get("tags") or []
-        d = out[slug]
-        d["arcs"] = c["arcs"]
-        d["arcWhy"] = {a: ["type"] + arc_codes(ARCS_BY_SLUG[a], e, tags) + (["rare"] if ARCS_BY_SLUG[a]["rarity"] == 5 else []) for a in c["arcs"]}
-        d["arcPct"] = c["arcPct"]
-        d["sets"] = c["sets"]
-        d["setPct"] = c["setPct"]
-        d["setWhy"] = {i: w for i, w in {"Suit6": "element", "Suit8": "atk"}.items() if any(x["id"] == i for x in c["sets"])}
-        d["setNote"] = c.get("setNote", {})
-        d["calc"] = {"team": c["team"], "basis": c["basis"], "note": c["note"], "members": c["members"], "shared": c.get("shared", 0), "total": c["total"], "seconds": c["seconds"]}
-        # reaksi Esper yang terbentuk dari pasangan elemen di tim (aturan: reactions game + NGA)
-        els = {m["slug"]: by_slug[m["slug"]]["element"] for m in c["members"]}
-        pairs = {frozenset(x) for x in [("Cosmos", "Lakshana"), ("Anima", "Cosmos"), ("Anima", "Incantation"), ("Chaos", "Psyche"),
-                                         ("Chaos", "Incantation"), ("Lakshana", "Psyche")]}
-        names = {frozenset(("Cosmos", "Lakshana")): "remora", frozenset(("Anima", "Cosmos")): "blossom", frozenset(("Anima", "Incantation")): "hexed",
-                 frozenset(("Chaos", "Psyche")): "nova", frozenset(("Chaos", "Incantation")): "scorch", frozenset(("Lakshana", "Psyche")): "stain"}
-        have = {names[frozenset((a, b))] for a in els.values() for b in els.values() if a != b and frozenset((a, b)) in pairs}
-        if {"blossom", "remora"} <= have:
-            have.add("charge")
-        if {"nova", "scorch"} <= have:
-            have.add("discord")
-        d["calc"]["reactions"] = sorted(have)
-
 # kurasi manual (builds_curated.json): urutan Awakening, catatan, tim rekomendasi dari sumber yang dikreditkan
 cur_path = D / "builds_curated.json"
 if cur_path.exists():
     for slug, c in jl(cur_path).items():
         d = out[slug]
-        for k in ("role", "faq", "arcs", "arcPct", "arcNote", "sets", "setPct", "setNote", "stats", "sub", "statNote", "awks", "awkGain", "skills", "skillNote", "src", "teams"):
+        for k in ("role", "faq", "awkRank", "awkNote", "arcs", "arcPct", "arcNote", "sets", "setPct", "setNote", "stats", "sub", "statNote", "awks", "awkGain", "skills", "skillNote", "src", "teams"):
             if k in c:
                 d[k] = c[k]
 

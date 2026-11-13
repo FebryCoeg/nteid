@@ -8,6 +8,8 @@ import json
 import re
 from pathlib import Path
 
+import awakening_prydwen as AP
+
 D = Path(__file__).resolve().parents[2] / "nte" / "data"
 OWN = {"title": "Rekomendasi pemilik situs", "by": "Hethereau", "url": ""}
 
@@ -131,8 +133,6 @@ def apply(out):
     unknown = []
     for slug, (rank, role, tier, arc_names, set_names, main, sub, skill_order, awk, team, faq) in ROWS.items():
         b = out.setdefault(slug, {})
-        for k in ("arcNote", "setNote", "statNote", "skillNote", "setPct", "arcPct"):
-            b.pop(k, None)
         b["role"] = {"rank": rank, "role": role.replace(" dan ", " / "), "tier": tier.replace(" di ", " at ")}
         if arc_names:
             slugs = []
@@ -153,13 +153,18 @@ def apply(out):
         sk = skills(skill_order)
         if sk:
             b["skills"] = sk
-        if awk:
+        if slug in AP.ORDER:
+            groups, rank = AP.parse(AP.ORDER[slug])
+            b["awks"] = [n for g in groups for n in g]
+            b["awkRank"] = {str(n): r for n, r in rank.items()}
+            if slug in AP.NOTE:
+                b["awkNote"] = T(*AP.NOTE[slug])
+            b["src"] = [AP.source(slug)]
+        elif awk:
             b["awks"] = awk
-        else:
-            b.pop("awks", None)
         b["faq"] = T(*faq)
-        b["src"] = [OWN] + [x for x in b.get("src", []) if x.get("by") != "ntebuild.com" and x.get("title") != OWN["title"]]
-        keep = [t for t in b.get("teams", []) if t["src"].get("by") != "ntebuild.com"]
+        b["src"] = [OWN] + b.get("src", [])
+        keep = []
         if team:
             name, members = team
             mem = []
