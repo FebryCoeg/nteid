@@ -178,6 +178,7 @@ def main():
 
 SET_ID = {"Lost Radiance (4)": "Suit6", "Shadow Creed (4)": "Suit8", "Fireflies and the Forest (4)": "Suit2",
           "Street Boxer (4)": "Suit5", "Speedy Hedgehog (4) + buff tim": "Suit11"}
+TEAM_ARC = {"shinku": "blushing-mirage", "elyms": "echoes-on-hold", "akane-rin": "far-side-of-the-moon", "iroi": "the-wrong-gate"}  # dari pengguna
 EXCLUDE_ARCS = {"what-s-desired"}  # uptime efek belum terverifikasi (peringkat terlalu tinggi dibanding sumber pembanding)
 
 
@@ -187,7 +188,13 @@ def export(agg, rows, ults, skills):
     top_arcs = sorted(arcs, key=lambda s: -arcs[s][0])[:4]
     sets = {SET_ID[n]: (avg(v, 0), avg(v, 1)) for n, v in agg["sets"].items() if n in SET_ID and n != "Speedy Hedgehog (4) + buff tim"}
     top_sets = sorted(sets, key=lambda i: -sets[i][0])[:3]
+    ids = {1076: "shinku", 1090: "elyms", 1057: "akane-rin", 1075: "iroi"}
+    total_dmg = sum(r[2] for r in rows)
+    share = {ids[c]: round(100 * sum(r[2] for r in rows if r[1] == c and r[3] != "倾陷伤害") / total_dmg, 1) for c in ids}
+    shared = round(100 * sum(r[2] for r in rows if r[3] == "倾陷伤害") / total_dmg, 1)  # damage break (milik seluruh tim)
+    members = [{"slug": sl, "arc": TEAM_ARC[sl], "share": share[sl]} for sl in ("shinku", "elyms", "akane-rin", "iroi")]
     out = {"shinku": {
+        "members": members, "shared": shared, "total": round(total_dmg), "seconds": round(rows[-1][0], 1),
         "team": ["shinku", "elyms", "akane-rin", "iroi"], "basis": {"arc": "blushing-mirage", "set": "Suit6"},
         "arcs": top_arcs, "arcPct": {s: {"team": arcs[s][0], "solo": arcs[s][1]} for s in top_arcs},
         "sets": [{"id": i, "pieces": 4} for i in top_sets], "setPct": {i: {"team": sets[i][0], "solo": sets[i][1]} for i in top_sets},

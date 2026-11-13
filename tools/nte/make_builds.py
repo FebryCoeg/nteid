@@ -172,7 +172,19 @@ if calc_path.exists():
         d["setPct"] = c["setPct"]
         d["setWhy"] = {i: w for i, w in {"Suit6": "element", "Suit8": "atk"}.items() if any(x["id"] == i for x in c["sets"])}
         d["setNote"] = c.get("setNote", {})
-        d["calc"] = {"team": c["team"], "basis": c["basis"], "note": c["note"]}
+        d["calc"] = {"team": c["team"], "basis": c["basis"], "note": c["note"], "members": c["members"], "shared": c.get("shared", 0), "total": c["total"], "seconds": c["seconds"]}
+        # reaksi Esper yang terbentuk dari pasangan elemen di tim (aturan: reactions game + NGA)
+        els = {m["slug"]: by_slug[m["slug"]]["element"] for m in c["members"]}
+        pairs = {frozenset(x) for x in [("Cosmos", "Lakshana"), ("Anima", "Cosmos"), ("Anima", "Incantation"), ("Chaos", "Psyche"),
+                                         ("Chaos", "Incantation"), ("Lakshana", "Psyche")]}
+        names = {frozenset(("Cosmos", "Lakshana")): "remora", frozenset(("Anima", "Cosmos")): "blossom", frozenset(("Anima", "Incantation")): "hexed",
+                 frozenset(("Chaos", "Psyche")): "nova", frozenset(("Chaos", "Incantation")): "scorch", frozenset(("Lakshana", "Psyche")): "stain"}
+        have = {names[frozenset((a, b))] for a in els.values() for b in els.values() if a != b and frozenset((a, b)) in pairs}
+        if {"blossom", "remora"} <= have:
+            have.add("charge")
+        if {"nova", "scorch"} <= have:
+            have.add("discord")
+        d["calc"]["reactions"] = sorted(have)
 
 (D / "builds_draft.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print("draf build:", len(out), "Esper ->", D / "builds_draft.json")

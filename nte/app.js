@@ -556,6 +556,17 @@
           const rankBadge = (i) => `<i class="bd-rank r${i + 1}">${i + 1}</i>`;
           const pctOf = (p) => (p ? `<span class="bd-pct"><b>${p.team}%</b><small>${S("TIM", "TEAM")}</small><b class="solo">${p.solo}%</b><small>SOLO</small></span>` : "");
           const calcNote = bd.calc ? `<p class="bd-calc"><b>${S("HASIL SIMULASI", "SIMULATION RESULT")}</b> · ${bd.calc.team.map((sl) => { const m = list.find((x) => x.slug === sl); return esc(m ? m.name : sl); }).join(" · ")}<br>${esc(tx(bd.calc.note))}</p>` : "";
+          const RX = { blossom: ["Blossom", "Blossom"], remora: ["Remora", "Remora"], charge: ["Charge", "Charge"], hexed: ["Hexed", "Hexed"], nova: ["Nova", "Nova"], scorch: ["Scorch", "Scorch"], stain: ["Stain", "Stain"], discord: ["Discord", "Discord"] };
+          if (bd.calc && (bd.calc.members || []).length) {
+            const mem = bd.calc.members.map((m) => {
+              const me = list.find((x) => x.slug === m.slug); if (!me) return "";
+              const ma = ARCS.find((a) => a.slug === m.arc), tg = ((SD.espers[me.id] || {}).tags || []).slice(0, 2);
+              return `<a class="bd-mem${m.slug === e.slug ? " me" : ""}" href="/esper/${me.slug}" data-link><img src="${img(me.icon)}" alt=""><span><b>${esc(me.name)}</b><small>${esc(me.element)}${tg.length ? " · " + esc(tg.join(" · ")) : ""}</small>${ma ? `<small class="bd-mem-arc">Arc: ${esc(ma.name)}</small>` : ""}</span><span class="bd-share"><b>${m.share}%</b><small>${S("DAMAGE TIM", "TEAM DMG")}</small></span></a>`;
+            }).join("");
+            html += `<div class="af-sec"><h4>${S("Tim yang diuji", "Tested team")}</h4><p class="mono">${S("DARI REKAMAN PERTARUNGAN NYATA", "FROM A REAL RECORDED FIGHT")} · ${Math.round(bd.calc.seconds)}s · ${(bd.calc.total / 1e6).toFixed(2)}M DMG</p><div class="bd-team">${mem}</div>
+              <div class="bd-rx"><span class="mono">${S("REAKSI ESPER YANG TERBENTUK", "ESPER REACTIONS FORMED")}</span>${(bd.calc.reactions || []).map((r) => `<em>${esc(RX[r] ? S(RX[r][0], RX[r][1]) : r)}</em>`).join("")}${bd.calc.shared ? `<span class="mono bd-rx-note">${S(`+${bd.calc.shared}% DAMAGE BREAK MILIK TIM`, `+${bd.calc.shared}% TEAM BREAK DAMAGE`)}</span>` : ""}</div>
+              <p class="txt bd-teamnote">${S("Ini satu susunan tim yang sudah diuji. Rekomendasi susunan tim lain baru bisa dibandingkan setelah ada rekaman pertarungan dengan tim berbeda.", "This is one team that has been tested. Other team compositions can only be compared once recordings of different teams are available.")}</p></div>`;
+          }
           const arcStats = SD.arcs || {};
           if ((bd.arcs || []).length) html += `<div class="af-sec"><h4>${S("Arc terbaik", "Best Arcs")}</h4><p class="mono">${S("URUTAN = PRIORITAS · ATK DASAR PADA LV.80", "ORDER = PRIORITY · BASE ATK AT LV.80")}</p>${calcNote}<div class="bd-arcs">${bd.arcs.map(arcOf).filter(Boolean).map((a, i) => {
             const at = (arcStats[a.slug] || {}).atk, why = (bd.arcWhy || {})[a.slug] || [];
