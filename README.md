@@ -12,7 +12,7 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 | **Kendaraan & Properti** | Semua kendaraan dan rumah yang bisa dimiliki di Hethereau. |
 | **Cerita** | Ringkasan resmi setiap bab cerita utama dan spinoff, lengkap dengan gambar sampul bab. |
 | **Anomali & Monster** | Arsip Anomaly dengan foto, kelas, kode, kutipan, kisah, karakteristik, dan Nexus, ditambah monster dan boss. |
-| **Istilah** | Arti istilah dunia NTE dari buku panduan dalam game. |
+| **Istilah** | Arti istilah dunia NTE dari buku panduan dalam game, lengkap dengan gambar: ilustrasi asli untuk istilah yang punya padanannya, ikon seragam per kelompok untuk sisanya. |
 | **Pencapaian** | 450+ achievement per kategori dengan medali, syarat, dan hadiah. Bisa ditandai selesai (tersimpan di browser) dan diekspor/impor sebagai file JSON. |
 | **Fashion & Makanan** | Galeri ilustrasi kostum setiap Esper, serta makanan dan bahan masak beserta efeknya. |
 | **Tier List** | Tier list Esper atau Arc buatan pengunjung sendiri: seret ke tier, ganti nama dan warna tier, tersimpan di browser, bisa diunduh sebagai gambar atau diekspor/impor JSON. |

@@ -733,6 +733,7 @@
     });
   }
 
+  const GROUPS = { 1: ["Konsep", "Concept"], 2: ["Organisasi", "Organization"], 3: ["Sistem", "System"], 4: ["Teori", "Theory"] };
   async function viewGlossary() {
     const list = await load("glossary");
     textPage({
@@ -740,8 +741,10 @@
       desc: S("Arti istilah yang dipakai di dunia Neverness to Everness, dari buku panduan dalam game.", "Meanings of terms used in the world of Neverness to Everness, from the in-game manual."),
       placeholder: S("Cari istilah…", "Search terms…"),
       list, search: (x) => [tx(x.name), tx(x.desc)], chipDefs: [], chipOf: () => "",
-      card: (x) => ({ k: S("Istilah", "Term"), t: x.name.en, p: strip(tx(x.desc)) }),
-      open: (x) => ({ name: S(x.name.id, x.name.en), kicker: S("ISTILAH", "TERM"), body: paras(tx(x.desc)) }),
+      item: (x, n) => `<button class="wcard" type="button" data-n="${n}">
+        <div class="wcard-img gloss${x.image ? " cover" : ""}"><img src="${img(x.image || x.icon)}" alt="" loading="lazy"></div>
+        <div class="wcard-body"><small>${esc(GROUPS[x.group] ? S(GROUPS[x.group][0], GROUPS[x.group][1]) : S("Istilah", "Term"))}</small><b>${esc(x.name.en)}</b><p>${esc(strip(tx(x.desc)))}</p></div></button>`,
+      open: (x) => ({ name: S(x.name.id, x.name.en), image: x.image || x.icon, mode: x.image ? "art" : "gloss", kicker: S("ISTILAH", "TERM"), body: paras(tx(x.desc)) }),
     });
   }
 

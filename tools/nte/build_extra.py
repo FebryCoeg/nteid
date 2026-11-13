@@ -12,6 +12,7 @@ import html
 import json
 import re
 
+import glossary_images as GI  # noqa: E402
 import build as B  # noqa: E402  (memakai LOC, clean, I18N dari build.py)
 
 LOC = B.LOC
@@ -319,7 +320,7 @@ def main():
     data = {
         "story": build_story(),
         "anomalies": build_anomalies(),
-        "glossary": build_glossary(),
+        "glossary": GI.attach(build_glossary()),
         "achievements": build_achievements(),
         "fashion": build_fashion(),
         "food": build_food(),
