@@ -1232,3 +1232,5 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 
 .foot-credit { margin-top: 6px; font-size: 0.72rem; color: var(--text-2); }
 .foot-credit a { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
+
+.adm-diag { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--bg); border: 2px dashed color-mix(in srgb, var(--pink) 45%, transparent); font: 600 0.72rem/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-2); }

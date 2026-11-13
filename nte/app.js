@@ -780,7 +780,7 @@
     const REPO = "FebryCoeg/nteid", PATH = "nte/data/builds.json";
     const KEY = "nte-admin-token";
     let token = ""; try { token = localStorage.getItem(KEY) || ""; } catch (e) {}
-    let builds = {}, sha = null, cur = es[0].slug, working = null, showAllArcs = false;
+    let builds = {}, sha = null, cur = es[0].slug, working = null, showAllArcs = false, diag = "";
     const STATS = ["ATK %", "HP %", "DEF %", "CRIT Rate", "CRIT DMG", "DMG Bonus", "ATK", "HP", "DEF", "Energy Regen", "Healing Bonus", "Break"];
     const api = (method, body) => fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}${method === "GET" ? "?ref=main&t=" + Date.now() : ""}`, {
       method, headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }, body: body ? JSON.stringify(body) : undefined,
@@ -808,7 +808,8 @@
         <p class="mono adm-note">${token ? "TOKEN TERSIMPAN DI BROWSER INI" : "TANPA TOKEN: HANYA BISA MELIHAT"}${msg ? " · " + esc(msg) : ""}</p>
         <div class="adm-box">
           <label>Token GitHub (fine-grained, akses Contents: Read and write hanya ke repo ${REPO})</label>
-          <div class="adm-row"><input type="password" id="admTok" placeholder="github_pat_..." value="${esc(token)}" autocomplete="off"><button class="btn" id="admSaveTok" type="button">Simpan token</button><button class="btn ghost" id="admClrTok" type="button">Hapus token</button></div>
+          <div class="adm-row"><input type="password" id="admTok" placeholder="github_pat_..." value="${esc(token)}" autocomplete="off"><button class="btn" id="admSaveTok" type="button">Simpan token</button><button class="btn ghost" id="admClrTok" type="button">Hapus token</button><button class="btn ghost" id="admCheck" type="button">Cek token</button></div>
+          ${diag ? `<pre class="adm-diag">${esc(diag)}</pre>` : ""}
         </div>
         <div class="adm-box">
           <label>Esper</label>
@@ -840,6 +841,26 @@
       drawArcs();
       $("#admArcQ").oninput = drawArcs;
     }
+    async function checkToken() {
+      if (!token) { diag = "Belum ada token. Tempel token lalu klik Simpan token."; render(); return; }
+      const H = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
+      const kind = token.startsWith("github_pat_") ? "token halus (fine-grained)" : token.startsWith("ghp_") ? "token klasik" : "jenis token tidak dikenal";
+      const lines = [`Jenis: ${kind}, panjang ${token.length} karakter`];
+      const call = async (label, url, opt) => {
+        try {
+          const r = await fetch(url, { headers: H, ...(opt || {}) });
+          const j = await r.json().catch(() => ({}));
+          const scopes = r.headers.get("x-oauth-scopes");
+          lines.push(`${r.ok ? "OK " : "GAGAL "} ${label}: ${r.status}${j.message ? " · " + j.message : ""}${j.login ? " · akun " + j.login : ""}${scopes ? " · scope: " + scopes : ""}`);
+          return r;
+        } catch (e) { lines.push(`GAGAL ${label}: tidak bisa terhubung`); }
+      };
+      await call("Token dikenali", "https://api.github.com/user");
+      await call(`Repo ${REPO} terlihat`, `https://api.github.com/repos/${REPO}`);
+      await call("Izin tulis (uji aman: membuat blob kosong tanpa mengubah repo)", `https://api.github.com/repos/${REPO}/git/blobs`, { method: "POST", body: JSON.stringify({ content: "cek izin", encoding: "utf-8" }) });
+      diag = lines.join("\n");
+      render();
+    }
     async function save(next, label) {
       const copy = { ...builds };
       if (next) copy[cur] = next; else delete copy[cur];
@@ -865,6 +886,7 @@
     root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
       if (t.id === "admSaveTok") { token = $("#admTok").value.trim(); try { localStorage.setItem(KEY, token); } catch (e) {} const r = await pull(); pick(); render(r === "ok" ? "TOKEN TERBACA (IZIN TULIS DIUJI SAAT MENYIMPAN)" : "TOKEN GAGAL (" + r + ")"); return; }
+      if (t.id === "admCheck") { token = $("#admTok").value.trim() || token; await checkToken(); return; }
       if (t.id === "admClrTok") { token = ""; try { localStorage.removeItem(KEY); } catch (e) {} await pull(); pick(); render("TOKEN DIHAPUS"); return; }
       if (t.dataset.addArc) { working.arcs.push(t.dataset.addArc); render(); return; }
       if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
