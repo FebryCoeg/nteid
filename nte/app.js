@@ -715,9 +715,10 @@
       bug: '<svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M4 11h4M16 11h4M4 18h4M16 18h4M9 5l-2-2M15 5l2-2"/></svg>',
       update: '<svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/></svg>',
     };
-    const item = (x) => `<div class="vi">
+    const pics = (x) => (x.img && x.img.length ? `<div class="vi-pics n${Math.min(x.img.length, 3)}">${x.img.map((m) => `<figure class="vi-pic ${esc(m.k || "ico")}"><img src="${img(m.s)}" alt="${esc(m.n || "")}" title="${esc(m.n || "")}" loading="lazy"></figure>`).join("")}</div>` : "");
+    const item = (x) => `<div class="vi${x.img && x.img.length ? " has-pic" : ""}${x.img && x.img.length > 1 ? " multi" : ""}${x.img && x.img.length === 1 && x.img[0].k === "wide" ? " has-wide" : ""}">${pics(x)}<div class="vi-main">
         <div class="vi-h">${x.link ? `<a href="${esc(x.link)}" data-link><b>${esc(x.t)}</b></a>` : `<b>${esc(x.t)}</b>`}${x.tag ? `<span class="vi-tag">${esc(x.tag)}</span>` : ""}${x.date ? `<span class="vi-date">${esc(x.date)}</span>` : ""}</div>
-        <p class="txt">${esc(x.d)}</p></div>`;
+        <p class="txt">${esc(x.d)}</p></div></div>`;
     const cards = v.sections.map((sc) => ({
       title: sc.title, sub: `${sc.items.length} ${S("butir", "items")}`, open: !!sc.open,
       icon: `<span class="vi-ico">${SI[sc.id] || ICO.chat}</span>`,
@@ -726,7 +727,7 @@
     main.innerHTML = `<div id="verRoot">` + head(S("VERSI", "VERSIONS"), S("Versi & Patch", "Versions & Patches"),
       S("Apa saja yang ditambahkan dan diubah di setiap update Neverness to Everness, dirangkum dalam bahasa Indonesia.", "What each Neverness to Everness update adds and changes."), list.length) + `
       <div class="ver-tabs" role="tablist">${list.map((x) => `<button class="tab" type="button" data-ver="${esc(x.id)}" aria-selected="${x.id === v.id}">${S("Versi", "Version")} ${esc(x.id)}</button>`).join("")}</div>
-      <section class="ver-hero">
+      <section class="ver-hero${v.art ? " has-art" : ""}">
         <div class="ver-num"><span class="mono">${S("VERSI", "VERSION")}</span><b>${esc(v.id)}</b></div>
         <div class="ver-info">
           <h2>${esc(v.title)}</h2>
@@ -734,6 +735,7 @@
           <p class="txt">${esc(v.lead)}</p>
           <div class="ver-phases">${v.phases.map((f) => `<div><span class="mono">${esc(f.n)}</span><b>${esc(f.range)}</b><small>${esc(f.note)}</small></div>`).join("")}</div>
         </div>
+        ${v.art ? `<figure class="ver-art"><img src="${img(v.art.s)}" alt="${esc(v.art.n || "")}"><figcaption>${esc(v.art.n || "")}</figcaption></figure>` : ""}
       </section>
       ${v.note ? `<p class="ver-note">${esc(v.note)}</p>` : ""}
       <div class="ver-list">${accordion(cards)}</div>

@@ -11,6 +11,51 @@ from pathlib import Path
 
 OFFICIAL = "https://nte.perfectworld.com/en/article/news/gamenews/20261109/264948.html"
 
+ROOT = Path(__file__).resolve().parents[2]
+DATA = ROOT / "nte" / "data"
+
+
+def _load(name):
+    return json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
+
+
+_ESPERS = {x["slug"]: x for x in _load("espers")}
+_ARCS = {x["slug"]: x for x in _load("arcs")}
+_VEH = {x["name"]: x for x in _load("vehicles")}
+_FASH = {x["name"]["en"]: x for x in _load("fashion")}
+_STORY = {x["title"]["en"]: x for x in _load("story")}
+_ITEMS = {x["id"]: x for x in _load("items")["items"]}
+
+
+def _ok(path):
+    assert (ROOT / "nte" / path).exists(), path
+    return path
+
+
+def E(slug):   # potret Esper
+    return {"s": _ok(_ESPERS[slug]["portrait"]), "k": "art", "n": _ESPERS[slug]["name"]}
+
+
+def A(slug):   # ikon Arc
+    return {"s": _ok(_ARCS[slug]["icon"]), "k": "ico", "n": _ARCS[slug]["name"]}
+
+
+def V(name):   # ikon kendaraan
+    return {"s": _ok(_VEH[name]["icon"]), "k": "ico", "n": name}
+
+
+def F(name):   # ilustrasi kostum
+    return {"s": _ok(_FASH[name]["image"]), "k": "art", "n": name}
+
+
+def S_(title):  # gambar bab cerita
+    return {"s": _ok(_STORY[title]["image"]), "k": "wide", "n": title}
+
+
+def I(iid):    # ikon item
+    return {"s": _ok(_ITEMS[iid]["icon"]), "k": "ico", "n": _ITEMS[iid]["name"]}
+
+
 V15 = {
     "id": "1.5",
     "title": "Once Upon a Glitched Call",
@@ -20,6 +65,7 @@ V15 = {
         {"n": "Fase 1", "range": "11 Nov – 2 Des 2026", "note": "Elyms debut, Shinku rerun"},
         {"n": "Fase 2", "range": "2 Des – 23 Des 2026", "note": "Exe debut"},
     ],
+    "art": E("elyms"),
     "lead": "Update 1.5 membawa episode utama baru \"Meet Me in the Data Stream\", Esper baru Elyms (lalu Exe di fase 2), "
             "mode tank 4 pemain, sistem City Logistics, kendaraan baru, dan banyak perbaikan kenyamanan.",
     "sources": [
@@ -33,22 +79,22 @@ V15 = {
         {
             "id": "esper", "title": "Esper & Banner", "open": True,
             "items": [
-                {"t": "Elyms", "tag": "Esper baru · S-Class · Limited", "link": "/esper/elyms",
+                {"t": "Elyms", "img": [E("elyms")], "tag": "Esper baru · S-Class · Limited", "link": "/esper/elyms",
                  "date": "11 Nov – 2 Des 2026",
                  "d": "Esper Cosmos dengan peran Buff, Instant Cycle, DMG Boost, dan Burst DPS (sesuai data game). "
                       "Hadir lewat Limited Board \"Android Dreams\" bersama karakter A-class Mint, Edgar, dan Adler. "
                       "Board ini membawa glider \"Joy Buoy\", livery Novus A001 \"+Friend & Rescue+\", dan kostum Elyms \"Drifting Petals\". "
                       "Hadiah bonus tersedia di milestone 50, 120, dan 200 total roll lewat halaman Skin Perks."},
-                {"t": "Exe", "tag": "Esper baru · S-Class · Limited (Fase 2)", "link": "/esper/exe",
+                {"t": "Exe", "img": [E("exe")], "tag": "Esper baru · S-Class · Limited (Fase 2)", "link": "/esper/exe",
                  "date": "2 Des – 23 Des 2026",
                  "d": "Esper Chaos dengan peran Main DPS dan Summoner. Menurut Game8, ia membangun Frame lewat serangan lalu memakainya untuk "
                       "memanggil Digital Echo yang menaikkan damage, dengan Rating yang mengatur jumlah Frame yang dihasilkan."},
-                {"t": "Shinku (rerun)", "tag": "Rerun · S-Class · Limited", "link": "/esper/crimson",
+                {"t": "Shinku (rerun)", "img": [E("crimson")], "tag": "Rerun · S-Class · Limited", "link": "/esper/crimson",
                  "date": "11 Nov – 2 Des 2026",
                  "d": "Kembali lewat Limited Board \"Before the Dawn\" bersama Mint, Edgar, dan Adler. Ada livery glider \"Overcast Canopy\", "
                       "livery Blizzard-V4 \"Hidden Dragon\", dan kostum \"Student of Terrasea\". Di data game Esper ini tercatat sebagai Crimson. "
                       "Hanya roll di board yang sama yang dihitung untuk Resolve Perks, dan tiap board dihitung terpisah."},
-                {"t": "Chaos (rerun)", "tag": "Rerun · menurut sumber komunitas", "link": "/esper/chaos",
+                {"t": "Chaos (rerun)", "img": [E("chaos")], "tag": "Rerun · menurut sumber komunitas", "link": "/esper/chaos",
                  "d": "Beberapa liputan menyebut Chaos ikut rerun di fase 2. Periksa banner di dalam game sebelum memutuskan."},
                 {"t": "Syarat membuka banner", "tag": "Info",
                  "d": "Selesaikan quest utama \"Prologue - A New Destination - Head to Eibon Antique Shop\" untuk bisa memakai board karakter baru."},
@@ -57,19 +103,19 @@ V15 = {
         {
             "id": "arc", "title": "Arc Baru", "open": True,
             "items": [
-                {"t": "Echoes on Hold", "tag": "Arc S-Class · Limited · tipe Solid", "link": "/arc/echoes-on-hold",
+                {"t": "Echoes on Hold", "img": [A("echoes-on-hold")], "tag": "Arc S-Class · Limited · tipe Solid", "link": "/arc/echoes-on-hold",
                  "date": "11 Nov – 2 Des 2026",
                  "d": "Arc khas Elyms. Hanya didapat lewat program Arc Research \"Echo Special\" memakai Tri-Key atau Echo Key (menu Arc Shop > Arc Research Program)."},
-                {"t": "Blushing Mirage (rerun)", "tag": "Arc S-Class · Rerun · tipe Synthesis", "link": "/arc/blushing-mirage",
+                {"t": "Blushing Mirage (rerun)", "img": [A("blushing-mirage")], "tag": "Arc S-Class · Rerun · tipe Synthesis", "link": "/arc/blushing-mirage",
                  "d": "Arc khas Shinku. Hanya lewat program Arc Research \"Resolve Special\" memakai Tri-Key atau Resolve Key."},
-                {"t": "Dotted Horizon", "tag": "Arc S-Class · tipe Plasma · menurut Game8", "link": "/arc/dotted-horizon",
+                {"t": "Dotted Horizon", "img": [A("dotted-horizon")], "tag": "Arc S-Class · tipe Plasma · menurut Game8", "link": "/arc/dotted-horizon",
                  "d": "Arc khas Exe, tersedia bersamaan dengan banner Exe di fase 2."},
             ],
         },
         {
             "id": "cerita", "title": "Cerita & Konten Baru", "open": True,
             "items": [
-                {"t": "Episode utama: Meet Me in the Data Stream", "tag": "Cerita utama", "link": "/cerita",
+                {"t": "Episode utama: Meet Me in the Data Stream", "img": [S_("Meet Me in the Data Stream")], "tag": "Cerita utama", "link": "/cerita",
                  "d": "Episode baru yang terbuka setelah menamatkan episode \"The Witch\". Ceritanya berawal dari legenda tentang mimpi bertemu teman lama yang "
                       "meninggalkan \"nomor tidak valid\", lalu sebuah panggilan masuk di dalam mimpi. Muncul pertanyaan: apakah kapten dan letnan ETD-6 menghilang "
                       "dalam misi rahasia, dan apakah Anomali tingkat tinggi atau kejahatan Anomali ada di baliknya?"},
@@ -77,7 +123,7 @@ V15 = {
                  "d": "Dunia digital berisi Anomali yang lahir dari rumor internet dan legenda urban, dijelajahi selama episode utama 1.5."},
                 {"t": "Anomaly Pilgrimage: Amber Broodmother", "tag": "Boss mingguan",
                  "d": "Terbuka setelah menamatkan episode \"Fogden Game\". Menurut Game8, mengalahkannya memberi material Ascension utama untuk Elyms dan Exe."},
-                {"t": "City Hangouts dan Home Time Elyms", "tag": "Bond",
+                {"t": "City Hangouts dan Home Time Elyms", "img": [E("elyms")], "tag": "Bond",
                  "d": "Cerita City Hangouts dan mode undangan Home Time dengan Elyms, terbuka setelah punya Elyms dan mencapai Bond Level tertentu. "
                       "Ada juga quest Bond, ikut duduk di kursi penumpang kendaraan, dan tutorial tempur Elyms."},
             ],
@@ -85,9 +131,9 @@ V15 = {
         {
             "id": "fitur", "title": "Fitur & Mode Baru", "open": False,
             "items": [
-                {"t": "City Logistics", "tag": "Sistem baru · event", "date": "11 Nov – 23 Des 2026",
+                {"t": "City Logistics", "img": [I("Avatar_Logistics")], "tag": "Sistem baru · event", "date": "11 Nov – 23 Des 2026",
                  "d": "Perluasan hobi City Delivery: kamu membangun bisnis logistik, merekrut karyawan, dan memberi tugas pengiriman. Event-nya memberi token \"Kool\" untuk Event Shop."},
-                {"t": "Full Tank Ahead", "tag": "Mode PvP · event", "date": "19 Nov – 23 Des 2026",
+                {"t": "Full Tank Ahead", "img": [V("Iron Ogre")], "tag": "Mode PvP · event", "date": "19 Nov – 23 Des 2026",
                  "d": "Mode tank mini 4 pemain memakai TerraX \"Iron Ogre\". Mata uangnya \"TX Token\" untuk ditukar di Event Shop."},
                 {"t": "Tycoon's Deck", "tag": "Event · menurut Game8", "date": "2 Des – 23 Des 2026",
                  "d": "Permainan kartu membangun kota: bangunan disusun untuk menciptakan sinergi dan menaikkan skor. Sebagian liputan menyebutnya board game."},
@@ -96,7 +142,7 @@ V15 = {
                  "d": "Etalase koleksi, laporan saat pertandingan, riwayat pertandingan, asisten lelang baru Elyms, koleksi baru, dan penyesuaian peluang muncul beberapa koleksi."},
                 {"t": "Shadow-n-Seek", "tag": "Mini game",
                  "d": "Bot AI mengisi slot kosong kalau antrean terlalu lama, dan posisi beberapa objek diacak tiap pertandingan."},
-                {"t": "Akane Rin", "tag": "Fitur karakter", "d": "Bisa merekam gitar, membagikan kode musik, dan membagikan Bagel."},
+                {"t": "Akane Rin", "img": [E("akane-rin")], "tag": "Fitur karakter", "d": "Bisa merekam gitar, membagikan kode musik, dan membagikan Bagel."},
                 {"t": "Pop-Up Divination House", "tag": "Item dunia terbuka",
                  "d": "Bangunan yang bisa dipasang dan dibongkar di dunia terbuka. Terbuka di total progres 5.100 pada event Fortune's Bounty."},
             ],
@@ -104,41 +150,41 @@ V15 = {
         {
             "id": "kosmetik", "title": "Kendaraan, Kostum & Aksesori", "open": False,
             "items": [
-                {"t": "Iron Ogre", "tag": "Kendaraan · tank mini",
+                {"t": "Iron Ogre", "img": [V("Iron Ogre")], "tag": "Kendaraan · tank mini",
                  "d": "Dari Mystery Box \"Open Roads Ahead\". Menembakkan peluru ledak untuk membersihkan Anomali dan preman di jalan, dan dipakai juga di mode Full Tank Ahead."},
-                {"t": "Prototype Land Overlord 001", "tag": "Kendaraan", "d": "Kendaraan bergaya wahana anak yang memakai Fons untuk dorongan kecepatan. Dari Mystery Box \"Open Roads Ahead\"."},
-                {"t": "Ori-LV03 dan C001", "tag": "Kendaraan",
+                {"t": "Prototype Land Overlord 001", "img": [V("Prototype Land Overlord 001")], "tag": "Kendaraan", "d": "Kendaraan bergaya wahana anak yang memakai Fons untuk dorongan kecepatan. Dari Mystery Box \"Open Roads Ahead\"."},
+                {"t": "Ori-LV03 dan C001", "img": [V("Ori-LV03"), V("C001")], "tag": "Kendaraan",
                  "d": "Ori-LV03 adalah hadiah level Reputasi event City Logistics. C001 dibeli di Event Shop dengan token Kool."},
-                {"t": "Kostum Elyms: Y2K Mystique", "tag": "Shop · permanen", "date": "diskon 11 Nov – 23 Des 2026",
+                {"t": "Kostum Elyms: Y2K Mystique", "img": [F("Y2K Mystique")], "tag": "Shop · permanen", "date": "diskon 11 Nov – 23 Des 2026",
                  "d": "Harga diskon 2.680 Riftcrystal dari 3.280 (hemat 18%), selama periode diskon."},
-                {"t": "Kostum Elyms: Drifting Petals dan Windflower", "tag": "Kostum",
+                {"t": "Kostum Elyms: Drifting Petals dan Windflower", "img": [F("Drifting Petals"), F("Windflower")], "tag": "Kostum",
                  "d": "Drifting Petals dari board \"Android Dreams\" atau halaman event Dialing Perks. Windflower terbuka di Bond Level 10 bersama Elyms."},
-                {"t": "Aksesori Tiny Friend dan Eagle Eye", "tag": "Aksesori",
+                {"t": "Aksesori Tiny Friend dan Eagle Eye", "img": [I("Pendant_8"), I("Pendant_9")], "tag": "Aksesori",
                  "d": "Tiny Friend terbuka di total progres 3.000 event Fortune's Bounty. Eagle Eye didapat dari \"Forward Momentum Skin Bundle\" di Mall > Gift Center."},
             ],
         },
         {
             "id": "event", "title": "Event & Hadiah", "open": True,
             "items": [
-                {"t": "Open Roads Ahead (Mystery Box)", "tag": "Event", "date": "11 Nov – 23 Des 2026",
+                {"t": "Open Roads Ahead (Mystery Box)", "img": [V("Iron Ogre"), V("Prototype Land Overlord 001"), I("Frame_MangHe_005")], "tag": "Event", "date": "11 Nov – 23 Des 2026",
                  "d": "15 kotak. Kotak pertama seharga 50.000 Fons atau 50 Annulith dan harganya naik tiap kotak. Membuka semuanya membuka seluruh hadiah: kendaraan Iron Ogre dan "
                       "Prototype Land Overlord 001, livery \"Caution: Graffiti!\", frame avatar \"Wayfinder\", namecard \"The Open Road\", Fabricated Dice, A Handwritten Letter, dan lainnya."},
-                {"t": "Circle Gifts", "tag": "Login", "date": "11 Nov – 23 Des 2026", "d": "Login total 7 hari mendapat Solid Dice x10."},
+                {"t": "Circle Gifts", "img": [I("Dicelimite")], "tag": "Login", "date": "11 Nov – 23 Des 2026", "d": "Login total 7 hari mendapat Solid Dice x10."},
                 {"t": "City Logistics", "tag": "Event", "date": "11 Nov – 23 Des 2026",
                  "d": "Selesaikan quest terbatas untuk token Kool. Menamatkan semuanya memberi namecard \"Big Dreams\". Event Shop berisi kendaraan C001, gelar \"Hethereau Delivery King\", "
                       "case ponsel \"Five-Star Reviews\", avatar \"Kool\", dan lainnya. Level Reputasi memberi Ori-LV03, Annulith, Floe Cinema Ticket, Elite Hunter Guide, dan Chaotic Dye."},
-                {"t": "Hunter's Crucible: Breakthrough", "tag": "Event", "date": "11 Nov – 23 Des 2026",
+                {"t": "Hunter's Crucible: Breakthrough", "img": [I("CharacterUpMaterial_lv3"), I("WeaponUpMaterial_lv3")], "tag": "Event", "date": "11 Nov – 23 Des 2026",
                  "d": "Tamatkan stage tantangan untuk gelar \"Hunter's Crucible - Blade Honed\" (efek visualnya berubah sesuai total poin), Annulith, Fabricated Dice, Fons, Elite Hunter Guide, dan Chaotic Dye."},
-                {"t": "Fortune's Bounty", "tag": "Event", "date": "11 Nov – 23 Des 2026",
+                {"t": "Fortune's Bounty", "img": [I("Pendant_8")], "tag": "Event", "date": "11 Nov – 23 Des 2026",
                  "d": "Kumpulkan Fortune Coins. Hadiah milestone: Pop-Up Divination House, aksesori Tiny Friend, jejak ban \"Hyperflame\", asap ban \"Neonbula\", Solid Dice, Fabricated Dice, dan kotak material."},
-                {"t": "Circle Bounty (panduan versi 1.5)", "tag": "Event", "date": "11 Nov – 22 Des 2026",
+                {"t": "Circle Bounty (panduan versi 1.5)", "img": [I("combat_68")], "tag": "Event", "date": "11 Nov – 22 Des 2026",
                  "d": "Butuh quest utama \"Relax Time\". Selesaikan Circle Quest untuk EXP dan rank. Ada Elite Hunter Supplies (Annulith x680, Solid Dice x4, Fabricated Dice x2, Fons x950.000, dan lainnya) "
                       "dan Honor Hunter Supplies (tambahan avatar \"Long Time No See\", frame \"Who's Calling?\", namecard \"City of Wonders\"). Arc-light Trove II memberi pilihan salah satu Arc Fluff of ... atau Fons x2.000.000."},
                 {"t": "Full Tank Ahead", "tag": "Event", "date": "19 Nov – 23 Des 2026", "d": "Event peluncuran Iron Ogre. Hadiah Event Shop: Annulith, Floe Cinema Ticket, Fons, Elite Hunter Guide, Chaotic Dye."},
-                {"t": "Fishing Frenzy", "tag": "Event", "date": "23 Nov – 23 Des 2026", "d": "Memancing di titik \"Sea Angler\" Nacupeda Park dan naikkan level memancing. Hadiah: Annulith, Floe Cinema Ticket, Elite Hunter Guide, Chaotic Dye, dan boss Manhole."},
+                {"t": "Fishing Frenzy", "img": [I("EquipmentUpMaterial_lv3")], "tag": "Event", "date": "23 Nov – 23 Des 2026", "d": "Memancing di titik \"Sea Angler\" Nacupeda Park dan naikkan level memancing. Hadiah: Annulith, Floe Cinema Ticket, Elite Hunter Guide, Chaotic Dye, dan boss Manhole."},
                 {"t": "Pixel Surge", "tag": "Event", "date": "16 Nov – 23 Nov 2026",
                  "d": "Hadiah dobel saat memakai Character Pixels di Houdinii's Magic Stage, Houdinii's Schemes, Bubble Can Factory, dan Rabbit Hole. Batas dobel 120 per hari (sisa terbawa), total 840."},
-                {"t": "Gold Clash", "tag": "Event", "date": "23 Nov – 7 Des 2026", "d": "Efisiensi Fons 2x di Pink Paws Heist."},
+                {"t": "Gold Clash", "img": [I("steal_gold")], "tag": "Event", "date": "23 Nov – 7 Des 2026", "d": "Efisiensi Fons 2x di Pink Paws Heist."},
                 {"t": "Event tambahan (menurut Game8)", "tag": "Event",
                  "d": "Beyond the Rails - Frozen Circle (19 Nov – 3 Des), Fons Rush dengan Fons 2x saat memakai City Stamina (7 – 14 Des), dan Magic Lucky Flip (10 – 23 Des)."},
             ],
@@ -163,8 +209,8 @@ V15 = {
         {
             "id": "bug", "title": "Perbaikan Bug", "open": False,
             "items": [
-                {"t": "Akane Rin", "tag": "Bug", "d": "Dodge dan Critical Riposte tidak bisa tersambung ke serangan dasar berikutnya saat Basic Attack ditahan. Sudah diperbaiki."},
-                {"t": "Shinku", "tag": "Bug",
+                {"t": "Akane Rin", "img": [E("akane-rin")], "tag": "Bug", "d": "Dodge dan Critical Riposte tidak bisa tersambung ke serangan dasar berikutnya saat Basic Attack ditahan. Sudah diperbaiki."},
+                {"t": "Shinku", "img": [E("crimson")], "tag": "Bug",
                  "d": "Animasi meluncur yang kadang janggal diperbaiki. Pasif \"Menacing Gaze\" di Beyond the Rails kini mulai dari stack penuh saat masuk atau mengulang stage."},
                 {"t": "Anomaly Hunt: Black Tome", "tag": "Bug",
                  "d": "Kombinasi Redirect Linko dengan Synced Strike Xiaozhen saat karakter terbelenggu boss tidak lagi memberi lonjakan damage yang tidak wajar."},
@@ -177,7 +223,7 @@ V15 = {
             "items": [
                 {"t": "Maintenance", "tag": "Jadwal", "date": "11 Nov 2026",
                  "d": "06.00 – 11.00 (UTC+8), atau sekitar 05.00 – 10.00 WIB, bisa maju atau mundur. Login tidak tersedia selama maintenance, dan \"Pink Paws Heist\" ditutup sementara sejak 05.30 (UTC+8)."},
-                {"t": "Kompensasi", "tag": "Hadiah",
+                {"t": "Kompensasi", "img": [I("Annulith_x300")], "tag": "Hadiah",
                  "d": "Annulith x300 untuk maintenance dan Annulith x300 untuk perbaikan bug, dikirim lewat surat dalam game. Berlaku untuk Appraiser yang membuat karakter sebelum 11 Nov 2026, 06.00 (UTC+8). Klaim sebelum surat kedaluwarsa."},
                 {"t": "Pengingat", "tag": "Info",
                  "d": "Limited Board Akane Rin \"Dazzling Star\" berakhir 11 Nov 2026, 05.59 (UTC+8). Tukarkan hadiah kosmetiknya di halaman event Void Perks sebelum itu."},
