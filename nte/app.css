@@ -882,3 +882,30 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .dlg-btns .btn { height: 42px; padding: 0 20px; }
 .toast { position: fixed; left: 50%; bottom: 24px; z-index: 310; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 10px 20px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 0.8rem var(--display); box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink); animation: pop 0.2s ease; transition: opacity 0.4s; }
 .toast.out { opacity: 0; }
+
+/* ---------------- DETAIL ESPER & ARC ---------------- */
+.roles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 4px; }
+.roles .mono { color: var(--text-2); font-size: 0.66rem; letter-spacing: 0.1em; margin-right: 4px; }
+.roles b { padding: 5px 12px; border-radius: 999px; background: var(--cream); color: var(--ink); font: 800 0.72rem var(--display); box-shadow: 0 0 0 2px var(--edge); }
+.statbox { margin: 16px 0; padding: 16px 18px; border-radius: 22px; background: var(--panel); box-shadow: var(--ring); }
+.stat-lv { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 12px; }
+.stat-lv .mono { color: var(--pink); font-size: 0.7rem; letter-spacing: 0.1em; }
+.stat-lv b { font: 800 1.5rem var(--display); min-width: 2ch; }
+.stat-lv input[type=range] { width: 100%; accent-color: var(--pink); }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 14px; }
+.stat-grid div { padding: 10px 14px; border-radius: 16px; background: var(--panel-2); border: 2px solid var(--edge); }
+.stat-grid span { display: block; font: 600 0.62rem var(--mono); color: var(--text-2); letter-spacing: 0.08em; text-transform: uppercase; }
+.stat-grid b { font: 800 1.2rem var(--display); }
+.skillgrp { margin-bottom: 6px; }
+.skill-head { padding: 12px 16px; margin: 6px 0 10px; border-radius: 18px; background: var(--panel-2); border-left: 5px solid var(--pink); }
+.skill-head h4 { font: 800 1rem var(--display); text-transform: uppercase; }
+.skill-head details { margin-top: 6px; color: var(--text-2); font-size: 0.85rem; }
+.skill-head summary { cursor: pointer; color: var(--pink); font: 600 0.72rem var(--mono); letter-spacing: 0.06em; }
+.skill-head details p { margin-top: 8px; }
+.entry.sub { margin-left: 14px; border-left: 2px solid var(--edge); padding-left: 14px; }
+.outfit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.outfit { margin: 0; border-radius: 20px; overflow: hidden; background: var(--panel-2); box-shadow: var(--ring); }
+.outfit img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 15%; }
+.outfit figcaption { padding: 10px 14px 14px; }
+.outfit b { display: block; font: 800 0.85rem var(--display); text-transform: uppercase; }
+.outfit small { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--text-2); font-size: 0.76rem; margin-top: 4px; }
