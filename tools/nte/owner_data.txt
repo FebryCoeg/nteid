@@ -382,12 +382,12 @@
 * Best Teams (Akane Rin Remora): Elyms + Shinku (Cosmos DPS), Akane Rin (Lakshana Main DPS), Iroi (Support)
 * Skill Priority: Ultimate → Skill → QTE → Basic Attack
 * Best Awakening Nodes (Urutan Prioritas 1–6):
-   1. A1 (404: Island Out of Reach) [Prioritas 1]: Setelah melancarkan Ultimate Do You Get Deja Vu, setiap stack Optical Illusion yang dikonsumsi sebelum cast akan meningkatkan CRIT DMG seluruh tim sebesar 10% selama 20 detik.
-   2. A2 (200: Nodes Connected) [Prioritas 2]: Meningkatkan rasio DMG Ultimate sebesar 30%, dan setiap stack Optical Illusion yang dikonsumsi saat menggunakan Goodbye to You membuat serangan itu mengabaikan 5% DEF target.
+   1. A4 (302: Wish Redirected) [Prioritas 1]: Selama Elyms berada di dalam party dan hidup, CRIT DMG seluruh tim meningkat sebesar 20%.
+   2. A1 (404: Island Out of Reach) [Prioritas 2]: Setelah melancarkan Ultimate Do You Get Deja Vu, setiap stack Optical Illusion yang dikonsumsi sebelum cast akan meningkatkan CRIT DMG seluruh tim sebesar 10% selama 20 detik.
    3. A3 (504: Gateway Timeout) [Prioritas 3]: Saat Connection Strength naik dari Medium ke Strong, Elyms mendapatkan 3 stack Optical Illusion dan batas tumpukannya naik menjadi 4.
-   4. A4 (302: Wish Redirected) [Prioritas 4]: Selama Elyms berada di dalam party dan hidup, CRIT DMG seluruh tim meningkat sebesar 20%.
-   5. A6 (301: Moved Permanently) [Prioritas 5]: Setelah menggunakan Ultimate, setiap stack Optical Illusion yang dikonsumsi sebelumnya meningkatkan Follow-up Attack DMG Elyms sebesar 25% selama 20 detik.
-   6. A5 (304: Nothing Has Changed) [Prioritas 6]: Meningkatkan rasio DMG The Ones Who Left sebesar 100% dan mengatur Cycle Energy Elyms langsung ke 100 saat memasuki pertarungan.
+   4. A5 (304: Nothing Has Changed) [Prioritas 4]: Meningkatkan rasio DMG The Ones Who Left sebesar 100% dan mengatur Cycle Energy Elyms langsung ke 100 saat memasuki pertarungan.
+   5. A2 (200: Nodes Connected) [Prioritas 5]: Meningkatkan rasio DMG Ultimate sebesar 30%, dan setiap stack Optical Illusion yang dikonsumsi saat menggunakan Goodbye to You membuat serangan itu mengabaikan 5% DEF target.
+   6. A6 (301: Moved Permanently) [Prioritas 6]: Setelah menggunakan Ultimate, setiap stack Optical Illusion yang dikonsumsi sebelumnya meningkatkan Follow-up Attack DMG Elyms sebesar 25% selama 20 detik.
 * Build FAQ:
    * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Tear of the Sea, 17× Fading Silhouette, 18× Blurred Silhouette, 15× Chaos Silhouette.
    * Ability Materials (4 Skill Lv. 10): 1,748,000 Beetle Coins, 40× Nestling's Longing, 40× Fading Silhouette, 40× Dove's Flutter, 40× Blurred Silhouette, 32× Hollowflower Seed, 64× The Olive Branch, 64× Chaos Silhouette.
