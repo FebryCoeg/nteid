@@ -322,6 +322,9 @@ def build_espers():
     out = []
     for cid, r in chars.items():
         name = loc_text(r.get("ItemName")).strip()
+        if not name:
+            # beberapa karakter (mis. Zankou) tidak punya teks di tabel karakter; ambil dari ST_Player
+            name = L("ST_Player", f"Role_Name_{cid[-3:]}").strip()
         if not name or cid == "1999" or cid not in awaken_files:
             continue
         ed = r.get("ElementData") or {}
