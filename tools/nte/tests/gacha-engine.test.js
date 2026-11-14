@@ -170,7 +170,10 @@ test("papan: id valid, rute tanpa duplikat, panah berpasangan", () => {
   for (const b of board.blocks) {
     assert.ok(ids.has(b.enter) && ids.has(b.exit), "panah blok tak ada");
     for (const id of b.tiles) assert.ok(ids.has(id), `id blok ${id} tak ada`);
-    assert.ok(board.route.includes(b.enter) && board.route.includes(b.exit), "panah harus ada di rute utama");
+    // panah hanya gambar: tidak ada di rute; yang memicu masuk/keluar adalah kotak rute di sebelahnya
+    assert.ok(!board.route.includes(b.enter) && !board.route.includes(b.exit), "panah tidak boleh jadi langkah di rute");
+    assert.ok(board.route.includes(b.enterTile) && board.route.includes(b.exitTile), "kotak pintu masuk/keluar harus ada di rute");
+    assert.notEqual(b.enterTile, b.exitTile);
   }
   const types = Object.fromEntries(board.tiles.map((t) => [t.id, t.type]));
   assert.equal(board.blocks.filter((b) => types[b.enter] === "arrowIn" && types[b.exit] === "arrowOut").length, board.blocks.length);
@@ -191,8 +194,10 @@ function mkBoard(types, blocks = [], extra = []) {
   for (const e of extra) tiles.push({ id: tiles.length, x: 0, y: 50, type: e });
   return { tiles, route: types.map((_, i) => i), blocks, start: 0 };
 }
-const B1 = mkBoard(["lost", "lost", "lost", "arrowIn", "lost", "arrowOut", "lost", "lost"],
-  [{ side: "right", enter: 3, exit: 5, tiles: [8, 9, 10] }], ["hero", "hero", "hero"]);
+// rute 0..7; blok berisi 8,9,10; gambar panah 11 (masuk) dan 12 (keluar) bukan langkah di rute.
+// Mendarat tepat di kotak 3 (kotak pintu masuk) memasukkan bidak ke blok; keluar dari blok mendarat di kotak 5.
+const B1 = mkBoard(Array(8).fill("lost"),
+  [{ side: "right", enter: 11, exit: 12, enterTile: 3, exitTile: 5, tiles: [8, 9, 10] }], ["hero", "hero", "hero", "arrowIn", "arrowOut"]);
 // urutan nilai acak yang diulang
 const seq = (vals) => { let i = 0; return () => vals[i++ % vals.length]; };
 
@@ -201,21 +206,18 @@ test("moveToken: langkah biasa dan melingkar di ujung rute", () => {
   assert.deepEqual(E.moveToken(B1, 6, 3, "enterFirst"), { path: [7, 0, 1], landed: 1 });
 });
 
-test("moveToken: mendarat tepat di panah masuk (aturan enterFirst) berhenti di kotak pertama blok", () => {
-  assert.deepEqual(E.moveToken(B1, 0, 3, "enterFirst"), { path: [1, 2, 3, 8], landed: 8 });
+test("moveToken: mendarat tepat di kotak pintu masuk -> lewat panah masuk lalu berhenti di kotak pertama blok", () => {
+  assert.deepEqual(E.moveToken(B1, 0, 3, "enterFirst"), { path: [1, 2, 3, 11, 8], landed: 8 });
 });
 
-test("moveToken: aturan traverse melewati seluruh blok dan berhenti di panah keluar", () => {
-  assert.deepEqual(E.moveToken(B1, 0, 3, "traverse"), { path: [1, 2, 3, 8, 9, 10, 5], landed: 5 });
+test("moveToken: hanya melewati kotak pintu masuk tidak masuk blok", () => {
+  assert.deepEqual(E.moveToken(B1, 2, 3, "enterFirst"), { path: [3, 4, 5], landed: 5 });
 });
 
-test("moveToken: hanya melewati panah masuk tidak masuk blok", () => {
-  assert.deepEqual(E.moveToken(B1, 2, 3, "enterFirst"), { path: [3, 4, 6], landed: 6 });
-});
-
-test("moveToken: dari dalam blok lanjut ke kotak berikutnya, keluar lewat panah keluar, kembali ke rute", () => {
+test("moveToken: dari dalam blok lanjut per kotak, keluar lewat panah keluar ke kotak pintu keluar, lalu rute", () => {
   assert.deepEqual(E.moveToken(B1, 9, 1, "enterFirst"), { path: [10], landed: 10 });
-  assert.deepEqual(E.moveToken(B1, 9, 3, "enterFirst"), { path: [10, 6, 7], landed: 7 });
+  assert.deepEqual(E.moveToken(B1, 10, 1, "enterFirst"), { path: [12, 5], landed: 5 });
+  assert.deepEqual(E.moveToken(B1, 9, 3, "enterFirst"), { path: [10, 12, 5, 6], landed: 6 });
 });
 
 test("roll paksa pity: bidak tidak bergerak dan hasilnya S", () => {
@@ -275,15 +277,19 @@ test("tanpa S, bidak tidak pernah berhenti di kotak Journey Together S", () => {
 // ---------------------------------------------------------------- Task 5: peluang mendarat dan keputusan aturan
 const stats = require(path.join(ROOT, "tools", "nte", "board_stats.js"));
 
-test("panah keluar bukan tempat berhenti: dilewati saat berjalan dari rute maupun dari blok", () => {
-  assert.deepEqual(E.moveToken(B1, 4, 1, "enterFirst"), { path: [6], landed: 6 });
-  assert.deepEqual(E.moveToken(B1, 9, 2, "enterFirst"), { path: [10, 6], landed: 6 });
+test("panah hanya gambar: bidak tidak pernah berhenti di panah, dari posisi dan dadu mana pun", () => {
+  for (const pos of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
+    for (let die = 1; die <= 6; die++) {
+      const m = E.moveToken(B1, pos, die, "enterFirst");
+      assert.ok(m.landed !== 11 && m.landed !== 12, `pos ${pos} dadu ${die} berhenti di panah`);
+    }
+  }
 });
 
 test("peristiwa S lebih suka kotak Journey Together S (masuk blok) bila terjangkau", () => {
   // dari 0: dadu 3 mendarat di panah masuk (3) -> kotak pertama blok (journeyS); dadu 4 mendarat di hero
-  const B = mkBoard(["lost", "lost", "lost", "arrowIn", "hero", "arrowOut", "lost", "lost"],
-    [{ side: "right", enter: 3, exit: 5, tiles: [8, 9, 10] }], ["journeyS", "livery", "hero"]);
+  const B = mkBoard(["lost", "lost", "lost", "lost", "hero", "lost", "lost", "lost"],
+    [{ side: "right", enter: 11, exit: 12, enterTile: 3, exitTile: 5, tiles: [8, 9, 10] }], ["journeyS", "livery", "hero", "arrowIn", "arrowOut"]);
   // undian S = 0 (kena), pemilihan dadu = 0.99 (cenderung pilihan terakhir): harus tetap memilih blok
   const r = E.roll(E.newState(), B, R, seq([0, 0.99]), { blockRule: "enterFirst" });
   assert.equal(r.reward.kind, "S");
@@ -303,7 +309,7 @@ test("peluang mendarat cocok angka resmi (aturan enterFirst)", () => {
   near("lost", 3);
   assert.ok(Math.abs((p.journeyS || 0) + (p.journeyA || 0) - 10.86) <= 3, "journey");
   for (const k of ["arclight", "fashion", "roll1", "roll5", "outfit", "livery"]) near(k, 1);
-  assert.equal(p.arrowOut || 0, 0, "bidak tak boleh berhenti di panah keluar");
+  assert.equal((p.arrowOut || 0) + (p.arrowIn || 0), 0, "bidak tak boleh berhenti di panah");
 });
 
 // ---------------------------------------------------------------- Task 7: simpan lokal

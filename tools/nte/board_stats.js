@@ -52,6 +52,6 @@ function report(rule, n) {
 
 if (require.main === module) {
   const n = Number(process.argv[2]) || 400000;
-  for (const rule of ["enterFirst", "traverse"]) report(rule, n);
+  report("enterFirst", n);
 }
 module.exports = { landingStats, OFFICIAL };

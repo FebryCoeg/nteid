@@ -1180,6 +1180,8 @@
       const raw = JSON.parse(localStorage.getItem(KEY) || "null");
       const first = (raw && banners.find((b) => b.id === raw.banner)) || banner;
       st = GE.restoreState(raw && raw.state, boards[first.boardFile], mkRules(first));
+      // susunan id papan berubah: posisi bidak tersimpan dari versi lama dikembalikan ke awal
+      if (raw && raw.bv !== (boards[first.boardFile].version || 1)) st = { ...st, pos: boards[first.boardFile].start, positions: {} };
       if (st.total > 0 && raw) {
         savedBanner = first;
         if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && typeof h.kind === "string").slice(0, 200);
@@ -1191,7 +1193,7 @@
     let board = boards[banner.boardFile];
     let R = mkRules(banner);
     if (st.board !== banner.boardId) st = GE.switchBoard(st, banner.boardId, board);
-    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, stats, banner: banner.id })); } catch (e) {} };
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, stats, banner: banner.id, bv: board.version || 1 })); } catch (e) {} };
 
     // ---- papan: kotak, posisi, nama
     let byTile = {}, ax = 0, ay = 0, BW = 1, BH = 1, arrowDir = {};

@@ -43,8 +43,8 @@ ROUTE = [
     (1357, 344, "apprentice"), (1408, 347, "lost"), (1460, 346, "journeyA"),
     (1460, 396, "apprentice"), (1460, 448, "hero"), (1460, 499, "apprentice"),
     (1512, 499, "apprentice"), (1563, 500, "lost", {"amount": 50}),
-    (1563, 549, "apprentice"), (1607, 549, "arrowIn", {"block": "right"}),
-    (1563, 601, "journeyA"), (1563, 653, "hero"), (1607, 653, "arrowOut", {"block": "right"}),
+    (1563, 549, "apprentice"),
+    (1563, 601, "journeyA"), (1563, 653, "hero"),
     (1563, 704, "apprentice"), (1563, 755, "apprentice"), (1563, 807, "lost"),
     (1512, 807, "arclight", {"slumber": True}), (1460, 806, "apprentice"), (1408, 807, "hero"), (1357, 806, "apprentice"), (1306, 806, "apprentice"),
     (1306, 756, "lost"),
@@ -52,10 +52,16 @@ ROUTE = [
     (998, 704, "apprentice"),
     (947, 704, "apprentice"), (895, 705, "hero"), (845, 704, "journeyA"), (793, 704, "apprentice"),
     (793, 654, "lost", {"amount": 30}), (793, 602, "apprentice"), (793, 552, "lost", {"amount": 50}), (793, 500, "hero"),
-    (751, 447, "arrowIn", {"block": "left"}),
     (793, 447, "apprentice"), (793, 397, "journeyA"),
-    (751, 346, "arrowOut", {"block": "left"}),
 ]
+
+# Panah: hanya gambar di samping kolom (bukan langkah di rute). Masing-masing sejajar dengan satu kotak rute.
+# Kotak pintu masuk = kotak rute di sebelah panah masuk (mendarat tepat di situ memasukkan bidak ke blok);
+# kotak pintu keluar = tempat bidak muncul di rute setelah keluar dari blok lewat panah keluar.
+ARROWS = {
+    "right": {"in": (1607, 549), "out": (1607, 653), "enterTile": (1563, 549), "exitTile": (1563, 653)},
+    "left": {"in": (751, 447), "out": (751, 346), "enterTile": (793, 447), "exitTile": (793, 346)},
+}
 
 # Blok ujung, urutan jalan searah jarum jam dari kotak pertama yang dimasuki.
 BLOCK_RIGHT = [
@@ -126,16 +132,16 @@ def main():
         nid += 1
         return tile["id"]
 
-    arrows = {"right": {}, "left": {}}
     for row in ROUTE:
-        i = add(row)
-        route.append(i)
-        if row[2] in ("arrowIn", "arrowOut"):
-            arrows[row[3]["block"]]["enter" if row[2] == "arrowIn" else "exit"] = i
+        route.append(add(row))
+    at = {(t["x"], t["y"]): t["id"] for t in tiles}
     blocks = []
     for side, rows in (("right", BLOCK_RIGHT), ("left", BLOCK_LEFT)):
         ids = [add(r) for r in rows]
-        blocks.append({"side": side, "enter": arrows[side]["enter"], "exit": arrows[side]["exit"], "tiles": ids})
+        ar = ARROWS[side]
+        enter = add((ar["in"][0], ar["in"][1], "arrowIn"))
+        exit_ = add((ar["out"][0], ar["out"][1], "arrowOut"))
+        blocks.append({"side": side, "enter": enter, "exit": exit_, "enterTile": at[ar["enterTile"]], "exitTile": at[ar["exitTile"]], "tiles": ids})
 
     # pemeriksa terhadap deteksi warna
     bad = 0
@@ -153,6 +159,7 @@ def main():
         "name": "Scarborough Fair",
         "source": "Peta 'Board Tile Guide' di game, dibaca dari screenshot pemilik situs 2026-11-15",
         "width": 1920, "height": 1080, "area": list(AREA),
+        "version": 2,  # naik tiap id kotak berubah; posisi bidak tersimpan di browser dengan versi lama direset
         "start": route[0],
         # keputusan dari tes peluang mendarat (tools/nte/board_stats.js): bidak yang mendarat tepat di panah masuk berhenti
         # di kotak pertama blok dan roll berikutnya berjalan di dalam blok; peluang S per roll mengikuti angka resmi

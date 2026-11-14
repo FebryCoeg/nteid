@@ -139,48 +139,43 @@
 
   function index(board) {
     if (board._ix) return board._ix;
-    const byId = {}, routeAt = {}, inBlock = {}, blockEnter = {};
+    const byId = {}, routeAt = {}, inBlock = {}, blockAtTile = {};
     for (const t of board.tiles) byId[t.id] = t;
     board.route.forEach((id, i) => { routeAt[id] = i; });
-    board.blocks.forEach((b, bi) => {
-      blockEnter[b.enter] = b;
+    board.blocks.forEach((b) => {
+      blockAtTile[b.enterTile] = b; // mendarat tepat di kotak pintu masuk memasukkan bidak ke blok
       b.tiles.forEach((id, i) => { inBlock[id] = { block: b, i }; });
     });
-    Object.defineProperty(board, "_ix", { value: { byId, routeAt, inBlock, blockEnter }, enumerable: false });
+    Object.defineProperty(board, "_ix", { value: { byId, routeAt, inBlock, blockAtTile }, enumerable: false });
     return board._ix;
   }
 
+  // Satu langkah ke depan. `via` = gambar panah yang dilewati saat keluar dari blok (hanya untuk animasi).
   function nextTile(board, id) {
     const ix = index(board);
     const ib = ix.inBlock[id];
-    let nxt;
-    if (ib) nxt = ib.i + 1 < ib.block.tiles.length ? ib.block.tiles[ib.i + 1] : ib.block.exit;
-    else nxt = board.route[(ix.routeAt[id] + 1) % board.route.length];
-    // panah keluar bukan tempat berhenti (angka resmi tidak punya kotak itu): langsung ke kotak sesudahnya
-    if (ix.byId[nxt].type === "arrowOut") nxt = board.route[(ix.routeAt[nxt] + 1) % board.route.length];
-    return nxt;
+    if (ib) return ib.i + 1 < ib.block.tiles.length ? { id: ib.block.tiles[ib.i + 1] } : { id: ib.block.exitTile, via: ib.block.exit };
+    return { id: board.route[(ix.routeAt[id] + 1) % board.route.length] };
   }
 
-  // Bidak berjalan `die` langkah searah rute. Hanya mendarat TEPAT di panah masuk yang memasukkan bidak ke blok:
-  //  - "enterFirst": bidak berhenti di kotak pertama blok; roll berikutnya lanjut di dalam blok sampai keluar lewat panah keluar.
-  //  - "traverse": bidak melewati seluruh blok dan berhenti di panah keluar.
-  function moveToken(board, pos, die, rule) {
+  // Bidak berjalan `die` langkah searah rute (kotak panah bukan langkah; panah hanya gambar di samping kotak rute).
+  // Mendarat TEPAT di kotak pintu masuk (kotak di sebelah panah masuk): bidak melewati panah masuk dan berhenti di kotak
+  // pertama blok; roll berikutnya berjalan di dalam blok, keluar lewat panah keluar ke kotak pintu keluar, lalu kembali ke rute.
+  // `path` berisi semua id yang dilewati (termasuk panah) untuk animasi; `landed` tempat berhenti.
+  function moveToken(board, pos, die) {
     const ix = index(board);
     const path = [];
     let cur = pos;
     for (let i = 0; i < die; i++) {
-      cur = nextTile(board, cur);
+      const n = nextTile(board, cur);
+      if (n.via !== undefined) path.push(n.via);
+      cur = n.id;
       path.push(cur);
     }
-    const blk = ix.blockEnter[cur];
-    if (blk && ix.routeAt[cur] !== undefined) {
-      if (rule === "traverse") {
-        path.push(...blk.tiles, blk.exit);
-        cur = blk.exit;
-      } else {
-        path.push(blk.tiles[0]);
-        cur = blk.tiles[0];
-      }
+    const blk = ix.blockAtTile[cur];
+    if (blk && !ix.inBlock[cur]) {
+      path.push(blk.enter, blk.tiles[0]);
+      cur = blk.tiles[0];
     }
     return { path, landed: cur };
   }
