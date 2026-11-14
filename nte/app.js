@@ -1244,7 +1244,7 @@
           <div class="calc-grid">
             <label class="cf"><span>Esper</span><select id="cE">${eso(defE.slug)}</select></label>
             ${field("cL", S("Level karakter", "Character level"), 80, "1–80")}
-            <label class="cf"><span>Arc</span><select id="cA"></select></label>
+            <label class="cf"><span>Arc <em>(${S("sesuai tipe karakter", "matches character type")})</em></span><select id="cA"></select></label>
             ${field("cAL", S("Level Arc", "Arc level"), 80, "1–80")}
             <label class="cf"><span>${S("Jenis skill", "Skill type")}</span><select id="cG"></select></label>
             ${field("cSL", S("Level skill", "Skill level"), 10, "1–10")}
@@ -1278,7 +1278,7 @@
     const esper = (slug) => list.find((e) => e.slug === slug);
     function fillArc() {
       const e = esper($c("cE").value), want = ((BUILDS[e.slug] || {}).arcs || [])[0];
-      $c("cA").innerHTML = opt("", S("Tanpa Arc", "No Arc"), false) + arcList.map((a) => opt(a.slug, a.name, a.slug === want)).join("");
+      $c("cA").innerHTML = opt("", S("Tanpa Arc", "No Arc"), false) + arcList.filter((x) => x.type === e.arcType).map((a) => opt(a.slug, a.name, a.slug === want)).join("");
       const el = e.element === "Anima" ? "Nature" : e.element;
       $c("cEl").innerHTML = ["Cosmos", "Nature", "Incantation", "Chaos", "Psyche", "Lakshana", "Normal"].map((k) => opt(k, k === "Nature" ? "Anima" : k, k === el)).join("");
       const sk = SD.espers[e.id].skills;
