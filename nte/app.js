@@ -58,6 +58,21 @@
     }));
   };
 
+  // ---------------- header mobile: sembunyi saat scroll turun, muncul saat scroll naik ----------------
+  (() => {
+    const hd = $("header.top"); if (!hd) return;
+    let last = scrollY, tick = false;
+    addEventListener("scroll", () => {
+      if (tick) return; tick = true;
+      requestAnimationFrame(() => {
+        const y = scrollY, d = y - last;
+        if (matchMedia("(max-width: 700px)").matches && Math.abs(d) > 6) hd.classList.toggle("hide", d > 0 && y > 90);
+        else if (!matchMedia("(max-width: 700px)").matches) hd.classList.remove("hide");
+        last = y; tick = false;
+      });
+    }, { passive: true });
+  })();
+
   // ---------------- tema & menu ----------------
   if ($(".theme-toggle")) $(".theme-toggle").onclick = () => {
     const root = document.documentElement;
