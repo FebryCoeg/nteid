@@ -1,0 +1,49 @@
+{
+  "name": "Arc Research Program",
+  "source": "Layar Arc Research Program (Echo Special) di game, dikirim pemilik situs 2026-11-15",
+  "default": "echo-special",
+  "rules": {
+    "perBox": 10,
+    "keysPerPull": 10,
+    "s": { "base": 0.03, "upShare": 0.25, "pityBoxes": 6 },
+    "up": { "pityBoxes": 8 },
+    "a": { "base": 0.07, "extra": 0.0545, "everyBoxMin": 1 },
+    "b": { "base": 0.9 },
+    "overall": { "S": 0.0419, "A": 0.1347, "B": 0.8234, "UP": 0.0168 },
+    "bonus": { "S": { "warp": 40 }, "A": { "warp": 4 }, "B": { "lost": 20 } },
+    "calibration": "Pembagian A/B di luar jaminan 1 Arc A per kotak disesuaikan (a.extra) agar cocok dengan angka resmi 13,47% / 82,34%. Perkiraan."
+  },
+  "banners": [
+    {
+      "id": "echo-special",
+      "name": "Echo Special",
+      "featuredArc": "echoes-on-hold",
+      "accent": "#ffc24d",
+      "poolConfirmed": false,
+      "pools": {
+        "S": [
+          { "type": "Solid", "arc": "echoes-on-hold", "up": true },
+          { "type": "Solid", "arc": null },
+          { "type": "Liquid", "arc": null },
+          { "type": "Gas", "arc": null },
+          { "type": "Synthesis", "arc": null },
+          { "type": "Plasma", "arc": null }
+        ],
+        "A": [
+          { "type": "Solid", "arc": null },
+          { "type": "Liquid", "arc": null },
+          { "type": "Gas", "arc": null },
+          { "type": "Synthesis", "arc": null },
+          { "type": "Plasma", "arc": null }
+        ],
+        "B": [
+          { "type": "Solid", "arc": null },
+          { "type": "Liquid", "arc": null },
+          { "type": "Gas", "arc": null },
+          { "type": "Synthesis", "arc": null },
+          { "type": "Plasma", "arc": null }
+        ]
+      }
+    }
+  ]
+}
