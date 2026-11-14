@@ -305,3 +305,16 @@ test("peluang mendarat cocok angka resmi (aturan enterFirst)", () => {
   for (const k of ["arclight", "fashion", "roll1", "roll5", "outfit", "livery"]) near(k, 1);
   assert.equal(p.arrowOut || 0, 0, "bidak tak boleh berhenti di panah keluar");
 });
+
+// ---------------------------------------------------------------- Task 7: simpan lokal
+test("restoreState: data rusak, asing, atau ngawur kembali ke keadaan awal", () => {
+  const fresh = { ...E.newState(), pos: B1.start };
+  const valid = { total: 12, sinceS: 12, mode: "baseline", pos: 3, dice: 0, obtained: { elyms: 1 }, sCount: 1 };
+  assert.deepEqual(E.restoreState(valid, B1, R), valid);
+  for (const bad of [undefined, null, "x", 5, [], {}, { ...valid, total: "a" }, { ...valid, sinceS: -1 }, { ...valid, sinceS: 90 },
+    { ...valid, mode: "zzz" }, { ...valid, dice: 99 }, { ...valid, obtained: { a: "b" } }, { ...valid, total: 1.5 }]) {
+    assert.deepEqual(E.restoreState(bad, B1, R), fresh, JSON.stringify(bad));
+  }
+  // posisi yang tak ada di papan kembali ke awal papan, sisanya dipertahankan
+  assert.deepEqual(E.restoreState({ ...valid, pos: 999 }, B1, R), { ...valid, pos: B1.start });
+});

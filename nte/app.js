@@ -1211,11 +1211,26 @@
           </div>
           <div class="gc-pity"><div class="gc-meter"><i id="gcMeter"></i></div><p class="mono" id="gcCount"></p></div>
         </section>
-        <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+        <div class="gc-col">
+          <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+          <section class="calc-card gc-side"><h3>${S("Statistik", "Stats")}</h3><div id="gcStats" class="gc-stats"></div>
+            <div class="gc-btns" style="margin-top:12px"><button type="button" class="chip" id="gcShare" aria-pressed="true">${S("Bagikan hasil", "Share result")}</button><button type="button" class="chip" id="gcReset">Reset</button></div></section>
+          <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gcHist" class="gc-out"></div></section>
+        </div>
       </div>`;
 
-    let st = GE.newState();
-    st.pos = board.start;
+    const KEY = "nte_gacha_v1";
+    let hist = [], stats = { S: 0, A: 0, B: 0 }, st;
+    try {
+      const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+      st = GE.restoreState(raw && raw.state, board, R);
+      if (st.total > 0 && raw) {
+        if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && typeof h.kind === "string").slice(0, 200);
+        const sx = raw.stats;
+        if (sx && ["S", "A", "B"].every((k) => Number.isInteger(sx[k]) && sx[k] >= 0)) stats = { S: sx.S, A: sx.A, B: sx.B };
+      }
+    } catch (e) { st = GE.restoreState(null, board, R); }
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, stats })); } catch (e) {} };
     let busy = false;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const piece = $("#gcPiece");
@@ -1254,11 +1269,73 @@
         for (let i = 0; i < n; i++) {
           const res = GE.roll(st, board, R, Math.random, { blockRule: board.blockRule });
           st = res.state;
-          for (const x of [res, ...res.extra]) { await animate(x, n > 1); batch.push(x); }
+          for (const x of [res, ...res.extra]) { await animate(x, n > 1); batch.push(x); record(x); }
           counters();
+          save();
         }
         showBatch(batch);
+        renderSide();
       } finally { setBusy(false); }
+    }
+    function record(x) {
+      const add = (rw, gift) => {
+        hist.unshift({ n: x.n, gift: !!gift, ...rw });
+        if (rw.kind === "S") stats.S++;
+        else if (rw.kind === "A_CHAR" || rw.kind === "A_ARC") stats.A++;
+        else if (rw.kind === "B_ARC") stats.B++;
+      };
+      add(x.reward, false);
+      if (x.gift) add(x.gift, true);
+      if (hist.length > 200) hist.length = 200;
+    }
+    function renderSide() {
+      const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
+      const avg = stats.S ? ` · ${S("rata-rata", "avg")} ${(st.total / stats.S).toFixed(1)}/S` : "";
+      $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Anowith (perkiraan)", "Anowith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"));
+      $("#gcHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.slice(0, 40).map((h) => `<li><small class="mono">#${h.n}${h.gift ? " · Points Gift" : ""}</small>${describe(h)}</li>`).join("")}</ol>` : `<p class="txt">${S("Belum ada roll.", "No rolls yet.")}</p>`;
+    }
+    function resetAll() {
+      if (busy || !confirm(S("Reset semua hasil simulasi?", "Reset all simulation results?"))) return;
+      st = GE.restoreState(null, board, R);
+      hist = []; stats = { S: 0, A: 0, B: 0 };
+      save(); place(st.pos); counters(); renderSide();
+      $("#gcOut").innerHTML = `<p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p>`;
+      $("#gcDie").textContent = "🎲";
+    }
+    async function shareImage() {
+      if (busy) return;
+      const top = hist.filter((h) => h.kind === "S" || h.kind === "A_CHAR" || h.kind === "A_ARC").slice(0, 10);
+      const info = (h) => (h.kind === "A_ARC" ? aMap[h.id] : eMap[h.id]);
+      const W = 1000, CW = 180, CH = 190, PAD = 30, perRow = 5, rows = Math.max(1, Math.ceil(top.length / perRow)), HEAD = 150, FOOT = 50, H = HEAD + rows * CH + FOOT;
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const g = cv.getContext("2d");
+      const imgs = {};
+      await Promise.all([...new Set(top.map((h) => info(h) && info(h).icon).filter(Boolean))].map((src) => new Promise((res) => { const im = new Image(); im.onload = () => { imgs[src] = im; res(); }; im.onerror = res; im.src = img(src); })));
+      g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
+      g.textBaseline = "middle"; g.textAlign = "left";
+      g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Simulator Gacha NTE", PAD, 52);
+      g.fillStyle = "#ff5a7a"; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText("Scarborough Fair" + (featured ? " · " + featured.name.split(" (")[0] : ""), PAD, 98);
+      g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
+      g.fillText(`${st.total} roll · S-Class ${stats.S} · A-Class ${stats.A} · Anowith ≈ ${(st.total * R.cost.perRoll).toLocaleString("id-ID")}`, PAD, 128);
+      if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada S atau A. Terus roll!", "No S or A yet. Keep rolling!"), PAD, HEAD + 40); }
+      top.forEach((h, i) => {
+        const it = info(h), cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
+        const col = h.kind === "S" ? "#ff5a7a" : "#b45be0";
+        g.save(); g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.clip();
+        g.fillStyle = "#2c2c31"; g.fillRect(cx - 52, cy - 52, 104, 104);
+        if (it && imgs[it.icon]) g.drawImage(imgs[it.icon], cx - 52, cy - 52, 104, 104);
+        g.restore();
+        g.lineWidth = 4; g.strokeStyle = col; g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.stroke();
+        g.textAlign = "center"; g.fillStyle = "#ece6dd"; g.font = "700 14px 'Plus Jakarta Sans', Arial, sans-serif";
+        const nm = it ? it.name.split(" (")[0] : h.id;
+        g.fillText(nm.length > 18 ? nm.slice(0, 17) + "…" : nm, cx, cy + 74);
+        g.fillStyle = col; g.font = "600 12px 'JetBrains Mono', monospace";
+        g.fillText(`${h.kind === "S" ? "S-Class" : h.kind === "A_ARC" ? "A Arc" : "A-Class"} · #${h.n}`, cx, cy + 94);
+        g.textAlign = "left";
+      });
+      g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
+      g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - FOOT / 2);
+      cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "gacha-nte.png"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
     }
     function showBatch(batch) {
       const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${x.skinBonus.length ? `<div class="gc-gift">${S("Bonus skin tercapai", "Skin bonus reached")}: ${esc(x.skinBonus.join(", "))}</div>` : ""}</li>`).join("");
@@ -1266,8 +1343,11 @@
     }
     $("#gcR1").onclick = () => doRolls(1);
     $("#gcR10").onclick = () => doRolls(10);
+    $("#gcReset").onclick = resetAll;
+    $("#gcShare").onclick = shareImage;
     place(st.pos);
     counters();
+    renderSide();
   }
 
   // ---------------- TENTANG ----------------

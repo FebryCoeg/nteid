@@ -216,5 +216,18 @@
     return { ...first, extra, state: st };
   }
 
-  return { createRng, newState, isForcedS, decideReward, applyRoll, moveToken, roll };
+  // Pulihkan keadaan dari data tersimpan (localStorage). Data apa pun yang tidak masuk akal -> keadaan awal.
+  function restoreState(raw, board, rules) {
+    const fresh = () => ({ ...newState(), pos: board.start });
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return fresh();
+    const int = (v, max) => Number.isInteger(v) && v >= 0 && v <= max;
+    const ok = int(raw.total, 1e7) && int(raw.sinceS, rules.s.hardPity - 1) && (raw.mode === "baseline" || raw.mode === "modified")
+      && int(raw.dice, 50) && int(raw.sCount, 1e7) && raw.obtained && typeof raw.obtained === "object" && !Array.isArray(raw.obtained)
+      && Object.values(raw.obtained).every((v) => int(v, 1e7));
+    if (!ok) return fresh();
+    const known = board.tiles.some((t) => t.id === raw.pos);
+    return { total: raw.total, sinceS: raw.sinceS, mode: raw.mode, pos: known ? raw.pos : board.start, dice: raw.dice, obtained: { ...raw.obtained }, sCount: raw.sCount };
+  }
+
+  return { createRng, newState, isForcedS, decideReward, applyRoll, moveToken, roll, restoreState };
 });
