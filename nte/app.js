@@ -1174,9 +1174,9 @@
       arclight: "Arc-light Mystery Box", fashion: "Fashion Center (Glider)", roll1: "Roll Again", roll5: "Multiple Surprises", outfit: "Daily Outfit", livery: "Mod Up! (Livery)",
       arrowIn: S("Pintu masuk blok", "Block entrance"), arrowOut: S("Pintu keluar blok", "Block exit"),
     };
-    const LBL = { journeyS: "S", journeyA: "A", arclight: "?", roll1: "+1", roll5: "+5", outfit: S("Baju", "Outfit"), livery: S("Mobil", "Livery"), fashion: "Glider" };
-    const tileLabel = (t) => (t.type === "lost" ? "×" + (t.amount || 30) : t.type === "arrowIn" || t.type === "arrowOut" ? arrowDir[t.id] || "" : LBL[t.type] || "");
-    const tilesHtml = board.tiles.map((t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`).join("");
+    const LBL = { roll1: "+1", roll5: "+5" };
+    const tileLabel = (t) => (t.type === "lost" ? "×" + (t.amount || 30) : LBL[t.type] || "");
+    const tilesHtml = board.tiles.map((t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}${arrowDir[t.id] === "◀" ? " gc-arrowLeft" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`).join("");
     const featured = eMap[R.pool.featuredS];
 
     // ---- tampilan satu hadiah

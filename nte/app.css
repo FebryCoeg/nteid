@@ -1455,22 +1455,25 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .gc-feat { color: var(--pink); }
 #gcMode { font-size: 0.62rem; color: var(--text-2); }
 #gcMode.on { color: var(--pink); }
-.gc-board { position: relative; width: 100%; border-radius: 12px; background: #e9e7e3; box-shadow: var(--ring); overflow: hidden; }
-.gc-t { position: absolute; box-sizing: border-box; border-radius: 22%; display: flex; align-items: center; justify-content: center; border: 2px solid #0003; box-shadow: 0 1px 0 #fff8 inset; }
-.gc-t b { font-size: clamp(5px, 1.05vw, 12px); line-height: 1; color: #fff; text-shadow: 0 1px 1px #0006; font-weight: 800; }
-.gc-hero { background: linear-gradient(#f9b233, #e58b0a); }
-.gc-apprentice { background: linear-gradient(#b45be0, #7a2fb7); border-color: #d34fe0; }
-.gc-lost { background: linear-gradient(#3b8fe8, #1f63c2); }
-.gc-journeyS { background: linear-gradient(#ffc24a, #f07a0a); box-shadow: 0 0 0 2px #ffe08a, 0 0 8px 2px #ffb21a; }
-.gc-journeyA { background: linear-gradient(#d65be8, #a02fc2); }
-.gc-arclight { background: linear-gradient(#e24fb5, #a3257f); }
-.gc-fashion { background: linear-gradient(#e870c4, #b83a97); }
-.gc-roll1, .gc-roll5 { background: linear-gradient(#ffd1ec, #f070b8); }
-.gc-roll1 b, .gc-roll5 b { color: #7a1d58; text-shadow: none; }
-.gc-outfit, .gc-livery { background: linear-gradient(#ffcf5a, #e9971b); box-shadow: 0 0 0 2px #fff3c4; }
-.gc-arrowIn, .gc-arrowOut { background: linear-gradient(#fff3b0, #f5d33c); border-color: #c79a00; }
-.gc-arrowIn b, .gc-arrowOut b { color: #7a5a00; text-shadow: none; font-size: clamp(6px, 1.3vw, 14px); }
-.gc-slumber::after { content: "Z"; position: absolute; top: -34%; right: -14%; width: 38%; aspect-ratio: 1; border-radius: 50%; background: #fff; color: #7a1d58; font-size: clamp(4px, 0.8vw, 9px); font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px #0005; }
+.gc-board { position: relative; width: 100%; border-radius: 12px; background: #2a2760 url("img/gacha/bg-fair.svg") center / 100% 100% no-repeat; box-shadow: var(--ring); overflow: hidden; }
+.gc-t { position: absolute; box-sizing: border-box; background: center / 100% 100% no-repeat; filter: drop-shadow(0 2px 2px #0006); }
+.gc-t b { position: absolute; right: -8%; bottom: -10%; min-width: 58%; padding: 1px 3px; border-radius: 99px; background: #000b; color: #fff; font-size: clamp(5px, 0.95vw, 11px); line-height: 1.3; font-weight: 800; text-align: center; }
+.gc-t b:empty { display: none; }
+.gc-hero { background-image: url("img/gacha/tile-hero.svg"); }
+.gc-apprentice { background-image: url("img/gacha/tile-apprentice.svg"); }
+.gc-lost { background-image: url("img/gacha/tile-lost.svg"); }
+.gc-journeyS { background-image: url("img/gacha/tile-journeyS.svg"); }
+.gc-journeyA { background-image: url("img/gacha/tile-journeyA.svg"); }
+.gc-arclight { background-image: url("img/gacha/tile-arclight.svg"); }
+.gc-fashion { background-image: url("img/gacha/tile-fashion.svg"); }
+.gc-roll1 { background-image: url("img/gacha/tile-roll1.svg"); }
+.gc-roll5 { background-image: url("img/gacha/tile-roll5.svg"); }
+.gc-outfit { background-image: url("img/gacha/tile-outfit.svg"); }
+.gc-livery { background-image: url("img/gacha/tile-livery.svg"); }
+.gc-arrowIn { background-image: url("img/gacha/tile-arrowIn.svg"); }
+.gc-arrowOut { background-image: url("img/gacha/tile-arrowOut.svg"); }
+.gc-arrowLeft { transform: scaleX(-1); }
+.gc-slumber::after { content: ""; position: absolute; top: -52%; right: -24%; width: 66%; aspect-ratio: 1; background: url("img/gacha/tile-slumber.svg") center / contain no-repeat; }
 .gc-piece { position: absolute; z-index: 3; transition: left 0.14s linear, top 0.14s linear; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 3px #fff, 0 3px 8px #0006; overflow: hidden; pointer-events: none; }
 .gc-piece img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gc-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
