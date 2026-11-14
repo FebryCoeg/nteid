@@ -1524,3 +1524,22 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 
 .gc-dice-ic { vertical-align: -4px; margin-right: 6px; object-fit: contain; }
 .gc-die .gc-dice-ic { margin: 0; vertical-align: middle; }
+
+/* ---- tata letak gacha: toolbar satu baris, kolom kiri/kanan seimbang ---- */
+.calc-beta.gc-wide { max-width: none; }
+.gc-toolbar { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--panel); box-shadow: var(--ring); }
+.gc-tb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.gc-tb .gc-tabs, .gc-toolbar .gc-tabs { margin: 0; }
+.gc-toolbar .gc-lbl { margin: 0; }
+.gc { margin-top: 14px; }
+.gc-col { display: grid; gap: 14px; min-width: 0; align-content: start; }
+.gc-res { max-height: none; overflow: visible; }
+.gc-res .gc-list { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.gc-res .gc-list li { min-width: 0; }
+.gc-hist { max-height: 360px; }
+.gc-bar { justify-content: space-between; }
+@media (max-width: 999px) { .gc-hist { max-height: 300px; } }
+.gc-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.gc-st { min-width: 0; }
+.gc-st b { overflow-wrap: anywhere; }
+.gc-st:last-child { grid-column: 1 / -1; }

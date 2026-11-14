@@ -1241,12 +1241,14 @@
     const dieIdle = () => dieIcon(40) || "🎲";
     const chipsHtml = () => banners.map((b) => `<button type="button" class="chip gc-bn" data-bn="${esc(b.id)}" aria-pressed="${b.id === banner.id}">${esc(b.name)} · ${esc(eMap[b.featuredS].name.split(" (")[0])}</button>`).join("");
     main.innerHTML = intro + `
-      <p class="calc-beta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
-      <p class="mono gc-lbl">${S("BANNER", "BANNER")}</p>
-      <div class="gc-tabs" id="gcBanners">${chipsHtml()}</div>
-      <div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" aria-selected="true" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" aria-selected="false" disabled>Arc · ${S("segera hadir", "coming soon")}</button></div>
+      <p class="calc-beta gc-wide"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
+      <div class="gc-toolbar">
+        <div class="gc-tb"><span class="mono gc-lbl">BANNER</span><div class="gc-tabs" id="gcBanners">${chipsHtml()}</div></div>
+        <div class="gc-tb"><span class="mono gc-lbl">${S("JENIS", "TYPE")}</span><div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" aria-selected="true" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" aria-selected="false" disabled>Arc · ${S("segera hadir", "coming soon")}</button></div></div>
+      </div>
       <p class="txt calc-note" id="gcNote" hidden>${S("Susunan papan banner ini masih perkiraan (memakai susunan papan yang sudah diketahui).", "This banner's board layout is still an estimate (it uses the known board layout).")}</p>
       <div class="gc">
+        <div class="gc-col gc-left">
         <section class="calc-card gc-main" id="gcMain">
           <div class="gc-top"><h3 id="gcTitle"></h3><span class="mono" id="gcMode"></span></div>
           <div class="gc-board" id="gcBoard"></div>
@@ -1256,12 +1258,13 @@
           </div>
           <div class="gc-pity"><div class="gc-meter"><i id="gcMeter"></i></div><p class="mono" id="gcCount"></p></div>
         </section>
-        <div class="gc-col">
-          <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+        <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out gc-res"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+        </div>
+        <div class="gc-col gc-right">
           <section class="calc-card gc-side"><h3>Skin Perks</h3><p class="txt calc-note">${S("Skin milik karakter banner ini. Didapat dari kotaknya, atau dari bonus jumlah roll di papan ini.", "Skins of this banner's character. Won from their tile, or from the roll-count bonus on this board.")}</p><div id="gcSkins" class="gc-skins"></div></section>
           <section class="calc-card gc-side"><h3>${S("Statistik", "Stats")}</h3><div id="gcStats" class="gc-stats"></div>
             <div class="gc-btns" style="margin-top:12px"><button type="button" class="chip" id="gcShare" aria-pressed="true">${S("Bagikan hasil", "Share result")}</button><button type="button" class="chip" id="gcReset">Reset</button></div></section>
-          <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gcHist" class="gc-out"></div></section>
+          <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gcHist" class="gc-out gc-hist"></div></section>
         </div>
       </div>`;
 
