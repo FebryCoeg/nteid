@@ -97,6 +97,7 @@
   },
   "icons": {
     "lostPieces": "img/item/silver_chequer.webp",
-    "annulith": "img/item/icon_ringstone.webp"
+    "annulith": "img/item/icon_ringstone.webp",
+    "dice": "img/item/dicelimite_256.webp"
   }
 }

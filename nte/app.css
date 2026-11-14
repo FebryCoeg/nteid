@@ -1521,3 +1521,6 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .gc-skst.on { background: var(--gc-accent, var(--pink)); color: #fff; }
 
 .gc-st span img { vertical-align: -3px; border-radius: 4px; }
+
+.gc-dice-ic { vertical-align: -4px; margin-right: 6px; object-fit: contain; }
+.gc-die .gc-dice-ic { margin: 0; vertical-align: middle; }

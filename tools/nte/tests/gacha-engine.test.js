@@ -446,7 +446,7 @@ test("data banner: skin yang tercatat punya nama dan jalur ikon yang ada", () =>
 // ---------------------------------------------------------------- Ikon mata uang dan skin dari database
 test("aturan: ikon Lost Pieces dan Annulith ada di database gambar situs", () => {
   assert.ok(rules.icons, "rules.icons kosong");
-  for (const k of ["lostPieces", "annulith"]) {
+  for (const k of ["lostPieces", "annulith", "dice"]) {
     assert.ok(rules.icons[k], `ikon ${k} belum diisi`);
     assert.ok(fs.existsSync(path.join(ROOT, "nte", rules.icons[k])), `berkas ikon ${k} tak ada: ${rules.icons[k]}`);
   }

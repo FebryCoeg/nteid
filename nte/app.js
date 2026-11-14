@@ -1225,7 +1225,7 @@
       else if (rw.kind === "A_ARC") d = ch(aMap[rw.id], "A Arc");
       else if (rw.kind === "B_ARC") d = ch(aMap[rw.id], "B Arc");
       else if (rw.kind === "LOST") d = { t: "Lost Pieces ×" + rw.lost, ic: R.icons && R.icons.lostPieces, tag: "" };
-      else if (rw.kind === "DICE") d = { t: S("Dadu gratis ×", "Free dice ×") + rw.dice, tag: "" };
+      else if (rw.kind === "DICE") d = { t: S("Dadu gratis ×", "Free dice ×") + rw.dice, ic: R.icons && R.icons.dice, tag: "" };
       else if (rw.skin) {
         // skin karakter featured: nama dan ikon dari data banner; sumbernya (kotak atau bonus roll) selalu ditampilkan
         const sk = (banner.skins || {})[rw.skin] || {};
@@ -1237,6 +1237,8 @@
       return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${d.note ? ` <em>${esc(d.note)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
     }
 
+    const dieIcon = (n) => (R.icons && R.icons.dice ? `<img class="gc-dice-ic" src="${esc(img(R.icons.dice))}" alt="" width="${n}" height="${n}">` : "");
+    const dieIdle = () => dieIcon(40) || "🎲";
     const chipsHtml = () => banners.map((b) => `<button type="button" class="chip gc-bn" data-bn="${esc(b.id)}" aria-pressed="${b.id === banner.id}">${esc(b.name)} · ${esc(eMap[b.featuredS].name.split(" (")[0])}</button>`).join("");
     main.innerHTML = intro + `
       <p class="calc-beta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
@@ -1249,8 +1251,8 @@
           <div class="gc-top"><h3 id="gcTitle"></h3><span class="mono" id="gcMode"></span></div>
           <div class="gc-board" id="gcBoard"></div>
           <div class="gc-bar">
-            <div class="gc-die" id="gcDie" aria-live="polite">🎲</div>
-            <div class="gc-btns"><button type="button" class="chip" id="gcR1" aria-pressed="true">Roll ×1</button><button type="button" class="chip" id="gcR10" aria-pressed="true">Roll ×10</button></div>
+            <div class="gc-die" id="gcDie" aria-live="polite">${dieIdle()}</div>
+            <div class="gc-btns"><button type="button" class="chip" id="gcR1" aria-pressed="true">${dieIcon(18)}Roll ×1</button><button type="button" class="chip" id="gcR10" aria-pressed="true">${dieIcon(18)}Roll ×10</button></div>
           </div>
           <div class="gc-pity"><div class="gc-meter"><i id="gcMeter"></i></div><p class="mono" id="gcCount"></p></div>
         </section>
@@ -1362,7 +1364,7 @@
       hist = []; stats = { S: 0, A: 0, B: 0 };
       save(); place(st.pos); counters(); renderSide();
       $("#gcOut").innerHTML = `<p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p>`;
-      $("#gcDie").textContent = "🎲";
+      $("#gcDie").innerHTML = dieIdle();
     }
     // ganti banner: pity, Modified, dan Points Gift tetap (dipakai bersama); posisi dan bonus skin per papan
     function switchBanner(id) {
