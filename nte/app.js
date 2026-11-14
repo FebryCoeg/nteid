@@ -121,6 +121,7 @@
     [/^\/cerita\/?$/, viewStory],
     [/^\/anomali\/?$/, viewAnomalies],
     [/^\/musuh\/?$/, viewEnemies],
+    [/^\/kalkulator\/?$/, viewCalc],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
     [/^\/fashion\/?$/, viewFashion],
@@ -1183,6 +1184,140 @@
     });
   }
 
+  // ---------------- KALKULATOR DAMAGE ----------------
+  // Rumus sama dengan tools/nte/dmgformula.py (terverifikasi dari video Radish + thread NGA).
+  const BREAK_BASE = [91, 93, 96, 98, 101, 104, 106, 109, 111, 114, 117, 119, 122, 124, 127, 130, 132, 135, 137, 140,
+    148, 159, 170, 182, 193, 204, 214, 226, 241, 257, 273, 289, 306, 325, 345, 367, 390, 413, 438, 462,
+    488, 517, 548, 581, 621, 663, 707, 752, 800, 854, 897, 942, 990, 1041, 1106, 1168, 1233, 1300, 1370, 1440,
+    1515, 1604, 1693, 1788, 1896, 1990, 2083, 2184, 2285, 2384, 2486, 2602, 2707, 2821, 2984, 3135, 3250, 3367, 3484, 3603];
+  const defZone = (lc, def, red, ign) => { const k = 600 + 6 * lc, eff = def * (1 - red) * (1 - ign); return k / (eff + k); };
+  const resZone = (res, red) => { const e = res - red; return e > 0.6 ? 1 / (6.25 * e - 1.25) : e >= 0 ? 1 - e : 1 - e / (1 - e); };
+  const RESKEY = { Cosmos: "cosmos", Chaos: "chaos", Lakshana: "lakshana", Incantation: "incantation", Psyche: "psyche", Anima: "nature", Nature: "nature" };
+  // "{0}% + {1}% *4 + {2}%" + nilai per level -> total rasio (%) ; null bila format tidak dikenali
+  function ratioOf(f, vals) {
+    const e = String(f).split(",")[0].replace(/\{(\d+)\}/g, (_, i) => (vals[+i] ?? "x")).replace(/%/g, "");
+    let sum = 0;
+    for (const t of e.split("+")) { const m = t.match(/^\s*([\d.]+)\s*(?:\*\s*(\d+))?\s*$/); if (!m) return null; sum += parseFloat(m[1]) * (m[2] ? +m[2] : 1); }
+    return sum;
+  }
+
+  async function viewCalc() {
+    setTitle(S("Kalkulator Damage", "Damage Calculator"));
+    const [espers, SD, arcs, enemies, BUILDS] = await Promise.all([load("espers"), load("stats"), load("arcs"), load("enemies"), load("builds_draft").catch(() => ({}))]);
+    const list = espers.filter((e) => SD.espers[e.id]);
+    const arcList = arcs.filter((a) => SD.arcs[a.slug]);
+    const num = (n) => Number(Math.floor(n)).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
+    const GROUPS = { basic: S("Serangan Dasar", "Basic Attack"), redirect: "Skill", ultimate: "Ultimate", support: "QTE" };
+    const opt = (val, t, sel) => `<option value="${esc(val)}"${sel ? " selected" : ""}>${esc(t)}</option>`;
+    const field = (id, label, val, hint) => `<label class="cf"><span>${label}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal">${hint ? `<small>${hint}</small>` : ""}</label>`;
+    const eso = (sel) => list.map((e) => opt(e.slug, e.name.split(" (")[0], e.slug === sel)).join("");
+    const defE = list.find((e) => e.slug === "elyms") || list[0];
+    const brk = [0, 1, 2, 3].map((i) => `<div class="cbrk">
+        <b>${S("Karakter", "Character")} ${i + 1}</b>
+        <label class="cf"><span>Esper</span><select id="bE${i}"><option value="">—</option>${eso("")}</select></label>
+        ${field("bL" + i, "Level", 80)}${field("bI" + i, "Break Intensity", 0)}${field("bB" + i, S("Bonus Break (%)", "Break bonus (%)"), 0)}
+      </div>`).join("");
+    main.innerHTML = head(S("KALKULATOR", "CALCULATOR"), S("Kalkulator Damage", "Damage Calculator"), S("Hitung damage satu serangan karakter ke musuh, dari data base game. Tanpa rotasi: satu karakter, satu skill.", "Calculate one character's damage per hit against an enemy from base game data. No rotation: one character, one skill."), null) + `
+      <div class="calc">
+        <section class="calc-card"><h3>${S("1 · Karakter dan skill", "1 · Character and skill")}</h3>
+          <div class="calc-grid">
+            <label class="cf"><span>Esper</span><select id="cE">${eso(defE.slug)}</select></label>
+            ${field("cL", S("Level karakter", "Character level"), 80, "1–80")}
+            <label class="cf"><span>Arc</span><select id="cA"></select></label>
+            ${field("cAL", S("Level Arc", "Arc level"), 80, "1–80")}
+            <label class="cf"><span>${S("Jenis skill", "Skill type")}</span><select id="cG"></select></label>
+            ${field("cSL", S("Level skill", "Skill level"), 10, "1–10")}
+            <label class="cf wide"><span>${S("Serangan", "Attack")}</span><select id="cR"></select></label>
+            <label class="cf"><span>${S("Basis rasio", "Ratio base")}</span><select id="cB"><option value="atk">ATK</option><option value="hp">HP</option><option value="def">DEF</option></select></label>
+            <label class="cf"><span>${S("Elemen serangan", "Attack element")}</span><select id="cEl"></select></label>
+          </div></section>
+        <section class="calc-card"><h3>${S("2 · Stat dari modul dan buff", "2 · Stats from modules and buffs")}</h3>
+          <p class="txt calc-note">${S("Isi total dari layar karakter di game (persen, tanpa tanda %). Stat dasar karakter dan Arc diambil otomatis.", "Enter totals from the in-game character screen (percent, no % sign). Base character and Arc stats are filled in automatically.")}</p>
+          <div class="calc-grid">
+            ${field("cAP", S("ATK % (HP/DEF % sesuai basis)", "ATK % (HP/DEF % per base)"), 0)}${field("cAF", S("ATK/HP/DEF tambahan (flat)", "Flat ATK/HP/DEF"), 0)}
+            ${field("cCR", S("CRIT Rate tambahan (%)", "Extra CRIT Rate (%)"), 0, S("dasar 5%", "base 5%"))}${field("cCD", S("CRIT DMG tambahan (%)", "Extra CRIT DMG (%)"), 0, S("dasar 50%", "base 50%"))}
+            ${field("cDB", S("Bonus DMG total (%)", "Total DMG bonus (%)"), 0, S("elemen + umum + skill", "element + general + skill"))}${field("cFB", S("Bonus Final DMG (%)", "Final DMG bonus (%)"), 0)}
+            ${field("cDI", S("Abaikan DEF (%)", "DEF ignore (%)"), 0)}${field("cDR", S("Kurangi DEF musuh (%)", "DEF reduction (%)"), 0)}
+            ${field("cRR", S("Kurangi RES musuh (%)", "RES reduction (%)"), 0)}
+          </div></section>
+        <section class="calc-card"><h3>${S("3 · Musuh", "3 · Enemy")}</h3>
+          <div class="calc-grid">
+            <label class="cf"><span>${S("Musuh", "Enemy")}</span><select id="cM">${enemies.map((x, i) => opt(i, x.name, x.name === "Morphix")).join("")}</select></label>
+            <label class="cf"><span>${S("Varian", "Variant")}</span><select id="cV"></select></label>
+            <label class="cf"><span>${S("Level musuh", "Enemy level")}</span><select id="cEL"></select></label>
+          </div>
+          <div class="calc-enemy" id="cEn"></div></section>
+        <section class="calc-card calc-out"><h3>${S("Hasil damage", "Damage result")}</h3><div id="cOut"></div></section>
+        <section class="calc-card"><h3>${S("4 · Break tim (4 karakter)", "4 · Team Break (4 characters)")}</h3>
+          <p class="txt calc-note">${S("Damage Break dijumlahkan dari semua karakter di tim, jadi pilih 4 karakter. Break Intensity diisi dari layar karakter.", "Break damage is summed over every character on the team, so pick 4 characters. Enter Break Intensity from the character screen.")}</p>
+          <div class="cbrk-grid">${brk}</div><div id="bOut"></div></section>
+      </div>`;
+    const $c = (id) => $("#" + id), val = (id) => parseFloat($c(id).value) || 0;
+    const clamp = (x, a, b) => Math.min(b, Math.max(a, Math.round(x) || a));
+    const esper = (slug) => list.find((e) => e.slug === slug);
+    function fillArc() {
+      const e = esper($c("cE").value), want = ((BUILDS[e.slug] || {}).arcs || [])[0];
+      $c("cA").innerHTML = opt("", S("Tanpa Arc", "No Arc"), false) + arcList.map((a) => opt(a.slug, a.name, a.slug === want)).join("");
+      const el = e.element === "Anima" ? "Nature" : e.element;
+      $c("cEl").innerHTML = ["Cosmos", "Nature", "Incantation", "Chaos", "Psyche", "Lakshana", "Normal"].map((k) => opt(k, k === "Nature" ? "Anima" : k, k === el)).join("");
+      const sk = SD.espers[e.id].skills;
+      $c("cG").innerHTML = Object.keys(GROUPS).filter((g) => sk[g] && (sk[g].rows || []).length).map((g) => opt(g, GROUPS[g], g === "redirect")).join("");
+      fillRows();
+    }
+    function fillRows() {
+      const e = esper($c("cE").value), g = $c("cG").value, rows = ((SD.espers[e.id].skills[g] || {}).rows || []);
+      const ok = rows.map((r, i) => [r, i]).filter(([r]) => /DMG|Rasio/i.test(r.l) && ratioOf(r.f, r.v[0]) != null);
+      $c("cR").innerHTML = ok.map(([r, i]) => opt(i, r.l)).join("") || opt("", S("(tidak ada rasio yang bisa dihitung)", "(no calculable ratios)"));
+    }
+    function fillEnemy() {
+      const m = enemies[+$c("cM").value];
+      $c("cV").innerHTML = m.variants.map((x, i) => opt(i, `${tx(x.label)} · ${Object.keys(x.levels).length} Lv`)).join("");
+      fillLv();
+    }
+    function fillLv() {
+      const m = enemies[+$c("cM").value], x = m.variants[+$c("cV").value || 0], ks = Object.keys(x.levels);
+      $c("cEL").innerHTML = ks.map((k, i) => opt(k, "Lv " + k, i === ks.length - 1)).join("");
+    }
+    function enemyStat() { const m = enemies[+$c("cM").value], x = m.variants[+$c("cV").value || 0]; return x.levels[$c("cEL").value] || x.levels[Object.keys(x.levels).pop()]; }
+    function calc() {
+      const e = esper($c("cE").value), st = SD.espers[e.id], lc = clamp(val("cL"), 1, 80), s = enemyStat();
+      const arc = $c("cA").value ? SD.arcs[$c("cA").value] : null, la = clamp(val("cAL"), 1, 80);
+      const base = $c("cB").value, bs = st[base][lc - 1], arcAtk = base === "atk" && arc ? arc.atk[la - 1] : 0;
+      const stat = (bs + arcAtk) * (1 + val("cAP") / 100) + val("cAF");
+      const sk = (st.skills[$c("cG").value] || {}).rows || [], row = sk[+$c("cR").value];
+      const lvS = clamp(val("cSL"), 1, 10), ratio = row ? ratioOf(row.f, row.v[Math.min(lvS, row.v.length) - 1]) : null;
+      const rk = RESKEY[$c("cEl").value] || "normal";
+      const bonus = 1 + val("cDB") / 100, cr = Math.min(1, Math.max(0, 0.05 + val("cCR") / 100)), cd = 0.5 + val("cCD") / 100;
+      const dz = defZone(lc, s.def, val("cDR") / 100, val("cDI") / 100), rz = resZone(s.res[rk] ?? 0.2, val("cRR") / 100), fin = 1 + val("cFB") / 100;
+      $c("cEn").innerHTML = `<div class="cen"><span>HP</span><b>${num(s.hp)}</b></div><div class="cen"><span>DEF</span><b>${num(s.def)}</b></div><div class="cen"><span>ATK</span><b>${num(s.atk)}</b></div><div class="cen"><span>Break</span><b>${s.unbal}</b></div>${Object.entries(s.res).map(([k, r]) => `<div class="cen${k === rk ? " on" : ""}"><span>RES ${k}</span><b>${Math.round(r * 1000) / 10}%</b></div>`).join("")}`;
+      if (ratio == null) { $c("cOut").innerHTML = `<p class="txt">${S("Pilih serangan yang rasionya bisa dihitung.", "Pick an attack with a calculable ratio.")}</p>`; }
+      else {
+        const noCrit = stat * (ratio / 100) * bonus * dz * rz * fin, crit = noCrit * (1 + cd), avg = noCrit * (1 + cr * cd);
+        const hits = Math.ceil(s.hp / Math.max(1, avg)).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
+        $c("cOut").innerHTML = `<div class="cres"><div><span>${S("Tanpa CRIT", "Non-crit")}</span><b>${num(noCrit)}</b></div><div><span>CRIT</span><b>${num(crit)}</b></div><div class="avg"><span>${S("Rata-rata", "Average")}</span><b>${num(avg)}</b></div></div>
+          <p class="mono calc-eq">${num(stat)} ${base.toUpperCase()} × ${ratio}% × ${bonus.toFixed(2)} (DMG) × ${dz.toFixed(3)} (DEF) × ${rz.toFixed(3)} (RES ${esc($c("cEl").value)}) × ${fin.toFixed(2)} (Final) · CR ${Math.round(cr * 100)}% / CD ${Math.round(cd * 100)}%</p>
+          <p class="txt calc-note">${S(`Butuh sekitar ${hits} serangan seperti ini untuk menghabiskan HP musuh.`, `About ${hits} hits like this to deplete the enemy's HP.`)}</p>`;
+      }
+      // Break: jumlah semua karakter (harus 4)
+      let tot = 0, rows = "", n = 0;
+      [0, 1, 2, 3].forEach((i) => {
+        const slug = $c("bE" + i).value;
+        if (!slug) return; n++;
+        const b = esper(slug), L = clamp(val("bL" + i), 1, 80);
+        const d = BREAK_BASE[L - 1] * (1 + val("bI" + i) / 300 + val("bB" + i) / 100) * (s.unbal / 3) * defZone(L, s.def, val("cDR") / 100, val("cDI") / 100) * resZone(s.res[RESKEY[b.element] || "normal"] ?? 0.2, val("cRR") / 100);
+        tot += d; rows += `<div class="cbr"><span>${esc(b.name.split(" (")[0])} Lv${L}</span><b>${num(d)}</b></div>`;
+      });
+      $c("bOut").innerHTML = n === 4 ? `${rows}<div class="cres"><div class="avg"><span>${S("Total Break tim", "Team Break total")}</span><b>${num(tot)}</b></div></div>` : `<p class="txt calc-note">${S(`Pilih 4 karakter dulu (sekarang ${n}/4).`, `Pick 4 characters first (${n}/4 now).`)}</p>${rows}`;
+    }
+    $c("cE").addEventListener("change", () => { fillArc(); calc(); });
+    $c("cG").addEventListener("change", () => { fillRows(); calc(); });
+    $c("cM").addEventListener("change", () => { fillEnemy(); calc(); });
+    $c("cV").addEventListener("change", () => { fillLv(); calc(); });
+    main.querySelector(".calc").addEventListener("input", calc);
+    main.querySelector(".calc").addEventListener("change", calc);
+    fillArc(); fillEnemy(); calc();
+  }
+
   // ---------------- PROPERTI ----------------
   async function viewProperty() {
     setTitle(S("Properti", "Property"));
@@ -1215,7 +1350,7 @@
   const ST_TEXT = {
     "Lewati ke konten": "Skip to content", "Database NTE": "NTE Database", "Beranda": "Home",
     "Esper": "Espers", "Arc": "Arcs", "Modul": "Modules", "Item": "Items", "Furnitur": "Furniture", "Kendaraan": "Vehicles", "Properti": "Property",
-    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Status Anomali": "Anomaly Stats", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
+    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Status Anomali": "Anomaly Stats", "Kalkulator": "Calculator", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
     "MENU · INDEKS ARSIP": "MENU · ARCHIVE INDEX", "LAINNYA": "MORE",
     "Portofolio Febry Coeg": "Febry Coeg's Portfolio", "Profil, sosial media, game, dan video YouTube": "Profile, socials, games and YouTube videos",
     "Join Discord NTE Indonesia ↗": "Join the NTE Indonesia Discord ↗", "Donate lewat Trakteer ↗": "Donate via Trakteer ↗",

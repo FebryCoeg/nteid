@@ -1373,3 +1373,29 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .logo-img { height: 30px; }
 }
 @media (max-width: 1080px) { .top-nav + .top-actions { margin-left: auto; } }
+.calc { display: grid; gap: 16px; margin-top: 18px; }
+.calc-card { padding: 18px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); }
+.calc-card h3 { margin: 0 0 12px; font: 800 0.9rem var(--display); text-transform: uppercase; color: var(--pink); }
+.calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.cf { display: grid; gap: 4px; min-width: 0; }
+.cf.wide { grid-column: 1 / -1; }
+.cf span { font: 700 0.68rem var(--mono); text-transform: uppercase; color: var(--text-2); }
+.cf small { font-size: 0.66rem; color: var(--text-2); opacity: .8; }
+.cf input, .cf select { width: 100%; min-width: 0; padding: 9px 10px; border-radius: 10px; border: 0; background: var(--panel-2); color: var(--text); box-shadow: var(--ring); font: 600 0.84rem inherit; }
+.calc-note { font-size: 0.8rem; margin: 6px 0 12px; }
+.calc-enemy { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-top: 14px; }
+.cen { padding: 8px 10px; border-radius: 12px; background: var(--panel-2); }
+.cen span { display: block; font: 700 0.6rem var(--mono); text-transform: uppercase; color: var(--text-2); }
+.cen b { font: 800 0.92rem var(--display); }
+.cen.on { box-shadow: 0 0 0 2px var(--pink); }
+.cres { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.cres > div { padding: 14px; border-radius: 14px; background: var(--panel-2); }
+.cres .avg { box-shadow: 0 0 0 2px var(--pink); }
+.cres span { display: block; font: 700 0.64rem var(--mono); text-transform: uppercase; color: var(--text-2); }
+.cres b { font: 800 1.5rem var(--display); }
+.calc-eq { margin-top: 12px; font-size: 0.66rem; word-break: break-word; line-height: 1.6; color: var(--text-2); }
+.cbrk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.cbrk { display: grid; gap: 8px; padding: 12px; border-radius: 14px; background: var(--panel-2); }
+.cbrk > b { font: 800 0.74rem var(--display); text-transform: uppercase; }
+.cbr { display: flex; justify-content: space-between; padding: 6px 4px; font: 600 0.8rem var(--mono); }
+#bOut { margin-top: 12px; }
