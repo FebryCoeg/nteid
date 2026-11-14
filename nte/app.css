@@ -1570,9 +1570,9 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .ga-box.in { animation: ga-in 0.7s cubic-bezier(0.2, 0.85, 0.25, 1) both; }
 .ga-box.spin { animation: ga-spin 1s ease-in-out both; }
 .ga-box.boom { animation: ga-boom 0.38s ease-in both; }
-@keyframes ga-in { from { transform: translate(-300%, -50%) rotate(-10deg); } to { transform: translate(-50%, -50%) rotate(0); } }
-@keyframes ga-spin { 0% { transform: translate(-50%, -50%) rotateY(0) scale(1); } 20% { transform: translate(-50%, -52%) rotateY(160deg) scale(1.04); } 70% { transform: translate(-50%, -50%) rotateY(560deg) scale(1.14); } 85% { transform: translate(-51%, -50%) rotateY(660deg) scale(1.2) rotate(-2deg); } 100% { transform: translate(-49%, -50%) rotateY(720deg) scale(1.22) rotate(2deg); } }
-@keyframes ga-boom { 0% { transform: translate(-50%, -50%) scale(1.22); filter: brightness(1) drop-shadow(0 12px 20px #0008); opacity: 1; } 60% { filter: brightness(3) drop-shadow(0 0 40px #ffd77a); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.9); filter: brightness(5); opacity: 0; } }
+@keyframes ga-in { from { transform: translate(-165%, -50%) rotate(-10deg); } to { transform: translate(-50%, -50%) rotate(0); } }
+@keyframes ga-spin { 0% { transform: translate(-50%, -50%) rotateY(0) scale(1); } 20% { transform: translate(-50%, -52%) rotateY(160deg) scale(1.04); } 70% { transform: translate(-50%, -50%) rotateY(560deg) scale(1.1); } 85% { transform: translate(-51%, -50%) rotateY(660deg) scale(1.14) rotate(-2deg); } 100% { transform: translate(-49%, -50%) rotateY(720deg) scale(1.15) rotate(2deg); } }
+@keyframes ga-boom { 0% { transform: translate(-50%, -50%) scale(1.15); filter: brightness(1) drop-shadow(0 12px 20px #0008); opacity: 1; } 60% { filter: brightness(3) drop-shadow(0 0 40px #ffd77a); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.45); filter: brightness(5); opacity: 0; } }
 .ga-flash { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 50%, #fff 0%, #ffe9a8 25%, #ffd77a00 70%); }
 .ga-flash.on { animation: ga-flash 0.7s ease-out both; }
 @keyframes ga-flash { 0% { opacity: 0.95; } 100% { opacity: 0; } }
@@ -1605,3 +1605,17 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .ga-hint[hidden] { display: none; }
 .ga-gen b { display: none; }
 .ga-gen img { width: 52px; height: 52px; filter: drop-shadow(0 2px 4px #0008); }
+
+/* ---- Arc di ponsel: panggung terkunci (tidak melebarkan layar), tombol Pull di atas panggung ---- */
+#gaRoot { overflow-x: clip; max-width: 100%; }
+.ga-stage { overflow: clip; contain: paint; clip-path: inset(0 round 12px); isolation: isolate; max-width: 100%; }
+@media (max-width: 760px) {
+  #gaMain { display: flex; flex-direction: column; }
+  #gaMain .gc-top { order: 0; }
+  #gaMain .gc-bar { order: 1; margin: 0 0 12px; }
+  #gaMain .ga-stage { order: 2; min-height: 420px; }
+  #gaMain .ga-pities { order: 3; }
+  #gaPull { flex: 1; justify-content: center; min-height: 44px; }
+}
+@media (max-width: 560px) { .ga-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px; } .ga-card { padding: 6px 3px 4px; } .ga-card b { font-size: 0.58rem; } .ga-stage { min-height: 420px; } }
+@media (max-width: 340px) { .ga-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

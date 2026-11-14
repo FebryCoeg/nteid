@@ -1534,7 +1534,7 @@
       for (let i = 0; i < 18; i++) {
         const s = document.createElement("i");
         s.className = "ga-shard";
-        const ang = (i / 18) * Math.PI * 2 + Math.random() * 0.3, d = 140 + Math.random() * 160;
+        const ang = (i / 18) * Math.PI * 2 + Math.random() * 0.3, d = stage.clientWidth * (0.22 + Math.random() * 0.26);
         s.style.setProperty("--dx", Math.cos(ang) * d + "px");
         s.style.setProperty("--dy", Math.sin(ang) * d + "px");
         s.style.setProperty("--rot", (Math.random() * 720 - 360) + "deg");
@@ -1563,6 +1563,7 @@
       if (busy) return;
       busy = true; skip = false; $r("#gaPull").disabled = true;
       try {
+        if (innerWidth < 760) $r("#gaStage").scrollIntoView({ block: "center", behavior: reduce() ? "auto" : "smooth" });
         const res = AE.openBox(st, rules, banner, Math.random);
         st = res.state;
         res.arcs.forEach((a) => {
