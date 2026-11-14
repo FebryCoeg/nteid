@@ -65,7 +65,8 @@ PAGES = [
     ("pencapaian", "Pencapaian", "Lebih dari 450 pencapaian Neverness to Everness lengkap dengan syarat dan hadiah."),
     ("fashion", "Fashion", "Galeri ilustrasi kostum setiap Esper di Neverness to Everness."),
     ("makanan", "Makanan", "Makanan dan bahan masak Neverness to Everness beserta efeknya."),
-    ("tierlist", "Tier List", "Buat tier list Esper atau Arc versimu sendiri, simpan di browser, dan unduh sebagai gambar."),
+    ("tierlist", "Buat Tier List", "Buat tier list Esper atau Arc versimu sendiri, simpan di browser, dan unduh sebagai gambar."),
+    ("tentang", "Tentang", "Tentang Arsip Hethereau: database fan-made Neverness to Everness berbahasa Indonesia, sumber data, hak cipta, dan cara membuatnya."),
     ("versi", "Versi dan Patch", "Rangkuman tiap update game Neverness to Everness dalam bahasa Indonesia."),
 ]
 

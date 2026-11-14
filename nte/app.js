@@ -125,6 +125,7 @@
     [/^\/anomali\/?$/, viewAnomalies],
     [/^\/musuh\/?$/, viewEnemies],
     [/^\/kalkulator\/?$/, viewCalc],
+    [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
     [/^\/fashion\/?$/, viewFashion],
@@ -276,7 +277,7 @@
       ["/fashion", "12", "Fashion", S("Kostum Esper dan ilustrasinya", "Esper outfits & illustrations"), N.fashion, thumbs("fashion")],
       ["/makanan", "13", S("Makanan", "Food"), S("Makanan, efek buff, dan bahan masak", "Dishes, buffs & ingredients"), N.makanan, thumbs("makanan")],
       ["/versi", "15", S("Versi & Patch", "Versions & Patches"), S("Isi tiap update: Esper, Arc, event, dan perbaikan", "What each update adds: Espers, Arcs, events & fixes"), "", ""],
-      ["/tierlist", "14", "Tier List", S("Buat tier list-mu sendiri, simpan, dan bagikan sebagai gambar", "Make your own tier list, save it and share it as an image"), "", thumbs("esper")],
+      ["/tierlist", "14", S("Buat Tier List", "Make a Tier List"), S("Buat tier list-mu sendiri, simpan, dan bagikan sebagai gambar", "Make your own tier list, save it and share it as an image"), "", thumbs("esper")],
     ];
     const bgs = (home && home.bg) || [];
     main.innerHTML = `
@@ -1148,6 +1149,43 @@
     });
   }
 
+  // ---------------- TENTANG ----------------
+  async function viewAbout() {
+    setTitle(S("Tentang", "About"));
+    const meta = await load("meta").catch(() => ({}));
+    const date = meta.sourceDate ? new Date(meta.sourceDate).toLocaleDateString(LANG === "en" ? "en-US" : "id-ID", { day: "numeric", month: "long", year: "numeric" }) : "";
+    const sec = (h, body) => `<div class="af-sec"><h4>${h}</h4>${body}</div>`;
+    const p = (t) => `<p class="txt about-p">${t}</p>`;
+    const li = (items) => `<ul class="about-list">${items.map((t) => `<li>${t}</li>`).join("")}</ul>`;
+    const a = (href, t) => `<a href="${href}" target="_blank" rel="noopener">${t}</a>`;
+    main.innerHTML = head(S("TENTANG", "ABOUT"), S("Tentang Arsip Hethereau", "About Hethereau Archive"), S("Apa situs ini, dari mana datanya, dan bagaimana semuanya dibuat.", "What this site is, where the data comes from, and how it is made."), null) + `
+      <div class="about">
+        ${sec(S("Tentang situs ini", "About this site"), p(S(
+          `Arsip Hethereau adalah database fan-made untuk game <b>Neverness to Everness</b> (NTE) dalam Bahasa Indonesia, dibuat oleh ${a("https://febrycoeg.my.id", "Febry Coeg")}. Isinya Esper, Arc, Modul, Item, Furnitur, Kendaraan, Properti, Cerita, Anomali, Pencapaian, Fashion, Makanan, Versi &amp; Patch, serta Tier List dan Kalkulator Damage. Efek, deskripsi, dan cerita diterjemahkan ke Bahasa Indonesia; tombol ID/EN mengubah isinya ke Bahasa Inggris aslinya.`,
+          `Hethereau Archive is a fan-made database for <b>Neverness to Everness</b> (NTE) in Indonesian, made by ${a("https://febrycoeg.my.id", "Febry Coeg")}. It covers Espers, Arcs, Modules, Items, Furniture, Vehicles, Property, Story, Anomalies, Achievements, Fashion, Food, Versions &amp; Patches, plus a Tier List maker and a Damage Calculator. Effects, descriptions and story are translated to Indonesian; the ID/EN button switches the content to the original English.`)))}
+        ${sec(S("Sumber data dan gambar", "Data and image sources"), p(S(
+          `Data dan gambar diolah dari ${a("https://github.com/Waifus-Grace/NTE_Assets", "NTE_Assets")}, hasil ekstrak file game, lalu diubah menjadi JSON dan gambar WebP dengan skrip Python.${meta.sourceVersion ? ` Versi data saat ini: <b>${esc(meta.sourceVersion)}</b>${date ? ` (${esc(date)})` : ""}.` : ""} Nama karakter, item, skill, dan istilah game sengaja tidak diterjemahkan.`,
+          `Data and images are processed from ${a("https://github.com/Waifus-Grace/NTE_Assets", "NTE_Assets")}, an extract of the game files, then converted into JSON and WebP images with Python scripts.${meta.sourceVersion ? ` Current data version: <b>${esc(meta.sourceVersion)}</b>${date ? ` (${esc(date)})` : ""}.` : ""} Names of characters, items, skills and game terms are intentionally left untranslated.`)))}
+        ${sec(S("Hak cipta dan status", "Copyright and status"), p(S(
+          `Neverness to Everness, termasuk semua data, gambar, nama, dan karakternya, adalah hak cipta <b>Hotta Studio / Perfect World</b>. Situs ini adalah fan-site tidak resmi dan <b>tidak berafiliasi</b> dengan Hotta Studio maupun Perfect World. Kalau ada konten yang perlu dihapus atau diperbaiki, hubungi lewat Discord di bawah.`,
+          `Neverness to Everness, including all of its data, images, names and characters, is copyright <b>Hotta Studio / Perfect World</b>. This is an unofficial fan site and is <b>not affiliated</b> with Hotta Studio or Perfect World. If any content needs removing or fixing, reach out on Discord below.`)))}
+        ${sec(S("Build rekomendasi", "Recommended builds"), p(S(
+          "Tab Build di halaman Esper (Arc, set modul, stat, Awakening, skill, dan tim) ditulis sendiri oleh pemilik situs, bukan hasil kutipan dari situs lain. Isinya pendapat dan bisa berubah seiring update game.",
+          "The Build tab on Esper pages (Arcs, module sets, stats, Awakenings, skills and teams) is written by the site owner, not copied from other sites. It is opinion and may change with game updates.")))}
+        ${sec(S("Kalkulator dan status musuh", "Calculator and enemy stats"), p(S(
+          `Rumus damage dipelajari dari video analisis Radish di YouTube dan thread komunitas di NGA, lalu dicocokkan satu sama lain. Angka musuh (HP, DEF, Resist, Break) diambil dari tabel data game, dan HP satu boss Beyond the Rails dicocokkan dengan rekaman pertarungan asli. Efek Awakening, Arc, dan modul belum dihitung otomatis, jadi hasil Kalkulator adalah perkiraan, bukan angka pasti dari game.`,
+          `The damage formula was studied from Radish's analysis videos on YouTube and a community thread on NGA, then cross-checked. Enemy numbers (HP, DEF, Resist, Break) come from the game's data tables, and one Beyond the Rails boss's HP was matched against a real recorded fight. Awakening, Arc and module effects are not applied automatically, so Calculator results are estimates, not exact in-game numbers.`)))}
+        ${sec(S("Data salah atau masukan?", "Wrong data or feedback?"), p(S(
+          `Pakai tombol <b>Laporkan data salah</b> di bagian bawah halaman mana pun, atau bergabung ke ${a(LINK.community, "Discord NTE Indonesia")}.`,
+          `Use the <b>Report wrong data</b> button at the bottom of any page, or join the ${a(LINK.community, "NTE Indonesia Discord")}.`)) + `<p class="about-btns"><button type="button" class="chip" data-report>${S("Laporkan data salah", "Report wrong data")}</button><a class="chip" href="${LINK.community}" target="_blank" rel="noopener">Discord</a><a class="chip" href="${LINK.donate}" target="_blank" rel="noopener">${S("Dukung lewat Trakteer", "Support via Trakteer")}</a></p>`)}
+        ${sec(S("Teknologi", "Technology"), li([
+          S("HTML, CSS, dan JavaScript murni tanpa framework", "Plain HTML, CSS and JavaScript, no framework"),
+          S("Python untuk mengolah data dan gambar", "Python for processing data and images"),
+          S("GitHub Actions untuk pengecekan dan pembaruan data, GitHub Pages untuk hosting", "GitHub Actions for data checks and updates, GitHub Pages for hosting"),
+        ]))}
+      </div>`;
+  }
+
   // ---------------- LAPORAN DATA SALAH ----------------
   function openReport() {
     const url = location.href;
@@ -1460,7 +1498,7 @@
   const ST_TEXT = {
     "Lewati ke konten": "Skip to content", "Database NTE": "NTE Database", "Beranda": "Home",
     "Esper": "Espers", "Arc": "Arcs", "Modul": "Modules", "Item": "Items", "Furnitur": "Furniture", "Kendaraan": "Vehicles", "Properti": "Property",
-    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Status Anomali": "Anomaly Stats", "Kalkulator": "Calculator", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
+    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Status Anomali": "Anomaly Stats", "Buat Tier List": "Make a Tier List", "Tentang": "About", "Tentang situs ini": "About this site", "Kalkulator": "Calculator", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
     "MENU · INDEKS ARSIP": "MENU · ARCHIVE INDEX", "LAINNYA": "MORE",
     "Portofolio Febry Coeg": "Febry Coeg's Portfolio", "Profil, sosial media, game, dan video YouTube": "Profile, socials, games and YouTube videos",
     "Join Discord NTE Indonesia ↗": "Join the NTE Indonesia Discord ↗", "Donate lewat Trakteer ↗": "Donate via Trakteer ↗",
@@ -1733,7 +1771,7 @@
   // ---------------- TIER LIST (buatan pengunjung, tersimpan di browser) ----------------
   let tlAbort = null;
   async function viewTierlist() {
-    setTitle("Tier List");
+    setTitle(S("Buat Tier List", "Make a Tier List"));
     const [home, arcs] = await Promise.all([load("home"), load("arcs")]);
     const SETS = {
       esper: home.roster.map((e) => ({ id: e.slug, name: e.name, icon: e.icon, cls: elClass(e.element), tag: e.element })),
@@ -1754,7 +1792,7 @@
     const byId = () => Object.fromEntries(items().map((i) => [i.id, i]));
     let q = "", sel = null, justDragged = false;
 
-    main.innerHTML = head("TIER LIST", "Tier List", S("Susun karakter atau Arc favoritmu ke dalam tier. Seret ke tier (di HP: ketuk karakter, lalu ketuk tier). Tersimpan otomatis di browser ini dan bisa diunduh sebagai gambar.", "Rank your favourite characters or Arcs into tiers. Drag them in (on phones: tap a character, then tap a tier). It saves automatically in this browser and can be downloaded as an image."), null) + `
+    main.innerHTML = head(S("TIER LIST", "TIER LIST"), S("Buat Tier List", "Make a Tier List"), S("Susun karakter atau Arc favoritmu ke dalam tier. Seret ke tier (di HP: ketuk karakter, lalu ketuk tier). Tersimpan otomatis di browser ini dan bisa diunduh sebagai gambar.", "Rank your favourite characters or Arcs into tiers. Drag them in (on phones: tap a character, then tap a tier). It saves automatically in this browser and can be downloaded as an image."), null) + `
       <div class="tl-bar">
         <div class="chips" id="tlMode"></div>
         <input class="filter-input" id="tlTitle" type="text" maxlength="60" aria-label="${S("Judul tier list", "Tier list title")}">
