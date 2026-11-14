@@ -283,11 +283,6 @@
           <span class="kv-tag">${S("DATABASE FAN-MADE", "FAN-MADE DATABASE")} · NEVERNESS TO EVERNESS</span>
           <h1 class="glitch" data-text="HETHEREAU"><span>HETHEREAU</span></h1>
           <p>${S("Esper, Arc, Modul, Item, Cerita, Anomali, Pencapaian, sampai Makanan. Semua data langsung dari file game, lengkap dalam Bahasa Indonesia.", "Espers, Arcs, Modules, Items, Story, Anomalies, Achievements and Food, straight from the game files.")}</p>
-          <div class="kv-btns">
-            <a class="kbtn cyan" href="/esper" data-link><b>${S("Jelajahi Database", "Explore Database")}</b><small>ESPER · ARC · ITEM</small></a>
-            <a class="kbtn violet" href="${LINK.community}" target="_blank" rel="noopener"><b>${S("Join Komunitas", "Join Community")}</b><small>DISCORD NTE INDONESIA</small></a>
-            <a class="kbtn pink" href="${LINK.donate}" target="_blank" rel="noopener"><b>Donate</b><small>TRAKTEER</small></a>
-          </div>
           <div class="home-stats">
             <div><b>${N.esper}</b><span>Esper</span></div>
             <div><b>${N.arc}</b><span>Arc</span></div>
