@@ -1218,8 +1218,8 @@
       cR: S("Pilih serangan yang mau dihitung, misalnya satu kali pakai skill.", "Pick the attack to calculate, for example one use of the skill."),
       cAP: S("Tambahan ATK dalam persen. Jumlahkan semua yang tertulis \"ATK +…%\" dari modul dan buff. Contoh: +10% dan +20% → isi 30. Tidak ada? Isi 0.", "Extra ATK in percent. Add up every \"ATK +…%\" from modules and buffs. Example: +10% and +20% → enter 30. None? Enter 0."),
       cAF: S("Tambahan ATK berupa angka biasa, tanpa tanda %, misalnya \"ATK +50\". Base ATK karakter dan Arc tidak perlu diisi di sini, sudah otomatis. Tidak ada? Isi 0.", "Extra ATK as a plain number, no % sign, such as \"ATK +50\". Do not enter base ATK here, it is automatic. None? Enter 0."),
-      cCR: S("CRIT Rate kamu dikurangi 5. Contoh: CRIT Rate 45% → isi 40.", "Your CRIT Rate minus 5. Example: CRIT Rate 45% → enter 40."),
-      cCD: S("CRIT DMG kamu dikurangi 50. Contoh: CRIT DMG 150% → isi 100.", "Your CRIT DMG minus 50. Example: CRIT DMG 150% → enter 100."),
+      cCR: S("Tulis CRIT Rate persis seperti di status karakter. Contoh: tertulis 45% → isi 45.", "Enter CRIT Rate exactly as shown in the character stats. Example: it shows 45% → enter 45."),
+      cCD: S("Tulis CRIT DMG persis seperti di status karakter. Contoh: tertulis 150% → isi 150.", "Enter CRIT DMG exactly as shown in the character stats. Example: it shows 150% → enter 150."),
       cDB: S("Jumlahkan semua bonus damage, misalnya \"Cosmos DMG +20%\" dan \"Ultimate DMG +10%\". Contoh: 20 + 10 → isi 30. Tidak ada? Isi 0.", "Add up all damage bonuses, such as \"Cosmos DMG +20%\" and \"Ultimate DMG +10%\". Example: 20 + 10 → enter 30. None? Enter 0."),
       cFB: S("Hanya untuk efek yang tertulis \"Final DMG\". Kebanyakan build tidak punya, isi 0.", "Only for effects that say \"Final DMG\". Most builds have none, enter 0."),
       cDI: S("Untuk efek \"abaikan X% DEF musuh\". Contoh: Lost Radiance 4 keping → isi 25. Tidak ada? Isi 0.", "For effects like \"ignore X% enemy DEF\". Example: Lost Radiance 4-piece → enter 25. None? Enter 0."),
@@ -1256,7 +1256,7 @@
           <p class="txt calc-note">${S("Isi total dari layar karakter di game (persen, tanpa tanda %). Stat dasar karakter dan Arc diambil otomatis.", "Enter totals from the in-game character screen (percent, no % sign). Base character and Arc stats are filled in automatically.")}</p>
           <div class="calc-grid">
             ${field("cAP", S("ATK % dari modul dan buff", "ATK % from modules and buffs"), 0)}${field("cAF", S("ATK flat dari modul/buff", "Flat ATK from modules/buffs"), 0, S("bukan Base ATK", "not Base ATK"))}
-            ${field("cCR", S("CRIT Rate tambahan (%)", "Extra CRIT Rate (%)"), 0, S("dasar 5%", "base 5%"))}${field("cCD", S("CRIT DMG tambahan (%)", "Extra CRIT DMG (%)"), 0, S("dasar 50%", "base 50%"))}
+            ${field("cCR", S("CRIT Rate (%)", "CRIT Rate (%)"), 5, S("angka di status", "as shown in stats"))}${field("cCD", S("CRIT DMG (%)", "CRIT DMG (%)"), 50, S("angka di status", "as shown in stats"))}
             ${field("cDB", S("Bonus DMG total (%)", "Total DMG bonus (%)"), 0, S("elemen + umum + skill", "element + general + skill"))}${field("cFB", S("Bonus Final DMG (%)", "Final DMG bonus (%)"), 0)}
             ${field("cDI", S("Abaikan DEF (%)", "DEF ignore (%)"), 0)}${field("cDR", S("Kurangi DEF musuh (%)", "DEF reduction (%)"), 0)}
             ${field("cRR", S("Kurangi RES musuh (%)", "RES reduction (%)"), 0)}
@@ -1308,7 +1308,7 @@
       const sk = (st.skills[$c("cG").value] || {}).rows || [], row = sk[+$c("cR").value];
       const lvS = clamp(val("cSL"), 1, 10), ratio = row ? ratioOf(row.f, row.v[Math.min(lvS, row.v.length) - 1]) : null;
       const rk = RESKEY[$c("cEl").value] || "normal";
-      const bonus = 1 + val("cDB") / 100, cr = Math.min(1, Math.max(0, 0.05 + val("cCR") / 100)), cd = 0.5 + val("cCD") / 100;
+      const bonus = 1 + val("cDB") / 100, cr = Math.min(1, Math.max(0, val("cCR") / 100)), cd = Math.max(0, val("cCD") / 100);
       const dz = defZone(lc, s.def, val("cDR") / 100, val("cDI") / 100), rz = resZone(s.res[rk] ?? 0.2, val("cRR") / 100), fin = 1 + val("cFB") / 100;
       $c("cEn").innerHTML = `<div class="cen"><span>HP</span><b>${num(s.hp)}</b></div><div class="cen"><span>DEF</span><b>${num(s.def)}</b></div><div class="cen"><span>ATK</span><b>${num(s.atk)}</b></div><div class="cen"><span>Break</span><b>${s.unbal}</b></div>${Object.entries(s.res).map(([k, r]) => `<div class="cen${k === rk ? " on" : ""}"><span>RES ${k}</span><b>${Math.round(r * 1000) / 10}%</b></div>`).join("")}`;
       if (ratio == null) { $c("cOut").innerHTML = `<p class="txt">${S("Pilih serangan yang rasionya bisa dihitung.", "Pick an attack with a calculable ratio.")}</p>`; }
