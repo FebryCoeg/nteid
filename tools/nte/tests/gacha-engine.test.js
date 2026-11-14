@@ -318,3 +318,16 @@ test("restoreState: data rusak, asing, atau ngawur kembali ke keadaan awal", () 
   // posisi yang tak ada di papan kembali ke awal papan, sisanya dipertahankan
   assert.deepEqual(E.restoreState({ ...valid, pos: 999 }, B1, R), { ...valid, pos: B1.start });
 });
+
+// ---------------------------------------------------------------- Task 8: poin Review Focus
+test("pity paksa berlaku juga untuk dadu gratis: roll gratis ke-90 pasti S dan tidak bergerak", () => {
+  const B = mkBoard(["lost", "roll5", "lost", "lost", "lost", "lost", "lost", "lost"]);
+  const st = { ...E.newState(), sinceS: 88, total: 88 };
+  const r = E.roll(st, B, R, seq([0.9, 0.0]), { blockRule: "enterFirst" });
+  assert.equal(r.reward.kind, "DICE"); // roll ke-89 mendarat di Multiple Surprises
+  assert.equal(r.extra[0].forced, true);
+  assert.equal(r.extra[0].die, null);
+  assert.equal(r.extra[0].reward.kind, "S");
+  assert.equal(r.extra[0].landed, 1);
+  assert.equal(r.extra.length, 5);
+});
