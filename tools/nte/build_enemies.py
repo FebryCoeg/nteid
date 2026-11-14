@@ -145,8 +145,46 @@ for g in groups.values():
         vs.append(v)
     if vs:
         out.append({"name": g["name"], "type": g["type"], "pre": g["pre"], "variants": vs})
+
+# ---- gambar: ikon kepala Monster Manual (200x200), diunduh dari repo data bila belum ada di nte/img/monster
+IMG_DIR = OUT.parent.parent / "img" / "monster"
+IMG_DIR.mkdir(parents=True, exist_ok=True)
+_tree = json.loads((B.CACHE / "_tree.json").read_text(encoding="utf-8"))
+_tree = _tree if isinstance(_tree, list) else _tree.get("tree", [])
+UPSTREAM = {}
+for x in _tree:
+    pth = x["path"] if isinstance(x, dict) else x
+    if pth.startswith("UI/MonsterManual/MonsterHeadIcon/200x200/") and pth.endswith(".png"):
+        UPSTREAM[pth.rsplit("/", 1)[1][:-4].lower()] = pth
+SPECIAL = {"Amber Broodmother": "boss_36_2", "Champion T": "boss_36", "Cursed Blade": "mon_13_2",
+           "Tin Soldier - Blue Rifle": "mon_35", "Tin Soldier - Red Axe": "mon_35_red"}
+
+
+def find_image(e):
+    pre = e["pre"] or ""
+    m = re.match(r"^(mon|boss)_(\d+)$", pre)
+    cands = [SPECIAL.get(e["name"], "")] + ([pre, "%s_%s" % (m.group(1), m.group(2).lstrip("0").zfill(2))] if m else [pre])
+    for c in cands:
+        if c and c.lower() in UPSTREAM:
+            return c.lower()
+    return ""
+
+
+from PIL import Image  # noqa: E402
+import io  # noqa: E402
+
+for e in out:
+    key = find_image(e)
+    if not key:
+        continue
+    dest = IMG_DIR / (key + ".webp")
+    if not dest.exists():
+        raw = B.fetch(UPSTREAM[key], binary=True)
+        Image.open(io.BytesIO(raw)).convert("RGBA").resize((200, 200)).save(dest, "WEBP", quality=82)
+    e["image"] = "img/monster/%s.webp" % key
 out.sort(key=lambda e: ({"weekly": 0, "boss": 1, "elite": 2, "normal": 3}.get(e["type"], 4), e["name"]))
 OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+print("tanpa gambar:", [e["name"] for e in out if not e.get("image")])
 print("musuh:", len(out), "| varian:", sum(len(e["variants"]) for e in out), "| tanpa nama (dilewati):", len(unnamed), unnamed[:30])
 for e in out:
     print(e["type"], e["name"], [(v["label"]["en"], len(v["levels"])) for v in e["variants"]])
