@@ -381,3 +381,16 @@ test("banner: karakter S ada di data Esper, berkas papan ada, banner bawaan ada"
     assert.match(b.accent, /^#[0-9a-fA-F]{6}$/);
   }
 });
+
+// ---------------------------------------------------------------- Ikon kotak SVG
+test("setiap jenis kotak di papan punya ikon SVG buatan sendiri (viewBox 64x64)", () => {
+  const types = [...new Set(board.tiles.map((t) => t.type))].filter((t) => t !== "start");
+  assert.ok(types.length >= 10);
+  for (const t of [...types, "slumber"]) {
+    const f = path.join(ROOT, "nte", "img", "gacha", `tile-${t}.svg`);
+    assert.ok(fs.existsSync(f), `ikon ${t} tak ada`);
+    const svg = fs.readFileSync(f, "utf8");
+    assert.match(svg, /<svg[^>]+viewBox="0 0 64 64"/, `viewBox ${t}`);
+    assert.ok(!/<image|href=/.test(svg), `ikon ${t} tak boleh memuat gambar luar`);
+  }
+});
