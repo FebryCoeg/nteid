@@ -125,6 +125,7 @@
     [/^\/anomali\/?$/, viewAnomalies],
     [/^\/musuh\/?$/, viewEnemies],
     [/^\/kalkulator\/?$/, viewCalc],
+    [/^\/gacha\/?$/, viewGacha],
     [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
@@ -1147,6 +1148,126 @@
         `<div class="stat-row">${v.kind ? `<div class="fact"><span>${S("Jenis", "Type")}</span><b>${esc(LABEL.vehicleKind[v.kind] || v.kind)}</b></div>` : ""}${v.source ? `<div class="fact"><span>${S("Didapat dari", "Obtained from")}</span><b>${esc(LABEL.source[v.source] || v.source)}</b></div>` : ""}</div>
          <p class="txt">${rich(v.desc)}</p>`);
     });
+  }
+
+  // ---------------- SIMULATOR GACHA ----------------
+  async function viewGacha() {
+    setTitle(S("Simulator Gacha", "Gacha Simulator"));
+    const [rules, board, espers, arcs] = await Promise.all([load("gacha-rules"), load("gacha-board"), load("espers"), load("arcs")]);
+    const GE = window.GachaEngine;
+    const intro = head(S("GACHA", "GACHA"), S("Simulator Gacha", "Gacha Simulator"), S("Lempar dadu di papan Scarborough Fair seperti di game. Angka peluang dari layar aturan resmi.", "Roll the dice on the Scarborough Fair board like in game. Odds come from the official in-game rules screen."), null);
+    if (!GE) { main.innerHTML = intro + `<p class="txt">${S("Mesin gacha gagal dimuat. Muat ulang halaman.", "The gacha engine failed to load. Reload the page.")}</p>`; return; }
+
+    const R = { ...rules, pool: { ...rules.pool,
+      aChars: espers.filter((e) => e.rank === "A").map((e) => e.slug),
+      aArcs: arcs.filter((a) => a.rarity === 4).map((a) => a.slug),
+      bArcs: arcs.filter((a) => a.rarity === 3).map((a) => a.slug) } };
+    const eMap = Object.fromEntries(espers.map((e) => [e.slug, e]));
+    const aMap = Object.fromEntries(arcs.map((a) => [a.slug, a]));
+    const byTile = Object.fromEntries(board.tiles.map((t) => [t.id, t]));
+    const [ax, ay, bx, by] = board.area, BW = bx - ax, BH = by - ay, TS = 44;
+    const pct = (v, total) => (v / total * 100).toFixed(3) + "%";
+    const arrowDir = {};
+    board.blocks.forEach((b) => { arrowDir[b.enter] = b.side === "right" ? "▶" : "◀"; arrowDir[b.exit] = b.side === "right" ? "◀" : "▶"; });
+    const TNAME = {
+      hero: "Hero Chest", apprentice: "Apprentice Chest", lost: "Lost Piece Box", journeyS: "Journey Together (S-Class)", journeyA: "Journey Together (A-Class)",
+      arclight: "Arc-light Mystery Box", fashion: "Fashion Center (Glider)", roll1: "Roll Again", roll5: "Multiple Surprises", outfit: "Daily Outfit", livery: "Mod Up! (Livery)",
+      arrowIn: S("Pintu masuk blok", "Block entrance"), arrowOut: S("Pintu keluar blok", "Block exit"),
+    };
+    const LBL = { journeyS: "S", journeyA: "A", arclight: "?", roll1: "+1", roll5: "+5", outfit: "Baju", livery: "Mobil", fashion: "Glider" };
+    const tileLabel = (t) => (t.type === "lost" ? "×" + (t.amount || 30) : t.type === "arrowIn" || t.type === "arrowOut" ? arrowDir[t.id] || "" : LBL[t.type] || "");
+    const tilesHtml = board.tiles.map((t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`).join("");
+    const featured = eMap[R.pool.featuredS];
+
+    // ---- tampilan satu hadiah
+    function describe(rw) {
+      const ch = (e, tag) => ({ t: e ? e.name.split(" (")[0] : rw.id, ic: e && e.icon, tag });
+      let d;
+      if (rw.kind === "S") d = ch(eMap[rw.id], "S");
+      else if (rw.kind === "A_CHAR") d = ch(eMap[rw.id], "A");
+      else if (rw.kind === "A_ARC") d = ch(aMap[rw.id], "A Arc");
+      else if (rw.kind === "B_ARC") d = ch(aMap[rw.id], "B Arc");
+      else if (rw.kind === "LOST") d = { t: "Lost Pieces ×" + rw.lost, tag: "" };
+      else if (rw.kind === "DICE") d = { t: S("Dadu gratis ×", "Free dice ×") + rw.dice, tag: "" };
+      else if (rw.kind === "OUTFIT") d = { t: S("Outfit karakter", "Character Outfit"), tag: "Skin" };
+      else if (rw.kind === "LIVERY") d = { t: S("Livery kendaraan", "Vehicle Livery"), tag: "Skin" };
+      else if (rw.kind === "GLIDER") d = { t: S("Skin Glider", "Glider Skin"), tag: "Skin" };
+      else d = { t: "—", tag: "" };
+      const extra = [rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
+      const cls = rw.kind === "S" ? " s" : rw.kind === "A_CHAR" || rw.kind === "A_ARC" ? " a" : "";
+      return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
+    }
+
+    main.innerHTML = intro + `
+      <p class="calc-beta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk Scarborough Fair). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for Scarborough Fair). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
+      <div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" aria-selected="true" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" aria-selected="false" disabled>Arc · ${S("segera hadir", "coming soon")}</button></div>
+      <div class="gc">
+        <section class="calc-card gc-main">
+          <div class="gc-top"><h3>Scarborough Fair${featured ? ` · <span class="gc-feat">${esc(featured.name.split(" (")[0])}</span>` : ""}</h3><span class="mono" id="gcMode"></span></div>
+          <div class="gc-board" id="gcBoard" style="aspect-ratio:${BW}/${BH}">${tilesHtml}<div class="gc-piece" id="gcPiece">${featured ? `<img src="${esc(img(featured.icon))}" alt="">` : ""}</div></div>
+          <div class="gc-bar">
+            <div class="gc-die" id="gcDie" aria-live="polite">🎲</div>
+            <div class="gc-btns"><button type="button" class="chip" id="gcR1" aria-pressed="true">Roll ×1</button><button type="button" class="chip" id="gcR10" aria-pressed="true">Roll ×10</button></div>
+          </div>
+          <div class="gc-pity"><div class="gc-meter"><i id="gcMeter"></i></div><p class="mono" id="gcCount"></p></div>
+        </section>
+        <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+      </div>`;
+
+    let st = GE.newState();
+    st.pos = board.start;
+    let busy = false;
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const piece = $("#gcPiece");
+    function place(id) {
+      const t = byTile[id];
+      piece.style.left = pct(t.x - ax - TS / 2, BW);
+      piece.style.top = pct(t.y - ay - TS / 2, BH);
+      piece.style.width = pct(TS, BW);
+      piece.style.height = pct(TS, BH);
+    }
+    function counters() {
+      const modified = st.mode === "modified";
+      $("#gcMode").textContent = modified ? S("PAPAN MODIFIED (peluang naik)", "MODIFIED BOARD (rate up)") : S("PAPAN BASELINE", "BASELINE BOARD");
+      $("#gcMode").classList.toggle("on", modified);
+      $("#gcCount").textContent = `${S("Roll sejak S-Class terakhir", "Rolls since last S-Class")}: ${st.sinceS}/${R.s.hardPity} · ${S("Modified setelah", "Modified after")} ${R.s.modifiedAfter} · ${S("total roll", "total rolls")}: ${st.total}`;
+      $("#gcMeter").style.width = Math.min(100, st.sinceS / R.s.hardPity * 100) + "%";
+    }
+    async function showDie(n) {
+      const die = $("#gcDie");
+      for (let i = 0; i < 5; i++) { die.textContent = String(1 + Math.floor(Math.random() * 6)); await sleep(55); }
+      die.textContent = String(n);
+    }
+    async function animate(res, fast) {
+      if (res.die == null) { $("#gcDie").textContent = "★"; await sleep(fast ? 120 : 300); }
+      else if (!fast) await showDie(res.die);
+      else $("#gcDie").textContent = String(res.die);
+      for (const id of res.path) { place(id); await sleep(fast ? 55 : 130); }
+    }
+    function setBusy(v) { busy = v; $("#gcR1").disabled = v; $("#gcR10").disabled = v; }
+
+    async function doRolls(n) {
+      if (busy) return;
+      setBusy(true);
+      const batch = [];
+      try {
+        for (let i = 0; i < n; i++) {
+          const res = GE.roll(st, board, R, Math.random, { blockRule: board.blockRule });
+          st = res.state;
+          for (const x of [res, ...res.extra]) { await animate(x, n > 1); batch.push(x); }
+          counters();
+        }
+        showBatch(batch);
+      } finally { setBusy(false); }
+    }
+    function showBatch(batch) {
+      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${x.skinBonus.length ? `<div class="gc-gift">${S("Bonus skin tercapai", "Skin bonus reached")}: ${esc(x.skinBonus.join(", "))}</div>` : ""}</li>`).join("");
+      $("#gcOut").innerHTML = `<ol class="gc-list">${rows}</ol>`;
+    }
+    $("#gcR1").onclick = () => doRolls(1);
+    $("#gcR10").onclick = () => doRolls(10);
+    place(st.pos);
+    counters();
   }
 
   // ---------------- TENTANG ----------------
