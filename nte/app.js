@@ -1266,6 +1266,7 @@
       cDI: S("Untuk efek \"abaikan X% DEF musuh\". Contoh: Lost Radiance 4 keping → isi 25. Tidak ada? Isi 0.", "For effects like \"ignore X% enemy DEF\". Example: Lost Radiance 4-piece → enter 25. None? Enter 0."),
       cDR: S("Untuk efek yang menurunkan DEF musuh. Kebanyakan build tidak punya, isi 0.", "For effects that lower enemy DEF. Most builds have none, enter 0."),
       cRR: S("Untuk efek yang menurunkan RES musuh. Kebanyakan build tidak punya, isi 0.", "For effects that lower enemy RES. Most builds have none, enter 0."),
+      cShare: S("Link ini menyimpan semua isianmu (karakter, Arc, stat, dan musuh). Kirim ke teman atau Discord, dan mereka langsung melihat hasil yang sama. Simpan juga untuk dibuka lagi nanti.", "This link stores everything you entered (character, Arc, stats, and enemy). Send it to a friend or Discord and they see the same result right away. Keep it to reopen later."),
       cBI: S("Angka Break Intensity karakter itu. Tidak tahu? Isi 0.", "That character's Break Intensity number. Not sure? Enter 0."),
       cBB: S("Bonus damage Break dalam persen. Biasanya 0.", "Break damage bonus in percent. Usually 0."),
     };
@@ -1311,7 +1312,7 @@
             <label class="cf"><span>${S("Level musuh / stage", "Enemy level / stage")}</span><select id="cEL"></select></label>
           </div>
           <div class="calc-enemy" id="cEn"></div></section>
-        <section class="calc-card calc-out"><div class="calc-outhead"><h3>${S("Hasil damage", "Damage result")}</h3><span class="calc-btns"><button type="button" class="chip" id="cShare">${S("Salin link hasil", "Copy result link")}</button><button type="button" class="chip" data-report>${S("Data salah? Laporkan", "Wrong data? Report")}</button></span></div><div id="cOut"></div></section>
+        <section class="calc-card calc-out"><div class="calc-outhead"><h3>${S("Hasil damage", "Damage result")}</h3><span class="calc-btns"><button type="button" class="chip" id="cShare">${S("Salin link hasil", "Copy result link")}</button>${hb()}</span>${hd("cShare")}</div><div id="cOut"></div></section>
         <section class="calc-card"><h3>${S("4 · Break tim (4 karakter)", "4 · Team Break (4 characters)")}</h3>
           <p class="txt calc-note">${S("Damage Break dijumlahkan dari semua karakter di tim, jadi pilih 4 karakter. Break Intensity diisi dari layar karakter.", "Break damage is summed over every character on the team, so pick 4 characters. Enter Break Intensity from the character screen.")}</p>
           <div class="cbrk-grid">${brk}</div><div id="bOut"></div></section>
@@ -1389,7 +1390,7 @@
     main.querySelector(".calc").addEventListener("click", (ev) => {
       const b = ev.target.closest(".chi"); if (!b) return;
       ev.preventDefault();
-      const box = b.closest(".cf").querySelector(".chelp"); if (!box) return;
+      const box = (b.closest(".cf") || b.closest(".calc-outhead")).querySelector(".chelp"); if (!box) return;
       box.hidden = !box.hidden; b.setAttribute("aria-expanded", String(!box.hidden));
     });
     main.querySelector(".calc").addEventListener("input", calc);
