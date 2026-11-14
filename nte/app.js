@@ -1217,7 +1217,7 @@
     setupBoard();
 
     // ---- tampilan satu hadiah
-    function describe(rw) {
+    function describe(rw, badge, inline) {
       const ch = (e, tag) => ({ t: e ? e.name.split(" (")[0] : rw.id, ic: e && e.icon, tag });
       let d, src = "";
       if (rw.kind === "S") d = ch(eMap[rw.id], "S");
@@ -1234,7 +1234,7 @@
       } else d = { t: "—", tag: "" };
       const extra = [src, rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
       const cls = rw.kind === "S" ? " s" : rw.kind === "A_CHAR" || rw.kind === "A_ARC" ? " a" : "";
-      return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${d.note ? ` <em>${esc(d.note)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
+      return `<div class="gc-rw${cls}">${badge && !inline ? `<i class="gc-badge">${esc(badge)}</i>` : ""}${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span>${badge && inline ? `<small class="gc-bi">${esc(badge)}</small>` : ""}<b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${d.note ? ` <em>${esc(d.note)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
     }
 
     const dieIcon = (n) => (R.icons && R.icons.dice ? `<img class="gc-dice-ic" src="${esc(img(R.icons.dice))}" alt="" width="${n}" height="${n}">` : "");
@@ -1339,8 +1339,13 @@
       if (hist.length > 200) hist.length = 200;
     }
     function showBatch(batch) {
-      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${(x.skinClaims || []).map((c) => `<div class="gc-gift">${S("Bonus roll papan", "Board roll bonus")}: ${describe(c)}</div>`).join("")}</li>`).join("");
-      $("#gcOut").innerHTML = `<ol class="gc-list">${rows}</ol>`;
+      const cells = [];
+      batch.forEach((x) => {
+        cells.push(describe(x.reward, "#" + x.n));
+        if (x.gift) cells.push(describe(x.gift, "Points Gift"));
+        (x.skinClaims || []).forEach((c) => cells.push(describe(c, S("Bonus roll", "Roll bonus"))));
+      });
+      $("#gcOut").innerHTML = `<ol class="gc-list">${cells.map((c) => `<li>${c}</li>`).join("")}</ol>`;
     }
     function renderSkins() {
       const feat = eMap[banner.featuredS].name.split(" (")[0];
@@ -1358,7 +1363,7 @@
       const chip = (a, b, ic) => `<div class="gc-st"><span>${ic ? `<img src="${esc(img(ic))}" alt="" width="16" height="16"> ` : ""}${esc(a)}</span><b>${esc(b)}</b></div>`;
       const avg = stats.S ? ` · ${S("rata-rata", "avg")} ${(st.total / stats.S).toFixed(1)}/S` : "";
       $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Annulith (perkiraan)", "Annulith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"), R.icons && R.icons.annulith);
-      $("#gcHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.slice(0, 40).map((h) => `<li><small class="mono">#${h.n}${h.gift ? " · Points Gift" : ""}</small>${describe(h)}</li>`).join("")}</ol>` : `<p class="txt">${S("Belum ada roll.", "No rolls yet.")}</p>`;
+      $("#gcHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.slice(0, 40).map((h) => `<li>${describe(h, "#" + h.n + (h.gift ? " · Points Gift" : h.claim ? " · " + S("bonus", "bonus") : ""), true)}</li>`).join("")}</ol>` : `<p class="txt">${S("Belum ada roll.", "No rolls yet.")}</p>`;
     }
     function resetAll() {
       if (busy || !confirm(S("Reset semua hasil simulasi?", "Reset all simulation results?"))) return;
