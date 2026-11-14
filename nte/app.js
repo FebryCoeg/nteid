@@ -1173,8 +1173,8 @@
           "Tab Build di halaman Esper (Arc, set modul, stat, Awakening, skill, dan tim) ditulis sendiri oleh pemilik situs, bukan hasil kutipan dari situs lain. Isinya pendapat dan bisa berubah seiring update game.",
           "The Build tab on Esper pages (Arcs, module sets, stats, Awakenings, skills and teams) is written by the site owner, not copied from other sites. It is opinion and may change with game updates.")))}
         ${sec(S("Kalkulator dan status musuh", "Calculator and enemy stats"), p(S(
-          `Rumus damage dipelajari dari video analisis Radish di YouTube dan thread komunitas di NGA, lalu dicocokkan satu sama lain. Angka musuh (HP, DEF, Resist, Break) diambil dari tabel data game, dan HP satu boss Beyond the Rails dicocokkan dengan rekaman pertarungan asli. Efek Awakening, Arc, dan modul belum dihitung otomatis, jadi hasil Kalkulator adalah perkiraan, bukan angka pasti dari game.`,
-          `The damage formula was studied from Radish's analysis videos on YouTube and a community thread on NGA, then cross-checked. Enemy numbers (HP, DEF, Resist, Break) come from the game's data tables, and one Beyond the Rails boss's HP was matched against a real recorded fight. Awakening, Arc and module effects are not applied automatically, so Calculator results are estimates, not exact in-game numbers.`)))}
+          `Rumus damage mengacu pada pembahasan komunitas <b>NGA</b> (forum game Tiongkok), dan hasil hitungannya sudah dicocokkan dengan contoh di sana. Angka musuh (HP, DEF, Resist, dan Break) diambil langsung dari tabel data game, dan HP satu boss Beyond the Rails sudah dicocokkan dengan rekaman pertarungan asli. Efek Awakening, Arc, dan modul belum dihitung otomatis, jadi hasil Kalkulator berupa perkiraan dan bukan angka pasti dari game.`,
+          `The damage formula follows discussions in the <b>NGA</b> community (a Chinese gaming forum), and its results have been checked against examples there. Enemy numbers (HP, DEF, Resist and Break) come straight from the game's data tables, and one Beyond the Rails boss's HP was matched against a real recorded fight. Awakening, Arc and module effects are not applied automatically, so Calculator results are estimates, not exact in-game numbers.`)))}
         ${sec(S("Data salah atau masukan?", "Wrong data or feedback?"), p(S(
           `Pakai tombol <b>Laporkan data salah</b> di bagian bawah halaman mana pun, atau bergabung ke ${a(LINK.community, "Discord NTE Indonesia")}.`,
           `Use the <b>Report wrong data</b> button at the bottom of any page, or join the ${a(LINK.community, "NTE Indonesia Discord")}.`)) + `<p class="about-btns"><button type="button" class="chip" data-report>${S("Laporkan data salah", "Report wrong data")}</button><a class="chip" href="${LINK.community}" target="_blank" rel="noopener">Discord</a><a class="chip" href="${LINK.donate}" target="_blank" rel="noopener">${S("Dukung lewat Trakteer", "Support via Trakteer")}</a></p>`)}
@@ -1264,7 +1264,7 @@
   }
 
   // ---------------- KALKULATOR DAMAGE ----------------
-  // Rumus sama dengan tools/nte/dmgformula.py (terverifikasi dari video Radish + thread NGA).
+  // Rumus sama dengan tools/nte/dmgformula.py (mengacu pada pembahasan komunitas NGA).
   const BREAK_BASE = [91, 93, 96, 98, 101, 104, 106, 109, 111, 114, 117, 119, 122, 124, 127, 130, 132, 135, 137, 140,
     148, 159, 170, 182, 193, 204, 214, 226, 241, 257, 273, 289, 306, 325, 345, 367, 390, 413, 438, 462,
     488, 517, 548, 581, 621, 663, 707, 752, 800, 854, 897, 942, 990, 1041, 1106, 1168, 1233, 1300, 1370, 1440,
