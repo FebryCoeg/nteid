@@ -17,7 +17,9 @@
   }
 
   function newState() {
-    return { total: 0, sinceS: 0, mode: "baseline", pos: 0, dice: 0, obtained: {}, sCount: 0 };
+    // Bersama semua papan Limited: total, sinceS, mode, obtained, sCount (+ Points Gift lewat total).
+    // Per papan: pos (papan aktif) + positions (papan lain), boardRolls (untuk bonus skin).
+    return { total: 0, sinceS: 0, mode: "baseline", pos: 0, dice: 0, obtained: {}, sCount: 0, board: "main", positions: {}, boardRolls: {} };
   }
 
   // 89 roll tanpa S-Class: roll berikutnya (ke-90) dipaksa S-Class featured
@@ -95,8 +97,10 @@
 
   // Terapkan satu roll ke keadaan. Mengembalikan { state, reward, gift, skinBonus }.
   function applyRoll(state, reward, rules, rng) {
-    const st = { ...state, obtained: { ...state.obtained } };
+    const st = { ...state, obtained: { ...state.obtained }, boardRolls: { ...(state.boardRolls || {}) } };
+    const boardId = st.board || "main";
     st.total += 1;
+    st.boardRolls[boardId] = (st.boardRolls[boardId] || 0) + 1;
     if (reward.kind === "S") {
       st.sinceS = 0;
       st.mode = "baseline";
@@ -115,7 +119,7 @@
       gift = finalize(st, isChar ? { kind: "A_CHAR", id: pick(pool.aChars, rng, "a-char") } : { kind: "A_ARC", id: pick(pool.aArcs, rng, "a-arc") }, rules);
     }
     const skinBonus = Object.entries(rules.skin)
-      .filter(([, v]) => v.atRolls === st.total)
+      .filter(([, v]) => v.atRolls === st.boardRolls[boardId])
       .map(([k]) => k);
     return { state: st, reward: out, gift, skinBonus };
   }
@@ -221,13 +225,25 @@
     const fresh = () => ({ ...newState(), pos: board.start });
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return fresh();
     const int = (v, max) => Number.isInteger(v) && v >= 0 && v <= max;
+    const plainIntMap = (o, max) => o && typeof o === "object" && !Array.isArray(o) && Object.values(o).every((v) => int(v, max));
     const ok = int(raw.total, 1e7) && int(raw.sinceS, rules.s.hardPity - 1) && (raw.mode === "baseline" || raw.mode === "modified")
       && int(raw.dice, 50) && int(raw.sCount, 1e7) && raw.obtained && typeof raw.obtained === "object" && !Array.isArray(raw.obtained)
-      && Object.values(raw.obtained).every((v) => int(v, 1e7));
+      && Object.values(raw.obtained).every((v) => int(v, 1e7))
+      && typeof raw.board === "string" && raw.board.length > 0 && raw.board.length <= 40
+      && plainIntMap(raw.positions, 1e6) && plainIntMap(raw.boardRolls, 1e7);
     if (!ok) return fresh();
     const known = board.tiles.some((t) => t.id === raw.pos);
-    return { total: raw.total, sinceS: raw.sinceS, mode: raw.mode, pos: known ? raw.pos : board.start, dice: raw.dice, obtained: { ...raw.obtained }, sCount: raw.sCount };
+    return { total: raw.total, sinceS: raw.sinceS, mode: raw.mode, pos: known ? raw.pos : board.start, dice: raw.dice, obtained: { ...raw.obtained }, sCount: raw.sCount,
+      board: raw.board, positions: { ...raw.positions }, boardRolls: { ...raw.boardRolls } };
   }
 
-  return { createRng, newState, isForcedS, decideReward, applyRoll, moveToken, roll, restoreState };
+  // Pindah papan/banner: pity dan hitungan bersama tetap, posisi bidak disimpan per papan.
+  function switchBoard(state, boardId, board) {
+    const positions = { ...(state.positions || {}), [state.board || "main"]: state.pos };
+    const saved = positions[boardId];
+    const known = saved !== undefined && board.tiles.some((t) => t.id === saved);
+    return { ...state, board: boardId, positions, pos: known ? saved : board.start, obtained: { ...state.obtained }, boardRolls: { ...(state.boardRolls || {}) } };
+  }
+
+  return { createRng, newState, isForcedS, decideReward, applyRoll, moveToken, roll, restoreState, switchBoard };
 });

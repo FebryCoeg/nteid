@@ -1,0 +1,15 @@
+{
+  "default": "scarborough-fair",
+  "note": "Satu banner = satu karakter S-Class featured + satu papan. Pity S-Class, Modified, dan Points Gift dipakai bersama antar papan Limited; bonus skin per papan. Tambah banner baru dengan menambah entri di sini (dan berkas papannya bila susunannya berbeda).",
+  "banners": [
+    {
+      "id": "scarborough-fair",
+      "name": "Scarborough Fair",
+      "featuredS": "elyms",
+      "boardFile": "gacha-board",
+      "boardId": "scarborough-fair",
+      "accent": "#ff5a7a",
+      "boardConfirmed": true
+    }
+  ]
+}

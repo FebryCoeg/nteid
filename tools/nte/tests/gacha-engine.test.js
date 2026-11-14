@@ -309,10 +309,11 @@ test("peluang mendarat cocok angka resmi (aturan enterFirst)", () => {
 // ---------------------------------------------------------------- Task 7: simpan lokal
 test("restoreState: data rusak, asing, atau ngawur kembali ke keadaan awal", () => {
   const fresh = { ...E.newState(), pos: B1.start };
-  const valid = { total: 12, sinceS: 12, mode: "baseline", pos: 3, dice: 0, obtained: { elyms: 1 }, sCount: 1 };
+  const valid = { total: 12, sinceS: 12, mode: "baseline", pos: 3, dice: 0, obtained: { elyms: 1 }, sCount: 1, board: "main", positions: { other: 4 }, boardRolls: { main: 12 } };
   assert.deepEqual(E.restoreState(valid, B1, R), valid);
   for (const bad of [undefined, null, "x", 5, [], {}, { ...valid, total: "a" }, { ...valid, sinceS: -1 }, { ...valid, sinceS: 90 },
-    { ...valid, mode: "zzz" }, { ...valid, dice: 99 }, { ...valid, obtained: { a: "b" } }, { ...valid, total: 1.5 }]) {
+    { ...valid, mode: "zzz" }, { ...valid, dice: 99 }, { ...valid, obtained: { a: "b" } }, { ...valid, total: 1.5 },
+    { ...valid, board: 5 }, { ...valid, positions: { x: "y" } }, { ...valid, boardRolls: { main: -1 } }, { ...valid, positions: [] }]) {
     assert.deepEqual(E.restoreState(bad, B1, R), fresh, JSON.stringify(bad));
   }
   // posisi yang tak ada di papan kembali ke awal papan, sisanya dipertahankan
@@ -330,4 +331,53 @@ test("pity paksa berlaku juga untuk dadu gratis: roll gratis ke-90 pasti S dan t
   assert.equal(r.extra[0].reward.kind, "S");
   assert.equal(r.extra[0].landed, 1);
   assert.equal(r.extra.length, 5);
+});
+
+// ---------------------------------------------------------------- Banner dan papan: keadaan bersama vs per papan
+const B2 = mkBoard(["lost", "lost", "lost", "lost"]);
+
+test("switchBoard: pity, mode, total, dan duplikat tetap; posisi dipisah per papan", () => {
+  const st = { ...E.newState(), sinceS: 10, total: 10, mode: "baseline", pos: 3, obtained: { elyms: 1 }, board: "a" };
+  const onB = E.switchBoard(st, "b", B2);
+  assert.equal(onB.board, "b");
+  assert.equal(onB.pos, B2.start);
+  assert.deepEqual([onB.sinceS, onB.total, onB.mode, onB.obtained], [10, 10, "baseline", { elyms: 1 }]);
+  assert.deepEqual(onB.positions, { a: 3 });
+  const back = E.switchBoard({ ...onB, pos: 2 }, "a", B1);
+  assert.equal(back.pos, 3);
+  assert.equal(back.positions.b, 2);
+});
+
+test("switchBoard: posisi tersimpan yang tak ada di papan tujuan kembali ke awal papan", () => {
+  const st = { ...E.newState(), board: "a", positions: { b: 999 } };
+  assert.equal(E.switchBoard(st, "b", B2).pos, B2.start);
+});
+
+test("bonus skin dihitung per papan, Points Gift dihitung bersama", () => {
+  let st = E.newState();
+  st = { ...st, board: "a" };
+  for (let i = 0; i < 49; i++) st = E.applyRoll(st, { kind: "NONE" }, R, NEVER).state;
+  st = E.switchBoard(st, "b", B2);
+  const onB = E.applyRoll(st, { kind: "NONE" }, R, NEVER); // total 50, tetapi baru roll ke-1 di papan b
+  assert.deepEqual(onB.skinBonus, []);
+  assert.equal(onB.gift !== null, true); // total 50 = kelipatan 10: Points Gift bersama
+  const backA = E.applyRoll(E.switchBoard(onB.state, "a", B1), { kind: "NONE" }, R, NEVER); // roll ke-50 di papan a
+  assert.deepEqual(backA.skinBonus, ["glider"]);
+});
+
+// ---------------------------------------------------------------- Data banner
+const banners = JSON.parse(fs.readFileSync(path.join(ROOT, "nte", "data", "gacha-banners.json"), "utf8"));
+const espersData = JSON.parse(fs.readFileSync(path.join(ROOT, "nte", "data", "espers.json"), "utf8"));
+
+test("banner: karakter S ada di data Esper, berkas papan ada, banner bawaan ada", () => {
+  assert.ok(banners.banners.length >= 1);
+  assert.ok(banners.banners.some((b) => b.id === banners.default), "banner bawaan tak ada");
+  const ids = new Set();
+  for (const b of banners.banners) {
+    assert.ok(!ids.has(b.id), "id banner ganda: " + b.id);
+    ids.add(b.id);
+    assert.ok(espersData.some((e) => e.slug === b.featuredS && e.rank === "S"), `featuredS ${b.featuredS} bukan Esper S`);
+    assert.ok(fs.existsSync(path.join(ROOT, "nte", "data", b.boardFile + ".json")), `berkas papan ${b.boardFile} tak ada`);
+    assert.match(b.accent, /^#[0-9a-fA-F]{6}$/);
+  }
 });
