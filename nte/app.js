@@ -1209,7 +1209,7 @@
     const num = (n) => Number(Math.floor(n)).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
     const GROUPS = { basic: S("Serangan Dasar", "Basic Attack"), redirect: "Skill", ultimate: "Ultimate", support: "QTE" };
     const opt = (val, t, sel) => `<option value="${esc(val)}"${sel ? " selected" : ""}>${esc(t)}</option>`;
-    const field = (id, label, val, hint) => `<label class="cf"><span>${label}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal">${hint ? `<small>${hint}</small>` : ""}</label>`;
+    const field = (id, label, val, hint) => `<label class="cf"><span>${label}${hint ? ` <em>(${hint})</em>` : ""}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal"></label>`;
     const eso = (sel) => list.map((e) => opt(e.slug, e.name.split(" (")[0], e.slug === sel)).join("");
     const defE = list.find((e) => e.slug === "elyms") || list[0];
     const brk = [0, 1, 2, 3].map((i) => `<div class="cbrk">
