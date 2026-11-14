@@ -39,6 +39,14 @@ def prefix(pid):
     return m.group(1).lower() if m else None
 
 
+MAN_NAME = {}
+for _k, _m in manual.items():
+    _p = re.match(r"^(mon_\d+|boss_\d+)", _k, re.I)
+    _n = (_m.get("MonsterName") or {}).get("LocalizedString")
+    if _p and _n:
+        MAN_NAME.setdefault(_p.group(1).lower(), _n)
+
+
 def name_for(pre):
     if not pre:
         return ""
@@ -47,7 +55,7 @@ def name_for(pre):
     for a in alts:
         if NAMES.get(a + "_name"):
             return NAMES[a + "_name"]
-    return ""
+    return MAN_NAME.get(pre, "")
 
 
 def name_fam(pre, fam):
@@ -95,6 +103,25 @@ for key, v in cl.items():
         if s:
             e["levels"][int(v["MonsterLevel"])] = s
 
+# ---- Beyond the Rails (Abyss): paket 'Abyss_<musim>_<stage>[_<babak>_<gelombang>]_<kelas musuh>'
+ABY = re.compile(r"^Abyss_(\d+)_(\d+)(?:_(\d)_(\d))?_(.+)$")
+for pid, row in pk.items():
+    m = ABY.match(pid)
+    if not m:
+        continue
+    cls = m.group(5)
+    pre = prefix(cls)
+    fam = "Abyss:" + cls
+    typ = "boss" if cls.lower().startswith("boss") else "normal"
+    e = enemies.setdefault(fam, {"id": fam, "pre": pre, "name": name_fam(pre, cls), "type": typ, "kind": "abyss", "levels": {}})
+    key = "%d-%02d" % (int(m.group(1)), int(m.group(2)))
+    s = stat(pid)
+    if not s:
+        continue
+    if key in e["levels"] and e["levels"][key] != s:
+        key += "-%s%s" % (m.group(3) or "0", m.group(4) or "0")   # satu stage, gelombang berbeda
+    e["levels"][key] = s
+
 # jenis dari Monster Manual (Boss / WeeklyBoss / Elite / Normal) bila ada
 man_type = {}
 for k, m in manual.items():
@@ -105,7 +132,7 @@ for e in enemies.values():
     if t:
         e["type"] = {"Boss": "boss", "WeeklyBoss": "weekly", "Elite": "elite", "Normal": "normal"}.get(t, e["type"])
 
-LABELS = [("WorldBoss", "Boss dunia", "World boss"), ("VisionBoss", "Boss Vision", "Vision boss"), ("DiyBoss", "Boss DIY", "DIY boss"),
+LABELS = [("Abyss", "Beyond the Rails", "Beyond the Rails"), ("WorldBoss", "Boss dunia", "World boss"), ("VisionBoss", "Boss Vision", "Vision boss"), ("DiyBoss", "Boss DIY", "DIY boss"),
           ("Weekly", "Boss mingguan (Clone)", "Weekly boss (Clone)"), ("Clone", "Clone", "Clone"), ("Bank", "Bank", "Bank"),
           ("Vision", "Vision", "Vision"), ("Quest", "Misi", "Quest"), ("Summon", "Panggilan", "Summon"), ("World", "Dunia", "Open world")]
 
@@ -125,6 +152,8 @@ for e in enemies.values():
     if not e["name"]:
         unnamed.append(e["id"])
         continue
+    if re.search(r"review", e["id"], re.I):
+        continue   # paket pratinjau, bukan musuh yang bisa dilawan
     g = groups.setdefault(e["name"], {"name": e["name"], "type": e["type"], "pre": e["pre"], "variants": []})
     g["variants"].append(e)
 
@@ -132,7 +161,7 @@ out = []
 for g in groups.values():
     seen, vs = {}, []
     for e in sorted(g["variants"], key=lambda e: (-len(e["levels"]), e["id"])):
-        lv = {str(k): e["levels"][k] for k in sorted(e["levels"])}
+        lv = {str(k): e["levels"][k] for k in sorted(e["levels"], key=lambda q: [int(x) if x.isdigit() else 0 for x in re.split(r"[-]", str(q))])}
         sig = json.dumps(lv, sort_keys=True)
         if len(lv) == 1 and re.search(r"PV|Parry|test", e["id"], re.I):
             continue
@@ -141,6 +170,8 @@ for g in groups.values():
             continue
         li, le = label(e["id"])
         v = {"id": e["id"], "ids": [e["id"]], "label": {"id": li, "en": le}, "levels": lv}
+        if e.get("kind") == "abyss":
+            v["kind"] = "abyss"
         seen[sig] = v
         vs.append(v)
     if vs:

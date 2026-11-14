@@ -1145,6 +1145,7 @@
   }
 
   // ---------------- MUSUH ----------------
+  const lvLabel = (v, k) => { if (v && v.kind === "abyss") { const [a, b] = String(k).split("-"); return `${S("Musim", "Season")} ${+a} · Stage ${+b}${String(k).split("-").length > 2 ? "·" + String(k).split("-")[2] : ""}`; } return k; };
   async function viewEnemies() {
     setTitle(S("Status Anomali", "Anomaly Stats"));
     const list = await load("enemies");
@@ -1153,13 +1154,14 @@
     const num = (n) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
     const pct = (r) => `${Math.round(r * 1000) / 10}%`;
     main.innerHTML = head(S("STATUS ANOMALI", "ANOMALY STATS"), S("Informasi Status Anomali", "Anomaly Stats Info"), S("Status anomali dan monster di setiap level: HP, ATK, DEF, Resist per elemen, dan Break (Unbal). Angka langsung dari tabel game.", "Anomaly and monster stats at every level: HP, ATK, DEF, per-element Resist and Break (Unbal). Numbers straight from the game tables."), list.length) + `
-      <div class="toolbar">${filterBox(S("Cari anomali atau monster…", "Search anomalies or monsters…"))}${chips(Object.entries(TYPES).map(([v, label]) => ({ v, label })), "type", undefined, S("Semua jenis", "All types"))}</div>
+      <div class="toolbar">${filterBox(S("Cari anomali atau monster…", "Search anomalies or monsters…"))}${chips(Object.entries(TYPES).map(([v, label]) => ({ v, label })), "type", undefined, S("Semua jenis", "All types"))}${chips([{ v: "abyss", label: "Beyond the Rails" }], "mode", undefined, S("Semua mode", "All modes"))}</div>
       <div class="wide-grid" id="grid"></div>`;
     useFilters((st) => {
-      const out = list.filter((e) => match(st.q, e.name) && (!st.type || e.type === st.type));
+      const out = list.filter((e) => match(st.q, e.name) && (!st.type || e.type === st.type) && (!st.mode || e.variants.some((v) => v.kind === "abyss")));
       $("#grid").innerHTML = out.map((e) => {
-        const lv = e.variants.flatMap((v) => Object.keys(v.levels).map(Number));
-        return `<button class="wcard en-card" type="button" data-n="${esc(e.name)}"><div class="wcard-img en-img">${e.image ? `<img src="${img(e.image)}" alt="" loading="lazy">` : `<span class="en-ph">${esc(e.name.charAt(0))}</span>`}</div><div class="wcard-body"><small>${esc(TYPES[e.type] || "")}</small><b>${esc(e.name)}</b><p>Lv ${Math.min(...lv)}–${Math.max(...lv)} · ${e.variants.length} ${S("varian", "variants")}</p></div></button>`;
+        const lv = e.variants.filter((v) => v.kind !== "abyss").flatMap((v) => Object.keys(v.levels).map(Number));
+        const hasAb = e.variants.some((v) => v.kind === "abyss");
+        return `<button class="wcard en-card" type="button" data-n="${esc(e.name)}"><div class="wcard-img en-img">${e.image ? `<img src="${img(e.image)}" alt="" loading="lazy">` : `<span class="en-ph">${esc(e.name.charAt(0))}</span>`}</div><div class="wcard-body"><small>${esc(TYPES[e.type] || "")}${hasAb ? " · Beyond the Rails" : ""}</small><b>${esc(e.name)}</b><p>${lv.length ? `Lv ${Math.min(...lv)}–${Math.max(...lv)} · ` : ""}${e.variants.length} ${S("varian", "variants")}</p></div></button>`;
       }).join("") || `<div class="empty">${S("Tidak ada anomali yang cocok.", "No matching entries.")}</div>`;
       setCount(out.length);
     });
@@ -1172,8 +1174,8 @@
         const hasImm = lvls.some(([, s]) => Object.keys(s.imm || {}).length);
         $("#enBody").innerHTML = `${e.variants.length > 1 ? `<div class="chips en-var">${e.variants.map((x, i) => `<button class="chip" type="button" data-i="${i}" aria-pressed="${i === vi}">${esc(tx(x.label))} · ${Object.keys(x.levels).length} Lv</button>`).join("")}</div>` : ""}
           <p class="mono en-id">${esc(v.ids.join(" · "))}</p>
-          <div class="en-wrap"><table class="en-tbl"><thead><tr><th>Lv</th><th>HP</th><th>ATK</th><th>DEF</th>${RES.map(([, n]) => `<th>${esc(n)}</th>`).join("")}<th>Break</th></tr></thead><tbody>
-          ${lvls.map(([lv, s]) => `<tr><td><b>${lv}</b></td><td>${num(s.hp)}</td><td>${num(s.atk)}</td><td>${num(s.def)}</td>${RES.map(([k]) => `<td>${pct(s.res[k] || 0)}</td>`).join("")}<td>${s.unbal}</td></tr>`).join("")}
+          <div class="en-wrap"><table class="en-tbl"><thead><tr><th>${v.kind === "abyss" ? S("Musim · Stage", "Season · Stage") : "Lv"}</th><th>HP</th><th>ATK</th><th>DEF</th>${RES.map(([, n]) => `<th>${esc(n)}</th>`).join("")}<th>Break</th></tr></thead><tbody>
+          ${lvls.map(([lv, s]) => `<tr><td><b>${lvLabel(v, lv)}</b></td><td>${num(s.hp)}</td><td>${num(s.atk)}</td><td>${num(s.def)}</td>${RES.map(([k]) => `<td>${pct(s.res[k] || 0)}</td>`).join("")}<td>${s.unbal}</td></tr>`).join("")}
           </tbody></table></div>
           ${hasImm ? `<p class="txt en-note">${S("Ada imunitas elemen pada sebagian level (lihat data game).", "Some levels have elemental immunities (see game data).")}</p>` : ""}`;
       };
@@ -1267,7 +1269,7 @@
           <div class="calc-grid">
             <label class="cf"><span>${S("Musuh", "Enemy")}</span>${sw("cM", enemies.map((x, i) => opt(i, x.name, x.name === "Morphix")).join(""))}</label>
             <label class="cf"><span>${S("Varian", "Variant")}</span><select id="cV"></select></label>
-            <label class="cf"><span>${S("Level musuh", "Enemy level")}</span><select id="cEL"></select></label>
+            <label class="cf"><span>${S("Level musuh / stage", "Enemy level / stage")}</span><select id="cEL"></select></label>
           </div>
           <div class="calc-enemy" id="cEn"></div></section>
         <section class="calc-card calc-out"><h3>${S("Hasil damage", "Damage result")}</h3><div id="cOut"></div></section>
@@ -1299,7 +1301,7 @@
     }
     function fillLv() {
       const m = enemies[+$c("cM").value], x = m.variants[+$c("cV").value || 0], ks = Object.keys(x.levels);
-      $c("cEL").innerHTML = ks.map((k, i) => opt(k, "Lv " + k, i === ks.length - 1)).join("");
+      $c("cEL").innerHTML = ks.map((k, i) => opt(k, x.kind === "abyss" ? lvLabel(x, k) : "Lv " + k, i === ks.length - 1)).join("");
     }
     function enemyStat() { const m = enemies[+$c("cM").value], x = m.variants[+$c("cV").value || 0]; return x.levels[$c("cEL").value] || x.levels[Object.keys(x.levels).pop()]; }
     function thumb(id, src) { const t = $c("t_" + id); if (!t) return; if (src) { t.src = img(src); t.hidden = false; } else t.hidden = true; }
