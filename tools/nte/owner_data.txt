@@ -190,7 +190,7 @@
 * Best Modules: Fireflies and the Forest
 * Main Stats: CRIT DMG, ATK%
 * Sub Stats Priority: CRIT Rate → ATK% → CRIT DMG → ATK
-* Best Teams (Blossom Team): Nanally + Jiuyuan (Sub-DPS), Adler (Support), Haniel (Buffer)
+* Best Teams (Blossom Team): Nanally + Hotori + Jiuyuan + Zero / Elyms
 * Skill Priority: Basic Attack → Ultimate → Skill → QTE
 * Best Awakening Nodes (Urutan Prioritas 1–6):
    1. A1 (Gang Formation) [Prioritas 1]: Memberikan Nanally 2.5 Ultimate Energy setiap kali ia melakukan Follow-up Attack (maksimal sekali setiap 1 detik).
