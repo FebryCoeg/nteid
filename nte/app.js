@@ -1302,6 +1302,8 @@
       cFB: S("Hanya untuk efek yang tertulis \"Final DMG\". Kebanyakan build tidak punya, isi 0.", "Only for effects that say \"Final DMG\". Most builds have none, enter 0."),
       cDI: S("Untuk efek \"abaikan X% DEF musuh\". Contoh: Lost Radiance 4 keping → isi 25. Tidak ada? Isi 0.", "For effects like \"ignore X% enemy DEF\". Example: Lost Radiance 4-piece → enter 25. None? Enter 0."),
       cDR: S("Untuk efek yang menurunkan DEF musuh. Kebanyakan build tidak punya, isi 0.", "For effects that lower enemy DEF. Most builds have none, enter 0."),
+      cAT: S("Cara paling akurat: buka layar status karakter di game, lalu isi angka ATK yang tertulis (HP atau DEF kalau serangannya berbasis itu). Kalau diisi, kolom ATK % dan ATK flat diabaikan. Kosongkan untuk hitung otomatis.", "The most accurate way: open the character status screen in game and enter the ATK shown (HP or DEF if the attack scales with that). If filled, the ATK % and flat ATK fields are ignored. Leave empty to calculate automatically."),
+      cRP: S("Untuk efek \"penetrasi RES\", misalnya buff stage Beyond the Rails \"All Resistance Penetration 25%\" (buff stage bisa beda tiap musim, baca di game). Isi 25. Tidak ada? Isi 0.", "For \"RES penetration\" effects, such as the Beyond the Rails stage buff \"All Resistance Penetration 25%\" (stage buffs differ each season, read it in game). Enter 25. None? Enter 0."),
       cRR: S("Untuk efek yang menurunkan RES musuh. Kebanyakan build tidak punya, isi 0.", "For effects that lower enemy RES. Most builds have none, enter 0."),
       cShare: S("Link ini menyimpan semua isianmu (karakter, Arc, stat, dan musuh). Kirim ke teman atau Discord, dan mereka langsung melihat hasil yang sama. Simpan juga untuk dibuka lagi nanti.", "This link stores everything you entered (character, Arc, stats, and enemy). Send it to a friend or Discord and they see the same result right away. Keep it to reopen later."),
       cBI: S("Angka Break Intensity karakter itu. Tidak tahu? Isi 0.", "That character's Break Intensity number. Not sure? Enter 0."),
@@ -1337,10 +1339,11 @@
           <p class="txt calc-note">${S("Isi total dari layar karakter di game (persen, tanpa tanda %). Stat dasar karakter dan Arc diambil otomatis.", "Enter totals from the in-game character screen (percent, no % sign). Base character and Arc stats are filled in automatically.")}</p>
           <div class="calc-grid">
             ${field("cAP", S("ATK % dari modul dan buff", "ATK % from modules and buffs"), 0)}${field("cAF", S("ATK flat dari modul/buff", "Flat ATK from modules/buffs"), 0, S("bukan Base ATK", "not Base ATK"))}
+            ${field("cAT", S("ATK total dari game", "Total ATK from game"), "", S("opsional, mengabaikan dua kolom di atas", "optional, overrides the two fields above"))}
             ${field("cCR", S("CRIT Rate (%)", "CRIT Rate (%)"), 5, S("angka di status", "as shown in stats"))}${field("cCD", S("CRIT DMG (%)", "CRIT DMG (%)"), 50, S("angka di status", "as shown in stats"))}
             ${field("cDB", S("Bonus DMG total (%)", "Total DMG bonus (%)"), 0, S("elemen + umum + skill", "element + general + skill"))}${field("cFB", S("Bonus Final DMG (%)", "Final DMG bonus (%)"), 0)}
             ${field("cDI", S("Abaikan DEF (%)", "DEF ignore (%)"), 0)}${field("cDR", S("Kurangi DEF musuh (%)", "DEF reduction (%)"), 0)}
-            ${field("cRR", S("Kurangi RES musuh (%)", "RES reduction (%)"), 0)}
+            ${field("cRR", S("Kurangi RES musuh (%)", "RES reduction (%)"), 0)}${field("cRP", S("Penetrasi RES (%)", "RES penetration (%)"), 0)}
           </div></section>
         <section class="calc-card"><h3>${S("3 · Musuh", "3 · Enemy")}</h3>
           <div class="calc-grid">
@@ -1393,19 +1396,20 @@
       const e = esper($c("cE").value), st = SD.espers[e.id], lc = clamp(val("cL"), 1, 80), s = enemyStat();
       const arc = $c("cA").value ? SD.arcs[$c("cA").value] : null, la = clamp(val("cAL"), 1, 80);
       const base = $c("cB").value, bs = st[base][lc - 1], arcAtk = base === "atk" && arc ? arc.atk[la - 1] : 0;
-      const stat = (bs + arcAtk) * (1 + val("cAP") / 100) + val("cAF");
+      const statAuto = (bs + arcAtk) * (1 + val("cAP") / 100) + val("cAF"), useTotal = val("cAT") > 0, stat = useTotal ? val("cAT") : statAuto;
+      const resCut = (val("cRR") + val("cRP")) / 100;
       const sk = (st.skills[$c("cG").value] || {}).rows || [], row = sk[+$c("cR").value];
       const lvS = clamp(val("cSL"), 1, 10), ratio = row ? ratioOf(row.f, row.v[Math.min(lvS, row.v.length) - 1]) : null;
       const rk = RESKEY[$c("cEl").value] || "normal";
       const bonus = 1 + val("cDB") / 100, cr = Math.min(1, Math.max(0, val("cCR") / 100)), cd = Math.max(0, val("cCD") / 100);
-      const dz = defZone(lc, s.def, val("cDR") / 100, val("cDI") / 100), rz = resZone(s.res[rk] ?? 0.2, val("cRR") / 100), fin = 1 + val("cFB") / 100;
+      const dz = defZone(lc, s.def, val("cDR") / 100, val("cDI") / 100), rz = resZone(s.res[rk] ?? 0.2, resCut), fin = 1 + val("cFB") / 100;
       $c("cEn").innerHTML = `<div class="cen"><span>HP</span><b>${num(s.hp)}</b></div><div class="cen"><span>DEF</span><b>${num(s.def)}</b></div><div class="cen"><span>ATK</span><b>${num(s.atk)}</b></div><div class="cen"><span>Break</span><b>${s.unbal}</b></div>${Object.entries(s.res).map(([k, r]) => `<div class="cen${k === rk ? " on" : ""}"><span>RES ${k === "nature" ? "Anima" : k}</span><b>${Math.round(r * 1000) / 10}%</b></div>`).join("")}`;
       if (ratio == null) { $c("cOut").innerHTML = `<p class="txt">${S("Pilih serangan yang rasionya bisa dihitung.", "Pick an attack with a calculable ratio.")}</p>`; }
       else {
         const noCrit = stat * (ratio / 100) * bonus * dz * rz * fin, crit = noCrit * (1 + cd), avg = noCrit * (1 + cr * cd);
         const hits = Math.ceil(s.hp / Math.max(1, avg)).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
         $c("cOut").innerHTML = `<div class="cres"><div><span>${S("Tanpa CRIT", "Non-crit")}</span><b>${num(noCrit)}</b></div><div><span>CRIT</span><b>${num(crit)}</b></div><div class="avg"><span>${S("Rata-rata", "Average")}</span><b>${num(avg)}</b></div></div>
-          <p class="mono calc-eq">Base ${base.toUpperCase()}: ${num(bs)} (${S("karakter", "character")} Lv${lc})${arcAtk ? ` + ${num(arcAtk)} (Arc Lv${la})` : ""} → × (1 + ${val("cAP")}%) + ${num(val("cAF"))} (flat) = <b>${num(stat)}</b></p>
+          <p class="mono calc-eq">${useTotal ? `${base.toUpperCase()} ${S("total dari game", "total from game")} = <b>${num(stat)}</b>` : `Base ${base.toUpperCase()}: ${num(bs)} (${S("karakter", "character")} Lv${lc})${arcAtk ? ` + ${num(arcAtk)} (Arc Lv${la})` : ""} → × (1 + ${val("cAP")}%) + ${num(val("cAF"))} (flat) = <b>${num(stat)}</b>`}</p>
           <p class="mono calc-eq">${num(stat)} ${base.toUpperCase()} × ${ratio}% × ${bonus.toFixed(2)} (DMG) × ${dz.toFixed(3)} (DEF) × ${rz.toFixed(3)} (RES ${esc($c("cEl").value)}) × ${fin.toFixed(2)} (Final) · CR ${Math.round(cr * 100)}% / CD ${Math.round(cd * 100)}%</p>
           <p class="txt calc-note">${S(`Butuh sekitar ${hits} serangan seperti ini untuk menghabiskan HP musuh.`, `About ${hits} hits like this to deplete the enemy's HP.`)}</p>`;
       }
@@ -1415,7 +1419,7 @@
         const slug = $c("bE" + i).value;
         if (!slug) return; n++;
         const b = esper(slug), L = clamp(val("bL" + i), 1, 80);
-        const d = BREAK_BASE[L - 1] * (1 + val("bI" + i) / 300 + val("bB" + i) / 100) * (s.unbal / 3) * defZone(L, s.def, val("cDR") / 100, val("cDI") / 100) * resZone(s.res[RESKEY[b.element] || "normal"] ?? 0.2, val("cRR") / 100);
+        const d = BREAK_BASE[L - 1] * (1 + val("bI" + i) / 300 + val("bB" + i) / 100) * (s.unbal / 3) * defZone(L, s.def, val("cDR") / 100, val("cDI") / 100) * resZone(s.res[RESKEY[b.element] || "normal"] ?? 0.2, resCut);
         tot += d; rows += `<div class="cbr"><span>${esc(b.name.split(" (")[0])} Lv${L}</span><b>${num(d)}</b></div>`; eq = `${BREAK_BASE[L - 1]} × (1 + Intensity/300 + bonus) × (Break musuh ${s.unbal} / 3) × DEF × RES`;
       });
       $c("bOut").innerHTML = n === 4 ? `${rows}<div class="cres"><div class="avg"><span>${S("Total Break tim", "Team Break total")}</span><b>${num(tot)}</b></div></div><p class="mono calc-eq">${eq}</p><p class="txt calc-note">${S("Break musuh, DEF, dan RES diambil dari musuh yang kamu pilih di bagian 3. Pengurangan Break oleh Discord belum dihitung.", "Enemy Break, DEF and RES come from the enemy chosen in section 3. Discord's Break reduction is not included yet.")}</p>` : `<p class="txt calc-note">${S(`Pilih 4 karakter dulu (sekarang ${n}/4).`, `Pick 4 characters first (${n}/4 now).`)}</p>${rows}`;
@@ -1433,7 +1437,7 @@
     main.querySelector(".calc").addEventListener("input", calc);
     main.querySelector(".calc").addEventListener("change", calc);
     // ---- link bisa dibagikan: seluruh isian disimpan di alamat halaman (?c=...) ----
-    const IDS = ["cE", "cL", "cA", "cAL", "cG", "cSL", "cR", "cB", "cEl", "cAP", "cAF", "cCR", "cCD", "cDB", "cFB", "cDI", "cDR", "cRR", "cM", "cV", "cEL"]
+    const IDS = ["cE", "cL", "cA", "cAL", "cG", "cSL", "cR", "cB", "cEl", "cAP", "cAF", "cCR", "cCD", "cDB", "cFB", "cDI", "cDR", "cRR", "cRP", "cAT", "cM", "cV", "cEL"]
       .concat([0, 1, 2, 3].flatMap((i) => ["bE" + i, "bL" + i, "bI" + i, "bB" + i]));
     const setVal = (id, value) => {
       const el = $c(id); if (!el || value == null) return;
