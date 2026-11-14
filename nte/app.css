@@ -1500,3 +1500,12 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .gc-st { padding: 6px 10px; border-radius: 10px; background: var(--panel-2); font-size: 0.72rem; display: grid; gap: 2px; }
 .gc-st span { color: var(--text-2); font-size: 0.62rem; }
 .gc-list .mono { display: block; margin: 0 0 3px 2px; }
+
+.gc-lbl { margin: 14px 0 0; font-size: 0.62rem; color: var(--text-2); }
+.gc-lbl + .gc-tabs { margin-top: 6px; }
+.gc-main { --gc-accent: var(--pink); }
+.gc-feat { color: var(--gc-accent); }
+#gcMode.on { color: var(--gc-accent); }
+.gc-piece { background: var(--gc-accent); }
+.gc-meter i { background: var(--gc-accent); }
+.gc-rw.s { box-shadow: 0 0 0 2px var(--gc-accent); }

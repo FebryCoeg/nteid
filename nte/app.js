@@ -1153,22 +1153,50 @@
   // ---------------- SIMULATOR GACHA ----------------
   async function viewGacha() {
     setTitle(S("Simulator Gacha", "Gacha Simulator"));
-    const [rules, board, espers, arcs] = await Promise.all([load("gacha-rules"), load("gacha-board"), load("espers"), load("arcs")]);
+    const [rules, bannersData, espers, arcs] = await Promise.all([load("gacha-rules"), load("gacha-banners"), load("espers"), load("arcs")]);
     const GE = window.GachaEngine;
-    const intro = head(S("GACHA", "GACHA"), S("Simulator Gacha", "Gacha Simulator"), S("Lempar dadu di papan Scarborough Fair seperti di game. Angka peluang dari layar aturan resmi.", "Roll the dice on the Scarborough Fair board like in game. Odds come from the official in-game rules screen."), null);
-    if (!GE) { main.innerHTML = intro + `<p class="txt">${S("Mesin gacha gagal dimuat. Muat ulang halaman.", "The gacha engine failed to load. Reload the page.")}</p>`; return; }
+    const intro = head(S("GACHA", "GACHA"), S("Simulator Gacha", "Gacha Simulator"), S("Lempar dadu di papan gacha seperti di game. Angka peluang dari layar aturan resmi.", "Roll the dice on the gacha board like in game. Odds come from the official in-game rules screen."), null);
+    const fail = (t) => { main.innerHTML = intro + `<p class="txt">${t}</p>`; };
+    if (!GE) return fail(S("Mesin gacha gagal dimuat. Muat ulang halaman.", "The gacha engine failed to load. Reload the page."));
 
-    const R = { ...rules, pool: { ...rules.pool,
-      aChars: espers.filter((e) => e.rank === "A").map((e) => e.slug),
-      aArcs: arcs.filter((a) => a.rarity === 4).map((a) => a.slug),
-      bArcs: arcs.filter((a) => a.rarity === 3).map((a) => a.slug) } };
     const eMap = Object.fromEntries(espers.map((e) => [e.slug, e]));
     const aMap = Object.fromEntries(arcs.map((a) => [a.slug, a]));
-    const byTile = Object.fromEntries(board.tiles.map((t) => [t.id, t]));
-    const [ax, ay, bx, by] = board.area, BW = bx - ax, BH = by - ay, TS = 44;
+    // papan tiap banner dimuat dari berkas masing-masing; banner yang datanya rusak dilewati
+    const boards = {};
+    await Promise.all([...new Set(bannersData.banners.map((b) => b.boardFile))].map(async (f) => { boards[f] = await load(f).catch(() => null); }));
+    const banners = bannersData.banners.filter((b) => eMap[b.featuredS] && boards[b.boardFile] && boards[b.boardFile].tiles);
+    if (!banners.length) return fail(S("Data banner gacha tidak bisa dimuat.", "Gacha banner data could not be loaded."));
+
+    const mkRules = (b) => ({ ...rules, pool: { ...rules.pool, featuredS: b.featuredS,
+      aChars: espers.filter((e) => e.rank === "A").map((e) => e.slug),
+      aArcs: arcs.filter((a) => a.rarity === 4).map((a) => a.slug),
+      bArcs: arcs.filter((a) => a.rarity === 3).map((a) => a.slug) } });
+
+    // ---- penyimpanan lokal (kunci v2: keadaan bersama + posisi per papan, riwayat, statistik, banner aktif)
+    const KEY = "nte_gacha_v2";
+    let hist = [], stats = { S: 0, A: 0, B: 0 }, st, savedBanner = null;
+    let banner = banners.find((b) => b.id === bannersData.default) || banners[0];
+    try {
+      const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+      const first = (raw && banners.find((b) => b.id === raw.banner)) || banner;
+      st = GE.restoreState(raw && raw.state, boards[first.boardFile], mkRules(first));
+      if (st.total > 0 && raw) {
+        savedBanner = first;
+        if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && typeof h.kind === "string").slice(0, 200);
+        const sx = raw.stats;
+        if (sx && ["S", "A", "B"].every((k) => Number.isInteger(sx[k]) && sx[k] >= 0)) stats = { S: sx.S, A: sx.A, B: sx.B };
+      }
+    } catch (e) { st = GE.restoreState(null, boards[banner.boardFile], mkRules(banner)); }
+    if (savedBanner) banner = savedBanner;
+    let board = boards[banner.boardFile];
+    let R = mkRules(banner);
+    if (st.board !== banner.boardId) st = GE.switchBoard(st, banner.boardId, board);
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, stats, banner: banner.id })); } catch (e) {} };
+
+    // ---- papan: kotak, posisi, nama
+    let byTile = {}, ax = 0, ay = 0, BW = 1, BH = 1, arrowDir = {};
+    const TS = 44;
     const pct = (v, total) => (v / total * 100).toFixed(3) + "%";
-    const arrowDir = {};
-    board.blocks.forEach((b) => { arrowDir[b.enter] = b.side === "right" ? "▶" : "◀"; arrowDir[b.exit] = b.side === "right" ? "◀" : "▶"; });
     const TNAME = {
       hero: "Hero Chest", apprentice: "Apprentice Chest", lost: "Lost Piece Box", journeyS: "Journey Together (S-Class)", journeyA: "Journey Together (A-Class)",
       arclight: "Arc-light Mystery Box", fashion: "Fashion Center (Glider)", roll1: "Roll Again", roll5: "Multiple Surprises", outfit: "Daily Outfit", livery: "Mod Up! (Livery)",
@@ -1176,8 +1204,14 @@
     };
     const LBL = { roll1: "+1", roll5: "+5" };
     const tileLabel = (t) => (t.type === "lost" ? "×" + (t.amount || 30) : LBL[t.type] || "");
-    const tilesHtml = board.tiles.map((t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}${arrowDir[t.id] === "◀" ? " gc-arrowLeft" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`).join("");
-    const featured = eMap[R.pool.featuredS];
+    const tileHtml = (t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}${arrowDir[t.id] === "◀" ? " gc-arrowLeft" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`;
+    function setupBoard() {
+      byTile = Object.fromEntries(board.tiles.map((t) => [t.id, t]));
+      [ax, ay] = board.area; BW = board.area[2] - ax; BH = board.area[3] - ay;
+      arrowDir = {};
+      board.blocks.forEach((b) => { arrowDir[b.enter] = b.side === "right" ? "▶" : "◀"; arrowDir[b.exit] = b.side === "right" ? "◀" : "▶"; });
+    }
+    setupBoard();
 
     // ---- tampilan satu hadiah
     function describe(rw) {
@@ -1198,13 +1232,17 @@
       return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
     }
 
+    const chipsHtml = () => banners.map((b) => `<button type="button" class="chip gc-bn" data-bn="${esc(b.id)}" aria-pressed="${b.id === banner.id}">${esc(b.name)} · ${esc(eMap[b.featuredS].name.split(" (")[0])}</button>`).join("");
     main.innerHTML = intro + `
-      <p class="calc-beta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk Scarborough Fair). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for Scarborough Fair). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
+      <p class="calc-beta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
+      <p class="mono gc-lbl">${S("BANNER", "BANNER")}</p>
+      <div class="gc-tabs" id="gcBanners">${chipsHtml()}</div>
       <div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" aria-selected="true" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" aria-selected="false" disabled>Arc · ${S("segera hadir", "coming soon")}</button></div>
+      <p class="txt calc-note" id="gcNote" hidden>${S("Susunan papan banner ini masih perkiraan (memakai susunan papan yang sudah diketahui).", "This banner's board layout is still an estimate (it uses the known board layout).")}</p>
       <div class="gc">
-        <section class="calc-card gc-main">
-          <div class="gc-top"><h3>Scarborough Fair${featured ? ` · <span class="gc-feat">${esc(featured.name.split(" (")[0])}</span>` : ""}</h3><span class="mono" id="gcMode"></span></div>
-          <div class="gc-board" id="gcBoard" style="aspect-ratio:${BW}/${BH}">${tilesHtml}<div class="gc-piece" id="gcPiece">${featured ? `<img src="${esc(img(featured.icon))}" alt="">` : ""}</div></div>
+        <section class="calc-card gc-main" id="gcMain">
+          <div class="gc-top"><h3 id="gcTitle"></h3><span class="mono" id="gcMode"></span></div>
+          <div class="gc-board" id="gcBoard"></div>
           <div class="gc-bar">
             <div class="gc-die" id="gcDie" aria-live="polite">🎲</div>
             <div class="gc-btns"><button type="button" class="chip" id="gcR1" aria-pressed="true">Roll ×1</button><button type="button" class="chip" id="gcR10" aria-pressed="true">Roll ×10</button></div>
@@ -1219,23 +1257,23 @@
         </div>
       </div>`;
 
-    const KEY = "nte_gacha_v1";
-    let hist = [], stats = { S: 0, A: 0, B: 0 }, st;
-    try {
-      const raw = JSON.parse(localStorage.getItem(KEY) || "null");
-      st = GE.restoreState(raw && raw.state, board, R);
-      if (st.total > 0 && raw) {
-        if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && typeof h.kind === "string").slice(0, 200);
-        const sx = raw.stats;
-        if (sx && ["S", "A", "B"].every((k) => Number.isInteger(sx[k]) && sx[k] >= 0)) stats = { S: sx.S, A: sx.A, B: sx.B };
-      }
-    } catch (e) { st = GE.restoreState(null, board, R); }
-    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, stats })); } catch (e) {} };
     let busy = false;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    const piece = $("#gcPiece");
+    let piece = null;
+    // gambar ulang papan, bidak, judul, dan aksen untuk banner aktif
+    function mountBoard() {
+      const featured = eMap[banner.featuredS];
+      $("#gcBoard").style.aspectRatio = `${BW}/${BH}`;
+      $("#gcBoard").innerHTML = board.tiles.map(tileHtml).join("") + `<div class="gc-piece" id="gcPiece"><img src="${esc(img(featured.icon))}" alt=""></div>`;
+      piece = $("#gcPiece");
+      $("#gcTitle").innerHTML = `${esc(banner.name)} · <span class="gc-feat">${esc(featured.name.split(" (")[0])}</span>`;
+      $("#gcMain").style.setProperty("--gc-accent", banner.accent);
+      $("#gcNote").hidden = banner.boardConfirmed !== false;
+      $$("#gcBanners .gc-bn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.bn === banner.id)));
+      place(st.pos);
+    }
     function place(id) {
-      const t = byTile[id];
+      const t = byTile[id] || byTile[board.start];
       piece.style.left = pct(t.x - ax - TS / 2, BW);
       piece.style.top = pct(t.y - ay - TS / 2, BH);
       piece.style.width = pct(TS, BW);
@@ -1259,7 +1297,7 @@
       else $("#gcDie").textContent = String(res.die);
       for (const id of res.path) { place(id); await sleep(fast ? 55 : 130); }
     }
-    function setBusy(v) { busy = v; $("#gcR1").disabled = v; $("#gcR10").disabled = v; }
+    function setBusy(v) { busy = v; $("#gcR1").disabled = v; $("#gcR10").disabled = v; $$("#gcBanners .gc-bn").forEach((b) => { b.disabled = v; }); }
 
     async function doRolls(n) {
       if (busy) return;
@@ -1279,7 +1317,7 @@
     }
     function record(x) {
       const add = (rw, gift) => {
-        hist.unshift({ n: x.n, gift: !!gift, ...rw });
+        hist.unshift({ n: x.n, gift: !!gift, banner: banner.id, ...rw });
         if (rw.kind === "S") stats.S++;
         else if (rw.kind === "A_CHAR" || rw.kind === "A_ARC") stats.A++;
         else if (rw.kind === "B_ARC") stats.B++;
@@ -1287,6 +1325,10 @@
       add(x.reward, false);
       if (x.gift) add(x.gift, true);
       if (hist.length > 200) hist.length = 200;
+    }
+    function showBatch(batch) {
+      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${x.skinBonus.length ? `<div class="gc-gift">${S("Bonus skin tercapai", "Skin bonus reached")}: ${esc(x.skinBonus.join(", "))}</div>` : ""}</li>`).join("");
+      $("#gcOut").innerHTML = `<ol class="gc-list">${rows}</ol>`;
     }
     function renderSide() {
       const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
@@ -1297,13 +1339,23 @@
     function resetAll() {
       if (busy || !confirm(S("Reset semua hasil simulasi?", "Reset all simulation results?"))) return;
       st = GE.restoreState(null, board, R);
+      st = GE.switchBoard(st, banner.boardId, board);
       hist = []; stats = { S: 0, A: 0, B: 0 };
       save(); place(st.pos); counters(); renderSide();
       $("#gcOut").innerHTML = `<p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p>`;
       $("#gcDie").textContent = "🎲";
     }
+    // ganti banner: pity, Modified, dan Points Gift tetap (dipakai bersama); posisi dan bonus skin per papan
+    function switchBanner(id) {
+      const nb = banners.find((b) => b.id === id);
+      if (busy || !nb || nb.id === banner.id) return;
+      banner = nb; board = boards[nb.boardFile]; R = mkRules(nb);
+      st = GE.switchBoard(st, nb.boardId, board);
+      setupBoard(); mountBoard(); counters(); save();
+    }
     async function shareImage() {
       if (busy) return;
+      const featured = eMap[banner.featuredS];
       const top = hist.filter((h) => h.kind === "S" || h.kind === "A_CHAR" || h.kind === "A_ARC").slice(0, 10);
       const info = (h) => (h.kind === "A_ARC" ? aMap[h.id] : eMap[h.id]);
       const W = 1000, CW = 180, CH = 190, PAD = 30, perRow = 5, rows = Math.max(1, Math.ceil(top.length / perRow)), HEAD = 150, FOOT = 50, H = HEAD + rows * CH + FOOT;
@@ -1314,13 +1366,13 @@
       g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
       g.textBaseline = "middle"; g.textAlign = "left";
       g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Simulator Gacha NTE", PAD, 52);
-      g.fillStyle = "#ff5a7a"; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText("Scarborough Fair" + (featured ? " · " + featured.name.split(" (")[0] : ""), PAD, 98);
+      g.fillStyle = banner.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(banner.name + " · " + featured.name.split(" (")[0], PAD, 98);
       g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
       g.fillText(`${st.total} roll · S-Class ${stats.S} · A-Class ${stats.A} · Anowith ≈ ${(st.total * R.cost.perRoll).toLocaleString("id-ID")}`, PAD, 128);
       if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada S atau A. Terus roll!", "No S or A yet. Keep rolling!"), PAD, HEAD + 40); }
       top.forEach((h, i) => {
         const it = info(h), cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
-        const col = h.kind === "S" ? "#ff5a7a" : "#b45be0";
+        const col = h.kind === "S" ? banner.accent : "#b45be0";
         g.save(); g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.clip();
         g.fillStyle = "#2c2c31"; g.fillRect(cx - 52, cy - 52, 104, 104);
         if (it && imgs[it.icon]) g.drawImage(imgs[it.icon], cx - 52, cy - 52, 104, 104);
@@ -1337,15 +1389,13 @@
       g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - FOOT / 2);
       cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "gacha-nte.png"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
     }
-    function showBatch(batch) {
-      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${x.skinBonus.length ? `<div class="gc-gift">${S("Bonus skin tercapai", "Skin bonus reached")}: ${esc(x.skinBonus.join(", "))}</div>` : ""}</li>`).join("");
-      $("#gcOut").innerHTML = `<ol class="gc-list">${rows}</ol>`;
-    }
+
     $("#gcR1").onclick = () => doRolls(1);
     $("#gcR10").onclick = () => doRolls(10);
     $("#gcReset").onclick = resetAll;
     $("#gcShare").onclick = shareImage;
-    place(st.pos);
+    $("#gcBanners").onclick = (ev) => { const b = ev.target.closest(".gc-bn"); if (b) switchBanner(b.dataset.bn); };
+    mountBoard();
     counters();
     renderSide();
   }
