@@ -18,7 +18,10 @@
   const rich = (s) => String(s ?? "").replace(/<(?!\/?(b|i)>)/g, "&lt;");
   const elClass = (e) => "el-" + String(e || "").toLowerCase();
 
-  const LINK = { donate: "https://trakteer.id/febrycoeg", community: "https://discord.gg/E2am3akPBB" };
+  const LINK = { donate: "https://trakteer.id/febrycoeg", community: "https://discord.gg/E2am3akPBB",
+    // Webhook Discord untuk tombol "Kirim langsung". Kosongkan = tombol hanya menyalin laporan dan membuka Discord.
+    // Buat di Discord: Pengaturan Channel > Integrasi > Webhook > Salin URL Webhook, lalu tempel di sini.
+    reportWebhook: "" };
   const QCOLOR = { 1: "Abu-abu", 2: "Hijau", 3: "Biru", 4: "Ungu", 5: "Emas", 6: "Merah" };
   const LABELS = {
     id: {
@@ -612,6 +615,7 @@
 </div></div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
+        html += `<p class="mono" style="margin-top:6px"><button type="button" class="chip" data-report>${S("Data build salah? Laporkan", "Wrong build data? Report")}</button></p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a, i) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="mono">${S("BONUS", "BONUS:")} ${[3, 6][i] || ""} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</p><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
       },
       awakening: () => {
@@ -1144,6 +1148,41 @@
     });
   }
 
+  // ---------------- LAPORAN DATA SALAH ----------------
+  function openReport() {
+    const url = location.href;
+    const compose = (note) => `**Laporan data salah · nteid.site**\nHalaman: ${url}\nMasalah: ${note || "(belum diisi)"}`;
+    sheet({ name: S("Laporkan data salah", "Report wrong data") }, `<span class="mono">${S("LAPORAN", "REPORT")}</span>`,
+      `<p class="txt">${S("Ceritakan apa yang salah (angka, nama, atau terjemahan). Alamat halaman ini ikut dilampirkan, jadi hasil Kalkulator-mu juga ikut terbawa.", "Tell us what is wrong (a number, a name, or a translation). This page's address is attached, so your Calculator result comes with it.")}</p>
+       <label class="cf" style="margin-top:12px"><span>${S("Apa yang salah?", "What is wrong?")}</span><textarea id="rpNote" rows="4" class="rp-note" placeholder="${esc(S("Contoh: ATK Arc Echoes on Hold Lv80 di game 580, di sini 570", "Example: Echoes on Hold Lv80 ATK is 580 in game, 570 here"))}"></textarea></label>
+       <p class="mono rp-url">${esc(url)}</p>
+       <div class="rp-btns">
+         ${LINK.reportWebhook ? `<button type="button" class="chip" id="rpSend" aria-pressed="true">${S("Kirim ke Discord", "Send to Discord")}</button>` : ""}
+         <button type="button" class="chip" id="rpCopy">${S("Salin laporan", "Copy report")}</button>
+         <a class="chip" href="${LINK.community}" target="_blank" rel="noopener">${S("Buka Discord", "Open Discord")}</a>
+       </div>
+       <p class="txt calc-note" id="rpMsg"></p>`);
+    const note = () => ($("#rpNote").value || "").trim().slice(0, 1500);
+    const msg = (t) => { $("#rpMsg").textContent = t; };
+    $("#rpCopy").onclick = async () => {
+      const text = compose(note());
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+      msg(ok ? S("Laporan disalin. Tempel di channel Discord.", "Report copied. Paste it in the Discord channel.") : S("Gagal menyalin, salin teksnya secara manual.", "Could not copy, copy the text manually."));
+    };
+    const send = $("#rpSend");
+    if (send) send.onclick = async () => {
+      if (!note()) { msg(S("Tulis dulu apa yang salah.", "Write what is wrong first.")); return; }
+      send.disabled = true;
+      try {
+        const r = await fetch(LINK.reportWebhook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "Laporan nteid.site", content: compose(note()).slice(0, 1900), allowed_mentions: { parse: [] } }) });
+        msg(r.ok ? S("Terkirim ke Discord. Terima kasih!", "Sent to Discord. Thank you!") : S("Gagal mengirim, gunakan Salin laporan.", "Could not send, use Copy report."));
+      } catch (e) { msg(S("Gagal mengirim, gunakan Salin laporan.", "Could not send, use Copy report.")); }
+      send.disabled = false;
+    };
+  }
+  document.addEventListener("click", (ev) => { if (ev.target.closest("[data-report]")) { ev.preventDefault(); openReport(); } });
+
   // ---------------- MUSUH ----------------
   const lvLabel = (v, k) => { if (v && v.kind === "abyss") { const [a, b] = String(k).split("-"); return `${S("Musim", "Season")} ${+a} · Stage ${+b}${String(k).split("-").length > 2 ? "·" + String(k).split("-")[2] : ""}`; } return k; };
   async function viewEnemies() {
@@ -1272,7 +1311,7 @@
             <label class="cf"><span>${S("Level musuh / stage", "Enemy level / stage")}</span><select id="cEL"></select></label>
           </div>
           <div class="calc-enemy" id="cEn"></div></section>
-        <section class="calc-card calc-out"><h3>${S("Hasil damage", "Damage result")}</h3><div id="cOut"></div></section>
+        <section class="calc-card calc-out"><div class="calc-outhead"><h3>${S("Hasil damage", "Damage result")}</h3><span class="calc-btns"><button type="button" class="chip" id="cShare">${S("Salin link hasil", "Copy result link")}</button><button type="button" class="chip" data-report>${S("Data salah? Laporkan", "Wrong data? Report")}</button></span></div><div id="cOut"></div></section>
         <section class="calc-card"><h3>${S("4 · Break tim (4 karakter)", "4 · Team Break (4 characters)")}</h3>
           <p class="txt calc-note">${S("Damage Break dijumlahkan dari semua karakter di tim, jadi pilih 4 karakter. Break Intensity diisi dari layar karakter.", "Break damage is summed over every character on the team, so pick 4 characters. Enter Break Intensity from the character screen.")}</p>
           <div class="cbrk-grid">${brk}</div><div id="bOut"></div></section>
@@ -1355,7 +1394,37 @@
     });
     main.querySelector(".calc").addEventListener("input", calc);
     main.querySelector(".calc").addEventListener("change", calc);
-    fillArc(); fillEnemy(); calc();
+    // ---- link bisa dibagikan: seluruh isian disimpan di alamat halaman (?c=...) ----
+    const IDS = ["cE", "cL", "cA", "cAL", "cG", "cSL", "cR", "cB", "cEl", "cAP", "cAF", "cCR", "cCD", "cDB", "cFB", "cDI", "cDR", "cRR", "cM", "cV", "cEL"]
+      .concat([0, 1, 2, 3].flatMap((i) => ["bE" + i, "bL" + i, "bI" + i, "bB" + i]));
+    const setVal = (id, value) => {
+      const el = $c(id); if (!el || value == null) return;
+      if (el.tagName === "SELECT" && ![...el.options].some((o) => o.value === value)) return;   // nilai tidak ada lagi: pakai bawaan
+      el.value = value;
+    };
+    function saveUrl() {
+      const q = new URLSearchParams();
+      IDS.forEach((id) => { const el = $c(id); if (el && el.value !== "") q.set(id, el.value); });
+      try { history.replaceState(history.state, "", location.pathname + "?" + q.toString()); } catch (e) {}
+    }
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) {
+        const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select();
+        let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {} ta.remove(); return ok;
+      }
+    }
+    $c("cShare").addEventListener("click", async () => { saveUrl(); toast((await copyText(location.href)) ? S("Link hasil disalin.", "Result link copied.") : S("Gagal menyalin, salin dari kolom alamat.", "Could not copy, copy it from the address bar.")); });
+    main.querySelector(".calc").addEventListener("input", () => setTimeout(saveUrl, 0));
+    main.querySelector(".calc").addEventListener("change", () => setTimeout(saveUrl, 0));
+    fillArc(); fillEnemy();
+    const qs = new URLSearchParams(location.search);
+    if (qs.has("cE")) {
+      const g = (id) => qs.get(id);
+      setVal("cE", g("cE")); fillArc(); setVal("cA", g("cA")); setVal("cG", g("cG")); fillRows(); setVal("cR", g("cR"));
+      setVal("cM", g("cM")); fillEnemy(); setVal("cV", g("cV")); fillLv(); setVal("cEL", g("cEL"));
+      IDS.filter((id) => !["cE", "cA", "cG", "cR", "cM", "cV", "cEL"].includes(id)).forEach((id) => setVal(id, g(id)));
+    }
+    calc();
   }
 
   // ---------------- PROPERTI ----------------
