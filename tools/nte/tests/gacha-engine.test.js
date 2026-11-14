@@ -183,3 +183,91 @@ test("papan: komposisi kotak rute sebanding dengan peluang mendarat resmi", () =
   assert.ok(Math.abs(share("hero") - 20.07) < 8, `hero ${share("hero")}`);
   assert.ok(Math.abs(share("lost") - 15.47) < 8, `lost ${share("lost")}`);
 });
+
+// ---------------------------------------------------------------- Task 4: gerak di papan
+// papan kecil: rute 0..7, panah masuk di 3, panah keluar di 5, blok berisi 8,9,10
+function mkBoard(types, blocks = [], extra = []) {
+  const tiles = types.map((type, id) => ({ id, x: id * 10, y: 0, type }));
+  for (const e of extra) tiles.push({ id: tiles.length, x: 0, y: 50, type: e });
+  return { tiles, route: types.map((_, i) => i), blocks, start: 0 };
+}
+const B1 = mkBoard(["lost", "lost", "lost", "arrowIn", "lost", "arrowOut", "lost", "lost"],
+  [{ side: "right", enter: 3, exit: 5, tiles: [8, 9, 10] }], ["hero", "hero", "hero"]);
+// urutan nilai acak yang diulang
+const seq = (vals) => { let i = 0; return () => vals[i++ % vals.length]; };
+
+test("moveToken: langkah biasa dan melingkar di ujung rute", () => {
+  assert.deepEqual(E.moveToken(B1, 0, 2, "enterFirst"), { path: [1, 2], landed: 2 });
+  assert.deepEqual(E.moveToken(B1, 6, 3, "enterFirst"), { path: [7, 0, 1], landed: 1 });
+});
+
+test("moveToken: mendarat tepat di panah masuk (aturan enterFirst) berhenti di kotak pertama blok", () => {
+  assert.deepEqual(E.moveToken(B1, 0, 3, "enterFirst"), { path: [1, 2, 3, 8], landed: 8 });
+});
+
+test("moveToken: aturan traverse melewati seluruh blok dan berhenti di panah keluar", () => {
+  assert.deepEqual(E.moveToken(B1, 0, 3, "traverse"), { path: [1, 2, 3, 8, 9, 10, 5], landed: 5 });
+});
+
+test("moveToken: hanya melewati panah masuk tidak masuk blok", () => {
+  assert.deepEqual(E.moveToken(B1, 2, 3, "enterFirst"), { path: [3, 4, 5], landed: 5 });
+});
+
+test("moveToken: dari dalam blok lanjut ke kotak berikutnya, keluar lewat panah keluar, kembali ke rute", () => {
+  assert.deepEqual(E.moveToken(B1, 9, 2, "enterFirst"), { path: [10, 5], landed: 5 });
+  assert.deepEqual(E.moveToken(B1, 9, 3, "enterFirst"), { path: [10, 5, 6], landed: 6 });
+});
+
+test("roll paksa pity: bidak tidak bergerak dan hasilnya S", () => {
+  const st = { ...E.newState(), sinceS: 89, total: 89, pos: 4 };
+  const r = E.roll(st, B1, R, NEVER, { blockRule: "enterFirst" });
+  assert.equal(r.die, null);
+  assert.deepEqual(r.path, []);
+  assert.equal(r.landed, 4);
+  assert.equal(r.reward.kind, "S");
+  assert.equal(r.forced, true);
+  assert.equal(r.state.pos, 4);
+  assert.equal(r.state.sinceS, 0);
+});
+
+test("roll biasa: bidak berpindah sesuai dadu dan total roll naik", () => {
+  const B = mkBoard(["lost", "lost", "lost", "lost", "lost", "lost", "lost", "lost"]);
+  const r = E.roll(E.newState(), B, R, seq([0.9, 0.0]), { blockRule: "enterFirst" });
+  assert.equal(r.die, 1);
+  assert.equal(r.state.pos, 1);
+  assert.equal(r.state.total, 1);
+  assert.equal(r.n, 1);
+});
+
+test("Multiple Surprises: 5 dadu gratis dijalankan langsung dan ikut menambah total roll", () => {
+  const B = mkBoard(["lost", "roll5", "lost", "lost", "lost", "lost", "lost", "lost"]);
+  const r = E.roll(E.newState(), B, R, seq([0.9, 0.0]), { blockRule: "enterFirst" });
+  assert.equal(r.reward.kind, "DICE");
+  assert.equal(r.extra.length, 5);
+  assert.equal(r.state.total, 6);
+  assert.equal(r.state.dice, 0);
+});
+
+test("dadu gratis beruntun dibatasi 50 supaya tidak berputar tanpa akhir", () => {
+  const B = mkBoard(Array(8).fill("roll5"));
+  const r = E.roll(E.newState(), B, R, seq([0.9, 0.0]), { blockRule: "enterFirst" });
+  assert.equal(r.extra.length, 50);
+  assert.ok(r.state.total <= 51);
+});
+
+test("peristiwa S mengarahkan bidak ke kotak yang bisa memberi S bila ada dalam 6 langkah", () => {
+  // kotak 1..6: hanya kotak 4 berupa chest; peluang S dipaksa (rng 0 memicu S)
+  const B = mkBoard(["lost", "lost", "lost", "lost", "hero", "lost", "lost", "lost"]);
+  const r = E.roll(E.newState(), B, R, () => 0, { blockRule: "enterFirst" });
+  assert.equal(r.reward.kind, "S");
+  assert.equal(r.landed, 4);
+  assert.equal(r.die, 4);
+});
+
+test("tanpa S, bidak tidak pernah berhenti di kotak Journey Together S", () => {
+  const B = mkBoard(["lost", "lost", "journeyS", "lost", "lost", "lost", "lost", "lost"]);
+  for (let s = 0; s < 200; s++) {
+    const r = E.roll(E.newState(), B, R, E.createRng(s), { blockRule: "enterFirst" });
+    if (r.reward.kind !== "S") assert.notEqual(r.landed, 2);
+  }
+});
