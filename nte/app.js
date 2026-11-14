@@ -1209,13 +1209,34 @@
     const num = (n) => Number(Math.floor(n)).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
     const GROUPS = { basic: S("Serangan Dasar", "Basic Attack"), redirect: "Skill", ultimate: "Ultimate", support: "QTE" };
     const opt = (val, t, sel) => `<option value="${esc(val)}"${sel ? " selected" : ""}>${esc(t)}</option>`;
-    const field = (id, label, val, hint) => `<label class="cf"><span>${label}${hint ? ` <em>(${hint})</em>` : ""}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal"></label>`;
+    const HELP = {
+      cL: S("Level karakter yang kamu pakai (1–80). Lihat di layar karakter. Level memengaruhi ATK dasar dan zona DEF.", "Your character's level (1–80). Affects base ATK and the DEF zone."),
+      cAL: S("Level Arc yang dipasang (1–80). ATK dasar Arc naik mengikuti level ini.", "Level of the equipped Arc (1–80). The Arc's base ATK scales with this."),
+      cSL: S("Level skill yang dipilih (1–10). Rasio damage skill naik per level.", "Level of the chosen skill (1–10). The skill's damage ratio rises per level."),
+      cB: S("Rasio skill dihitung dari stat apa. Hampir semua skill damage memakai ATK. Pilih HP atau DEF hanya kalau deskripsi skill di game menulis rasionya dari HP/DEF.", "Which stat the skill ratio scales with. Almost all damage skills use ATK. Pick HP or DEF only if the skill text says so."),
+      cEl: S("Elemen damage serangan. Menentukan RES musuh mana yang dipakai (kotak yang menyala di bagian Musuh). Otomatis sesuai elemen karakter; ubah hanya kalau serangannya beda elemen.", "Element of the attack. Decides which enemy RES applies (highlighted box in the Enemy section). Set automatically from the character; change only if the attack differs."),
+      cR: S("Pilih bagian skill yang mau dihitung. Angkanya adalah total rasio satu kali memakai skill itu (semua pukulan dijumlah).", "Pick the part of the skill to calculate. The ratio is the total for one use (all hits added)."),
+      cAP: S("Jumlah semua tambahan ATK dalam persen dari modul, bonus set, dan buff. Jumlahkan setiap '+X% ATK' yang berlaku. Contoh: modul +10% dan +8%, buff tim +20% → isi 38. Kalau Basis rasio = HP atau DEF, isi persen HP atau DEF-nya.", "Sum of all ATK percent bonuses from modules, set bonuses and buffs. Add every '+X% ATK' that applies. Example: modules +10% and +8%, team buff +20% → enter 38. If Ratio base is HP or DEF, enter the HP or DEF percent."),
+      cAF: S("Tambahan ATK berupa angka tetap, bukan persen (mis. stat modul 'ATK +50', buff '+100 ATK'). Kalau tidak ada, biarkan 0.", "Fixed ATK added as a number, not a percent (e.g. a module stat 'ATK +50'). Leave 0 if none."),
+      cCR: S("Tambahan CRIT Rate di atas dasar 5%. Kalau total CRIT Rate-mu 45%, isi 40. Maksimal total 100%.", "Extra CRIT Rate on top of the 5% base. If your total CRIT Rate is 45%, enter 40. Total caps at 100%."),
+      cCD: S("Tambahan CRIT DMG di atas dasar 50%. Kalau total CRIT DMG-mu 150%, isi 100.", "Extra CRIT DMG on top of the 50% base. If your total CRIT DMG is 150%, enter 100."),
+      cDB: S("Jumlah semua bonus DMG yang berlaku: DMG elemen (mis. Cosmos DMG +20%), DMG umum, dan DMG tipe skill (mis. Ultimate DMG +10%). Semuanya dijumlah, bukan dikali. Contoh: 20 + 10 + 15 → isi 45.", "Sum of every DMG bonus that applies: element DMG (e.g. Cosmos DMG +20%), general DMG, and skill-type DMG (e.g. Ultimate DMG +10%). They add up, not multiply. Example: 20 + 10 + 15 → enter 45."),
+      cFB: S("Hanya untuk efek yang tertulis 'Final DMG' (dikali terpisah di akhir), biasanya dari Awakening atau Arc tertentu. Kalau tidak ada, biarkan 0.", "Only for effects worded 'Final DMG' (multiplied separately at the end), usually from some Awakenings or Arcs. Leave 0 if none."),
+      cDI: S("Efek yang bertuliskan 'mengabaikan X% DEF musuh'. Contoh set Lost Radiance 4 keping: 25. Kalau tidak ada, 0.", "Effects worded 'ignore X% enemy DEF'. Example: Lost Radiance 4-piece = 25. 0 if none."),
+      cDR: S("Debuff yang menurunkan DEF musuh ('DEF musuh turun X%'). Berbeda dari 'abaikan DEF'. Kalau tidak ada, 0.", "Debuffs that lower enemy DEF ('enemy DEF -X%'). Different from 'ignore DEF'. 0 if none."),
+      cRR: S("Debuff yang menurunkan RES (resistansi) musuh, mis. 'RES Cosmos musuh turun 8%'. Kalau tidak ada, 0.", "Debuffs that lower the enemy's RES, e.g. 'enemy Cosmos RES -8%'. 0 if none."),
+      cBI: S("Break Intensity karakter itu (stat dari modul/Awakening, tampil di layar stat). Makin tinggi, makin besar damage Break-nya.", "That character's Break Intensity (a stat from modules/Awakenings). Higher means more Break damage."),
+      cBB: S("Bonus damage Break tambahan dalam persen dari efek tertentu. Kalau tidak ada, 0.", "Extra Break damage bonus in percent from certain effects. 0 if none."),
+    };
+    const hb = (id) => `<button type="button" class="chi" aria-label="${S("Penjelasan", "Help")}" aria-expanded="false">!</button>`;
+    const hd = (id) => `<div class="chelp" hidden>${esc(HELP[id] || "")}</div>`;
+    const field = (id, label, val, hint) => `<label class="cf"><span>${label}${hint ? ` <em>(${hint})</em>` : ""}${HELP[id] ? hb(id) : ""}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal">${HELP[id] ? hd(id) : ""}</label>`;
     const eso = (sel) => list.map((e) => opt(e.slug, e.name.split(" (")[0], e.slug === sel)).join("");
     const defE = list.find((e) => e.slug === "elyms") || list[0];
     const brk = [0, 1, 2, 3].map((i) => `<div class="cbrk">
         <b>${S("Karakter", "Character")} ${i + 1}</b>
         <label class="cf"><span>Esper</span><select id="bE${i}"><option value="">—</option>${eso("")}</select></label>
-        ${field("bL" + i, "Level", 80)}${field("bI" + i, "Break Intensity", 0)}${field("bB" + i, S("Bonus Break (%)", "Break bonus (%)"), 0)}
+        ${field("bL" + i, "Level", 80)}${field("bI" + i, "Break Intensity", 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBI") + "</label>")}${field("bB" + i, S("Bonus Break (%)", "Break bonus (%)"), 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBB") + "</label>")}
       </div>`).join("");
     main.innerHTML = head(S("KALKULATOR", "CALCULATOR"), S("Kalkulator Damage", "Damage Calculator"), S("Hitung damage satu serangan karakter ke musuh, dari data base game. Tanpa rotasi: satu karakter, satu skill.", "Calculate one character's damage per hit against an enemy from base game data. No rotation: one character, one skill."), null) + `
       <div class="calc">
@@ -1227,14 +1248,14 @@
             ${field("cAL", S("Level Arc", "Arc level"), 80, "1–80")}
             <label class="cf"><span>${S("Jenis skill", "Skill type")}</span><select id="cG"></select></label>
             ${field("cSL", S("Level skill", "Skill level"), 10, "1–10")}
-            <label class="cf wide"><span>${S("Serangan", "Attack")}</span><select id="cR"></select></label>
-            <label class="cf"><span>${S("Basis rasio", "Ratio base")}</span><select id="cB"><option value="atk">ATK</option><option value="hp">HP</option><option value="def">DEF</option></select></label>
-            <label class="cf"><span>${S("Elemen serangan", "Attack element")}</span><select id="cEl"></select></label>
+            <label class="cf wide"><span>${S("Serangan", "Attack")}${hb()}</span><select id="cR"></select>${hd("cR")}</label>
+            <label class="cf"><span>${S("Basis rasio", "Ratio base")}${hb()}</span><select id="cB"><option value="atk">ATK</option><option value="hp">HP</option><option value="def">DEF</option></select>${hd("cB")}</label>
+            <label class="cf"><span>${S("Elemen serangan", "Attack element")}${hb()}</span><select id="cEl"></select>${hd("cEl")}</label>
           </div></section>
         <section class="calc-card"><h3>${S("2 · Stat dari modul dan buff", "2 · Stats from modules and buffs")}</h3>
           <p class="txt calc-note">${S("Isi total dari layar karakter di game (persen, tanpa tanda %). Stat dasar karakter dan Arc diambil otomatis.", "Enter totals from the in-game character screen (percent, no % sign). Base character and Arc stats are filled in automatically.")}</p>
           <div class="calc-grid">
-            ${field("cAP", S("ATK % (HP/DEF % sesuai basis)", "ATK % (HP/DEF % per base)"), 0)}${field("cAF", S("ATK/HP/DEF tambahan (flat)", "Flat ATK/HP/DEF"), 0)}
+            ${field("cAP", S("ATK % dari modul dan buff", "ATK % from modules and buffs"), 0)}${field("cAF", S("ATK tambahan (angka tetap)", "Extra ATK (flat)"), 0)}
             ${field("cCR", S("CRIT Rate tambahan (%)", "Extra CRIT Rate (%)"), 0, S("dasar 5%", "base 5%"))}${field("cCD", S("CRIT DMG tambahan (%)", "Extra CRIT DMG (%)"), 0, S("dasar 50%", "base 50%"))}
             ${field("cDB", S("Bonus DMG total (%)", "Total DMG bonus (%)"), 0, S("elemen + umum + skill", "element + general + skill"))}${field("cFB", S("Bonus Final DMG (%)", "Final DMG bonus (%)"), 0)}
             ${field("cDI", S("Abaikan DEF (%)", "DEF ignore (%)"), 0)}${field("cDR", S("Kurangi DEF musuh (%)", "DEF reduction (%)"), 0)}
@@ -1313,6 +1334,12 @@
     $c("cG").addEventListener("change", () => { fillRows(); calc(); });
     $c("cM").addEventListener("change", () => { fillEnemy(); calc(); });
     $c("cV").addEventListener("change", () => { fillLv(); calc(); });
+    main.querySelector(".calc").addEventListener("click", (ev) => {
+      const b = ev.target.closest(".chi"); if (!b) return;
+      ev.preventDefault();
+      const box = b.closest(".cf").querySelector(".chelp"); if (!box) return;
+      box.hidden = !box.hidden; b.setAttribute("aria-expanded", String(!box.hidden));
+    });
     main.querySelector(".calc").addEventListener("input", calc);
     main.querySelector(".calc").addEventListener("change", calc);
     fillArc(); fillEnemy(); calc();
