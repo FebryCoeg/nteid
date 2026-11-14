@@ -1435,3 +1435,4 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .foot-report { margin-top: 6px; }
 .foot-report button { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }
 .calc-outhead .chelp { flex-basis: 100%; }
+.calc-btns { align-items: center; } .calc-btns .chi { margin-left: 2px; }
