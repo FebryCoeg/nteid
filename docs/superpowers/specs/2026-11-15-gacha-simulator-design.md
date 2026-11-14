@@ -50,7 +50,7 @@ Alat verifikasi pendekatan 3: setelah peta disalin, hitung secara simulasi perse
 ## Bagian yang sudah diputuskan
 - Halaman `/gacha` dengan tab Esper dan Arc. Tab Arc ditutup ("segera hadir") sampai aturan banner Arc tersedia.
 - Papan digambar 2D (HTML/CSS), posisi kotak diambil dari screenshot peta game dan disimpan sebagai data (JSON), bukan ditulis tangan di kode.
-- Tombol Roll 1x dan Roll 10x seperti di game. Mata uang tidak dihitung ketat; tampilkan saja jumlah roll dan perkiraan Anowith terpakai (160 per roll).
+- Tombol Roll 1x dan Roll 10x seperti di game. Mata uang tidak dihitung ketat; tampilkan saja jumlah roll dan perkiraan Annulith terpakai (160 per roll).
 - Hasil roll dihitung oleh mesin sederhana yang terpisah dari tampilan, supaya bisa diuji tanpa browser.
 - Tombol bagikan hasil membuat gambar lewat canvas, seperti Tier List.
 - Halaman diberi catatan bahwa ini simulasi dan angka diambil dari layar aturan game, plus nama papan yang dipakai.

@@ -394,3 +394,51 @@ test("setiap jenis kotak di papan punya ikon SVG buatan sendiri (viewBox 64x64)"
     assert.ok(!/<image|href=/.test(svg), `ikon ${t} tak boleh memuat gambar luar`);
   }
 });
+
+// ---------------------------------------------------------------- Skin banner: diperoleh sekali, duplikat jadi Warp Pieces
+test("skin dari kotak: pertama dapat skin, berikutnya duplikat jadi Warp Pieces (outfit 16, livery 16, glider 4)", () => {
+  for (const [kind, warp] of [["OUTFIT", 16], ["LIVERY", 16], ["GLIDER", 4]]) {
+    let st = E.newState();
+    const first = E.applyRoll(st, { kind }, R, NEVER);
+    assert.equal(first.reward.skin, kind.toLowerCase());
+    assert.equal(first.reward.dup, undefined);
+    assert.equal(first.reward.warp, undefined);
+    const second = E.applyRoll(first.state, { kind }, R, NEVER);
+    assert.equal(second.reward.dup, 1, kind);
+    assert.equal(second.reward.warp, warp, kind);
+  }
+});
+
+test("bonus roll papan mengklaim skin (skinClaims); kalau sudah punya, jadi Warp Pieces", () => {
+  let st = E.newState();
+  let claim = null;
+  for (let i = 1; i <= 50; i++) {
+    const r = E.applyRoll(st, { kind: "NONE" }, R, NEVER);
+    st = r.state;
+    if (r.skinClaims.length) claim = r.skinClaims[0];
+  }
+  assert.equal(claim.kind, "GLIDER");
+  assert.equal(claim.claim, true);
+  assert.equal(claim.dup, undefined);
+  assert.equal(st.obtained["skin:glider:" + R.pool.featuredS], 1);
+  // sudah punya glider dari kotak lalu bonus 50 roll: duplikat
+  let s2 = E.applyRoll(E.newState(), { kind: "GLIDER" }, R, NEVER).state;
+  let dupClaim = null;
+  for (let i = 1; i <= 50; i++) {
+    const r = E.applyRoll(s2, { kind: "NONE" }, R, NEVER);
+    s2 = r.state;
+    if (r.skinClaims.length) dupClaim = r.skinClaims[0];
+  }
+  assert.equal(dupClaim.dup, 1);
+  assert.equal(dupClaim.warp, 4);
+});
+
+test("data banner: skin yang tercatat punya nama dan jalur ikon yang ada", () => {
+  for (const b of banners.banners) {
+    for (const [k, v] of Object.entries(b.skins || {})) {
+      assert.ok(["outfit", "livery", "glider"].includes(k), "jenis skin tak dikenal " + k);
+      if (v.name) assert.equal(typeof v.name, "string");
+      if (v.icon) assert.ok(fs.existsSync(path.join(ROOT, "nte", v.icon)) || fs.existsSync(path.join(ROOT, v.icon)), "ikon skin tak ada: " + v.icon);
+    }
+  }
+});

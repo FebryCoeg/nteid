@@ -1509,3 +1509,13 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .gc-piece { background: var(--gc-accent); }
 .gc-meter i { background: var(--gc-accent); }
 .gc-rw.s { box-shadow: 0 0 0 2px var(--gc-accent); }
+
+.gc-skins { display: grid; gap: 8px; }
+.gc-sk { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; background: var(--panel-2); font-size: 0.8rem; }
+.gc-skic { width: 44px; height: 44px; flex: none; border-radius: 10px; background: #0003; display: flex; align-items: center; justify-content: center; color: var(--text-2); font-weight: 800; overflow: hidden; }
+.gc-skic img { width: 100%; height: 100%; object-fit: cover; }
+.gc-skt { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.gc-skt small { color: var(--text-2); font-size: 0.66rem; line-height: 1.5; }
+.gc-skt em { font-style: normal; font-size: 0.62rem; color: var(--text-2); }
+.gc-skst { flex: none; font-size: 0.62rem; padding: 3px 8px; border-radius: 99px; background: #0003; color: var(--text-2); }
+.gc-skst.on { background: var(--gc-accent, var(--pink)); color: #fff; }

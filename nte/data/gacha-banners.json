@@ -9,7 +9,27 @@
       "boardFile": "gacha-board",
       "boardId": "scarborough-fair",
       "accent": "#ff5a7a",
-      "boardConfirmed": true
+      "boardConfirmed": true,
+      "skins": {
+        "outfit": {
+          "name": null,
+          "icon": null,
+          "confirmed": false,
+          "note": "Outfit Daily Outfit banner ini belum diketahui namanya (Elyms punya Y2K Mystique, Drifting Petals, dan Windflower di database)."
+        },
+        "livery": {
+          "name": null,
+          "icon": null,
+          "confirmed": false,
+          "note": "Livery kendaraan Elyms belum ada di data game yang dipakai situs."
+        },
+        "glider": {
+          "name": "Joy Buoy",
+          "icon": "img/item/256_fashion_glide_1090.webp",
+          "confirmed": false,
+          "note": "Skin glider Elyms di database; belum dipastikan sama dengan hadiah Fashion Center banner ini."
+        }
+      }
     }
   ]
 }

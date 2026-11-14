@@ -91,6 +91,14 @@
       r.warp = (r.warp || 0) + d.aArcBonusWarp;
     } else if (r.kind === "B_ARC") {
       r.lost = (r.lost || 0) + d.bArcBonusLost;
+    } else if (r.kind === "OUTFIT" || r.kind === "LIVERY" || r.kind === "GLIDER") {
+      // skin karakter featured: sekali per karakter, duplikat otomatis jadi Warp Pieces
+      const skin = r.kind.toLowerCase();
+      r.skin = skin;
+      const key = "skin:" + skin + ":" + ((rules.pool && rules.pool.featuredS) || "");
+      const n = (st.obtained[key] || 0) + 1;
+      st.obtained[key] = n;
+      if (n >= 2) { r.dup = n - 1; r.warp = rules.skin[skin].dupWarp; }
     }
     return r;
   }
@@ -121,7 +129,9 @@
     const skinBonus = Object.entries(rules.skin)
       .filter(([, v]) => v.atRolls === st.boardRolls[boardId])
       .map(([k]) => k);
-    return { state: st, reward: out, gift, skinBonus };
+    // bonus roll papan: skin diklaim (dihitung seperti diperoleh; duplikat jadi Warp Pieces)
+    const skinClaims = skinBonus.map((k) => ({ ...finalize(st, { kind: k.toUpperCase() }, rules), claim: true }));
+    return { state: st, reward: out, gift, skinBonus, skinClaims };
   }
 
   // ---------------------------------------------------------------- gerak di papan
@@ -198,7 +208,7 @@
     const tile = ix.byId[landed];
     const reward = decideReward(state, tile, rules, rng, sEvent);
     const out = applyRoll({ ...state, pos: landed }, reward, rules, rng);
-    return { n: out.state.total, die, path, landed, reward: out.reward, gift: out.gift, skinBonus: out.skinBonus,
+    return { n: out.state.total, die, path, landed, reward: out.reward, gift: out.gift, skinBonus: out.skinBonus, skinClaims: out.skinClaims,
       forced, modeAfter: out.state.mode, extra: [], state: out.state };
   }
 

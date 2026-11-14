@@ -164,7 +164,7 @@
 
 **Interfaces:**
 - Consumes: `State`, `RollResult` (Task 4).
-- Produces: `saveGacha(state: State): void` dan `loadGacha(): State` (kunci `localStorage` `nte_gacha_v1`, try/catch, data tak valid → `newState()`); daftar riwayat (terbaru di atas, maksimum 200); statistik (total roll, jumlah S dan A, Anowith terpakai = total × 160, roll sejak S terakhir); tombol "Reset"; tombol "Bagikan hasil" yang menggambar canvas (gaya seperti ekspor Tier List di `nte/app.js` sekitar baris 1982) berisi nama papan, jumlah roll, hadiah S/A terbaik dengan gambar dari `nte/img`, lalu mengunduh PNG.
+- Produces: `saveGacha(state: State): void` dan `loadGacha(): State` (kunci `localStorage` `nte_gacha_v1`, try/catch, data tak valid → `newState()`); daftar riwayat (terbaru di atas, maksimum 200); statistik (total roll, jumlah S dan A, Annulith terpakai = total × 160, roll sejak S terakhir); tombol "Reset"; tombol "Bagikan hasil" yang menggambar canvas (gaya seperti ekspor Tier List di `nte/app.js` sekitar baris 1982) berisi nama papan, jumlah roll, hadiah S/A terbaik dengan gambar dari `nte/img`, lalu mengunduh PNG.
 
 - [ ] **Step 1:** Tulis uji manual tertulis di komentar: `localStorage` diisi `"{bukan json"` lalu muat ulang → halaman mulai awal tanpa error.
 - [ ] **Step 2:** Implement `saveGacha`/`loadGacha`, riwayat, statistik, reset, dan bagikan gambar.

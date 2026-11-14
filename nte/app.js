@@ -1203,6 +1203,9 @@
       arrowIn: S("Pintu masuk blok", "Block entrance"), arrowOut: S("Pintu keluar blok", "Block exit"),
     };
     const LBL = { roll1: "+1", roll5: "+5" };
+    const SKIN_LBL = { outfit: S("Outfit karakter", "Character Outfit"), livery: S("Livery kendaraan", "Vehicle Livery"), glider: S("Skin Glider", "Glider Skin") };
+    const SKIN_TILE = { outfit: "Daily Outfit", livery: "Mod Up! (Livery)", glider: "Fashion Center" };
+    const SKIN_LANDING = { outfit: "outfit", livery: "livery", glider: "fashion" };
     const tileLabel = (t) => (t.type === "lost" ? "×" + (t.amount || 30) : LBL[t.type] || "");
     const tileHtml = (t) => `<div class="gc-t gc-${t.type}${t.slumber ? " gc-slumber" : ""}${arrowDir[t.id] === "◀" ? " gc-arrowLeft" : ""}" style="left:${pct(t.x - ax - TS / 2, BW)};top:${pct(t.y - ay - TS / 2, BH)};width:${pct(TS, BW)};height:${pct(TS, BH)}" title="${esc(TNAME[t.type] || t.type)}"><b>${esc(tileLabel(t))}</b></div>`;
     function setupBoard() {
@@ -1216,20 +1219,22 @@
     // ---- tampilan satu hadiah
     function describe(rw) {
       const ch = (e, tag) => ({ t: e ? e.name.split(" (")[0] : rw.id, ic: e && e.icon, tag });
-      let d;
+      let d, src = "";
       if (rw.kind === "S") d = ch(eMap[rw.id], "S");
       else if (rw.kind === "A_CHAR") d = ch(eMap[rw.id], "A");
       else if (rw.kind === "A_ARC") d = ch(aMap[rw.id], "A Arc");
       else if (rw.kind === "B_ARC") d = ch(aMap[rw.id], "B Arc");
       else if (rw.kind === "LOST") d = { t: "Lost Pieces ×" + rw.lost, tag: "" };
       else if (rw.kind === "DICE") d = { t: S("Dadu gratis ×", "Free dice ×") + rw.dice, tag: "" };
-      else if (rw.kind === "OUTFIT") d = { t: S("Outfit karakter", "Character Outfit"), tag: "Skin" };
-      else if (rw.kind === "LIVERY") d = { t: S("Livery kendaraan", "Vehicle Livery"), tag: "Skin" };
-      else if (rw.kind === "GLIDER") d = { t: S("Skin Glider", "Glider Skin"), tag: "Skin" };
-      else d = { t: "—", tag: "" };
-      const extra = [rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
+      else if (rw.skin) {
+        // skin karakter featured: nama dan ikon dari data banner; sumbernya (kotak atau bonus roll) selalu ditampilkan
+        const sk = (banner.skins || {})[rw.skin] || {};
+        d = { t: sk.name || `${SKIN_LBL[rw.skin]} ${eMap[banner.featuredS].name.split(" (")[0]}`, ic: sk.icon, tag: "Skin", note: !sk.name ? S("nama belum diketahui", "name not known yet") : sk.confirmed === false ? S("perkiraan", "estimate") : "" };
+        src = rw.claim ? S(`Dari bonus ${R.skin[rw.skin].atRolls} roll papan`, `From the ${R.skin[rw.skin].atRolls}-roll board bonus`) : S("Dari kotak ", "From tile ") + SKIN_TILE[rw.skin];
+      } else d = { t: "—", tag: "" };
+      const extra = [src, rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
       const cls = rw.kind === "S" ? " s" : rw.kind === "A_CHAR" || rw.kind === "A_ARC" ? " a" : "";
-      return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
+      return `<div class="gc-rw${cls}">${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span><b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${d.note ? ` <em>${esc(d.note)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
     }
 
     const chipsHtml = () => banners.map((b) => `<button type="button" class="chip gc-bn" data-bn="${esc(b.id)}" aria-pressed="${b.id === banner.id}">${esc(b.name)} · ${esc(eMap[b.featuredS].name.split(" (")[0])}</button>`).join("");
@@ -1251,6 +1256,7 @@
         </section>
         <div class="gc-col">
           <section class="calc-card gc-side"><h3>${S("Hasil roll", "Roll results")}</h3><div id="gcOut" class="gc-out"><p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p></div></section>
+          <section class="calc-card gc-side"><h3>Skin Perks</h3><p class="txt calc-note">${S("Skin milik karakter banner ini. Didapat dari kotaknya, atau dari bonus jumlah roll di papan ini.", "Skins of this banner's character. Won from their tile, or from the roll-count bonus on this board.")}</p><div id="gcSkins" class="gc-skins"></div></section>
           <section class="calc-card gc-side"><h3>${S("Statistik", "Stats")}</h3><div id="gcStats" class="gc-stats"></div>
             <div class="gc-btns" style="margin-top:12px"><button type="button" class="chip" id="gcShare" aria-pressed="true">${S("Bagikan hasil", "Share result")}</button><button type="button" class="chip" id="gcReset">Reset</button></div></section>
           <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gcHist" class="gc-out"></div></section>
@@ -1324,16 +1330,29 @@
       };
       add(x.reward, false);
       if (x.gift) add(x.gift, true);
+      (x.skinClaims || []).forEach((c) => add(c, false));
       if (hist.length > 200) hist.length = 200;
     }
     function showBatch(batch) {
-      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${x.skinBonus.length ? `<div class="gc-gift">${S("Bonus skin tercapai", "Skin bonus reached")}: ${esc(x.skinBonus.join(", "))}</div>` : ""}</li>`).join("");
+      const rows = batch.map((x) => `<li>${describe(x.reward)}${x.gift ? `<div class="gc-gift">Points Gift: ${describe(x.gift)}</div>` : ""}${(x.skinClaims || []).map((c) => `<div class="gc-gift">${S("Bonus roll papan", "Board roll bonus")}: ${describe(c)}</div>`).join("")}</li>`).join("");
       $("#gcOut").innerHTML = `<ol class="gc-list">${rows}</ol>`;
     }
+    function renderSkins() {
+      const feat = eMap[banner.featuredS].name.split(" (")[0];
+      const rolls = (st.boardRolls || {})[banner.boardId] || 0;
+      $("#gcSkins").innerHTML = ["outfit", "livery", "glider"].map((k) => {
+        const sk = (banner.skins || {})[k] || {};
+        const have = ((st.obtained || {})["skin:" + k + ":" + banner.featuredS] || 0) > 0;
+        const note = !sk.name ? S("nama belum diketahui", "name not known yet") : sk.confirmed === false ? S("perkiraan", "estimate") : "";
+        const rate = (R.landing[SKIN_LANDING[k]] * 100).toFixed(2);
+        return `<div class="gc-sk"><div class="gc-skic">${sk.icon ? `<img src="${esc(img(sk.icon))}" alt="" loading="lazy" width="44" height="44">` : "?"}</div><div class="gc-skt"><b>${esc(sk.name || SKIN_LBL[k] + " " + feat)}</b>${note ? ` <em>${esc(note)}</em>` : ""}<small>${esc(S("Dari kotak ", "From tile ") + SKIN_TILE[k])} (${rate}% ${S("per roll", "per roll")}) · ${S("bonus", "bonus")} ${Math.min(rolls, R.skin[k].atRolls)}/${R.skin[k].atRolls} ${S("roll papan", "board rolls")}</small></div><span class="gc-skst${have ? " on" : ""}">${have ? S("Sudah dapat", "Owned") : S("Belum", "Not yet")}</span></div>`;
+      }).join("");
+    }
     function renderSide() {
+      renderSkins();
       const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
       const avg = stats.S ? ` · ${S("rata-rata", "avg")} ${(st.total / stats.S).toFixed(1)}/S` : "";
-      $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Anowith (perkiraan)", "Anowith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"));
+      $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Annulith (perkiraan)", "Annulith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"));
       $("#gcHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.slice(0, 40).map((h) => `<li><small class="mono">#${h.n}${h.gift ? " · Points Gift" : ""}</small>${describe(h)}</li>`).join("")}</ol>` : `<p class="txt">${S("Belum ada roll.", "No rolls yet.")}</p>`;
     }
     function resetAll() {
@@ -1351,7 +1370,7 @@
       if (busy || !nb || nb.id === banner.id) return;
       banner = nb; board = boards[nb.boardFile]; R = mkRules(nb);
       st = GE.switchBoard(st, nb.boardId, board);
-      setupBoard(); mountBoard(); counters(); save();
+      setupBoard(); mountBoard(); counters(); renderSide(); save();
     }
     async function shareImage() {
       if (busy) return;
@@ -1368,7 +1387,7 @@
       g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Simulator Gacha NTE", PAD, 52);
       g.fillStyle = banner.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(banner.name + " · " + featured.name.split(" (")[0], PAD, 98);
       g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
-      g.fillText(`${st.total} roll · S-Class ${stats.S} · A-Class ${stats.A} · Anowith ≈ ${(st.total * R.cost.perRoll).toLocaleString("id-ID")}`, PAD, 128);
+      g.fillText(`${st.total} roll · S-Class ${stats.S} · A-Class ${stats.A} · Annulith ≈ ${(st.total * R.cost.perRoll).toLocaleString("id-ID")}`, PAD, 128);
       if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada S atau A. Terus roll!", "No S or A yet. Keep rolling!"), PAD, HEAD + 40); }
       top.forEach((h, i) => {
         const it = info(h), cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
