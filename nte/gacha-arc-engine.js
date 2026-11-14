@@ -51,7 +51,14 @@
       const up = x === "U";
       const pool = banner.pools[rarity];
       const idx = up ? upIdx : rarity === "S" ? otherS[Math.floor(rng() * otherS.length)] : Math.floor(rng() * pool.length);
-      return { rarity, up, idx, bonus: { ...rules.bonus[rarity] } };
+      const arc = { rarity, up, idx, bonus: { ...rules.bonus[rarity] } };
+      if (rarity === "S") {
+        // pity saat didapat: jumlah Pull sejak S terakhir (dan sejak Arc UP terakhir), termasuk kotak ini
+        arc.pity = sinceS;
+        arc.upPity = sinceUp;
+        arc.hard = up ? forced.up : forced.s;
+      }
+      return arc;
     });
 
     const st = { ...state };

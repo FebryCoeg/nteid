@@ -1150,6 +1150,73 @@
     });
   }
 
+  // ---------------- GAMBAR BAGIKAN GACHA (ringkasan + daftar S dengan pity berwarna) ----------------
+  // o: { title, sub, accent, rows: [{ label, color, total, percent, avg }], chips: [{ name, num, color, hard }], legend: [{ color, text }], file, emptyText }
+  async function pityShareImage(o) {
+    const W = 1000, PAD = 30, CH = 36, GAP = 10, MAXCHIPS = 60;
+    const chipFont = "700 15px 'Plus Jakarta Sans', Arial, sans-serif";
+    const mg = document.createElement("canvas").getContext("2d");
+    mg.font = chipFont;
+    const all = o.chips, chips = all.slice(-MAXCHIPS).map((c) => {
+      const tw = mg.measureText(c.name).width, bw = Math.max(36, mg.measureText(String(c.num)).width + 20);
+      return { ...c, tw, bw, w: 16 + tw + 10 + bw + 4 };
+    });
+    const ROWH = 34, TOP = 150, tableH = ROWH * (o.rows.length + 1) + 16;
+    // tata letak mengalir
+    let x = PAD, y = 0;
+    chips.forEach((c) => { if (x + c.w > W - PAD) { x = PAD; y += CH + GAP; } c.x = x; c.y = y; x += c.w + GAP; });
+    const chipsH = chips.length ? y + CH : 40;
+    const noteH = all.length > MAXCHIPS ? 26 : 0;
+    const H = TOP + tableH + 24 + noteH + chipsH + 26 + 70;
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const g = cv.getContext("2d");
+    const rr = (px, py, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(px, py, w, h, r); else { g.moveTo(px + r, py); g.arcTo(px + w, py, px + w, py + h, r); g.arcTo(px + w, py + h, px, py + h, r); g.arcTo(px, py + h, px, py, r); g.arcTo(px, py, px + w, py, r); g.closePath(); } };
+    g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
+    g.textBaseline = "middle"; g.textAlign = "left";
+    g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText(o.title, PAD, 52);
+    g.fillStyle = o.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(o.sub, PAD, 98);
+    // tabel ringkasan (Total / Percent / Pity AVG)
+    let ty = TOP - 10;
+    g.fillStyle = "#1b1b24"; rr(PAD, ty, W - PAD * 2, tableH, 14); g.fill();
+    const cols = [W - PAD - 330, W - PAD - 200, W - PAD - 40];
+    g.font = "700 15px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillStyle = "#c9c4bb"; g.textAlign = "right";
+    ["Total", "Percent", "Pity AVG"].forEach((t, i) => g.fillText(t, cols[i], ty + 22));
+    o.rows.forEach((r, i) => {
+      const ry = ty + 22 + ROWH * (i + 1);
+      g.strokeStyle = "#ffffff18"; g.lineWidth = 1; g.beginPath(); g.moveTo(PAD + 14, ry - ROWH / 2); g.lineTo(W - PAD - 14, ry - ROWH / 2); g.stroke();
+      g.textAlign = "left"; g.fillStyle = r.color; g.font = "800 20px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillText(r.label, PAD + 20, ry);
+      g.textAlign = "right"; g.font = "800 20px 'Plus Jakarta Sans', Arial, sans-serif";
+      g.fillText(String(r.total), cols[0], ry); g.fillText(r.percent, cols[1], ry); g.fillText(r.avg, cols[2], ry);
+    });
+    // daftar S dengan bubble pity berwarna
+    const cy0 = TOP + tableH + 24;
+    if (noteH) { g.textAlign = "left"; g.fillStyle = "#8f8b84"; g.font = "600 14px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillText(S(`Menampilkan ${MAXCHIPS} terakhir dari ${all.length}.`, `Showing the last ${MAXCHIPS} of ${all.length}.`), PAD, cy0 - 4); }
+    if (!chips.length) { g.textAlign = "left"; g.fillStyle = "#8f8b84"; g.font = "600 16px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillText(o.emptyText, PAD, cy0 + 20); }
+    chips.forEach((c) => {
+      const px = c.x, py = cy0 + noteH + c.y;
+      g.fillStyle = "#1b1b24"; rr(px, py, c.w, CH, CH / 2); g.fill();
+      g.lineWidth = 2; g.strokeStyle = o.accent; rr(px, py, c.w, CH, CH / 2); g.stroke();
+      g.textAlign = "left"; g.fillStyle = "#ece6dd"; g.font = chipFont; g.fillText(c.name, px + 16, py + CH / 2 + 1);
+      const bx = px + c.w - c.bw - 4;
+      g.fillStyle = c.color; rr(bx, py + 4, c.bw, CH - 8, (CH - 8) / 2); g.fill();
+      if (c.hard) { g.lineWidth = 2; g.strokeStyle = "#fff"; rr(bx, py + 4, c.bw, CH - 8, (CH - 8) / 2); g.stroke(); }
+      g.textAlign = "center"; g.fillStyle = "#14141a"; g.font = "800 15px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillText(String(c.num), bx + c.bw / 2, py + CH / 2 + 1);
+    });
+    // legenda warna pity
+    let lx = PAD; const ly = H - 56;
+    g.font = "600 13px 'Plus Jakarta Sans', Arial, sans-serif"; g.textAlign = "left";
+    o.legend.forEach((l) => { g.fillStyle = l.color; g.beginPath(); g.arc(lx + 7, ly, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = "#c9c4bb"; g.fillText(l.text, lx + 20, ly + 1); lx += 34 + g.measureText(l.text).width; });
+    g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
+    g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - 22);
+    cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = o.file; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
+  }
+  const PITY_COL = { green: "#4ade80", yellow: "#facc15", orange: "#fb923c", red: "#f87171" };
+  // Esper: 1-30 hijau, 31-70 kuning, 71-89 oranye (soft pity, papan Modified), 90 merah (hard pity)
+  const pityColorE = (n, hard) => (hard || n >= 90 ? PITY_COL.red : n >= 71 ? PITY_COL.orange : n >= 31 ? PITY_COL.yellow : PITY_COL.green);
+  // Arc: S di Pull 1-2 hijau, 3-4 kuning, 5 oranye, 6 merah (hard pity)
+  const pityColorA = (n, hard) => (hard || n >= 6 ? PITY_COL.red : n >= 5 ? PITY_COL.orange : n >= 3 ? PITY_COL.yellow : PITY_COL.green);
+  const avgTxt = (sum, n, d = 1) => (n ? (sum / n).toFixed(d) : "—");
+
   // ---------------- SIMULATOR GACHA ----------------
   async function viewGacha() {
     setTitle(S("Simulator Gacha", "Gacha Simulator"));
@@ -1174,7 +1241,7 @@
 
     // ---- penyimpanan lokal (kunci v2: keadaan bersama + posisi per papan, riwayat, statistik, banner aktif)
     const KEY = "nte_gacha_v2";
-    let hist = [], stats = { S: 0, A: 0, B: 0 }, st, savedBanner = null;
+    let hist = [], stats = { S: 0, A: 0, B: 0, pSum: 0, pN: 0 }, st, savedBanner = null;
     let banner = banners.find((b) => b.id === bannersData.default) || banners[0];
     try {
       const raw = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -1186,7 +1253,8 @@
         savedBanner = first;
         if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && typeof h.kind === "string").slice(0, 200);
         const sx = raw.stats;
-        if (sx && ["S", "A", "B"].every((k) => Number.isInteger(sx[k]) && sx[k] >= 0)) stats = { S: sx.S, A: sx.A, B: sx.B };
+        const ok = (k) => sx && Number.isInteger(sx[k]) && sx[k] >= 0;
+        if (["S", "A", "B"].every(ok)) stats = { S: sx.S, A: sx.A, B: sx.B, pSum: ok("pSum") ? sx.pSum : 0, pN: ok("pN") ? sx.pN : 0 };
       }
     } catch (e) { st = GE.restoreState(null, boards[banner.boardFile], mkRules(banner)); }
     if (savedBanner) banner = savedBanner;
@@ -1234,7 +1302,8 @@
         d = { t: sk.name || `${SKIN_LBL[rw.skin]} ${eMap[banner.featuredS].name.split(" (")[0]}`, ic: sk.icon, tag: "Skin", note: !sk.name ? (sk.iconOnly ? "" : S("nama belum diketahui", "name not known yet")) : sk.confirmed === false ? S("perkiraan", "estimate") : "" };
         src = rw.claim ? S(`Dari bonus ${R.skin[rw.skin].atRolls} roll papan`, `From the ${R.skin[rw.skin].atRolls}-roll board bonus`) : S("Dari kotak ", "From tile ") + SKIN_TILE[rw.skin];
       } else d = { t: "—", tag: "" };
-      const extra = [src, rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
+      const pityTxt = rw.kind === "S" && rw.pity ? `Pity ${rw.pity}${rw.pityKind === "hard" ? " · hard pity" : rw.pityKind === "soft" ? " · soft pity" : ""}` : "";
+      const extra = [pityTxt, src, rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
       const cls = rw.kind === "S" ? " s" : rw.kind === "A_CHAR" || rw.kind === "A_ARC" ? " a" : "";
       return `<div class="gc-rw${cls}">${badge && !inline ? `<i class="gc-badge">${esc(badge)}</i>` : ""}${d.ic ? `<img src="${esc(img(d.ic))}" alt="" loading="lazy" width="40" height="40">` : `<span class="gc-rwi">${esc(d.tag || "·")}</span>`}<span>${badge && inline ? `<small class="gc-bi">${esc(badge)}</small>` : ""}<b>${esc(d.t)}</b>${d.tag && d.ic ? ` <em>${esc(d.tag)}</em>` : ""}${d.note ? ` <em>${esc(d.note)}</em>` : ""}${rw.dup ? ` <em>${S("duplikat", "duplicate")}</em>` : ""}${extra ? `<small>${esc(extra)}</small>` : ""}</span></div>`;
     }
@@ -1332,7 +1401,7 @@
     function record(x) {
       const add = (rw, gift) => {
         hist.unshift({ n: x.n, gift: !!gift, banner: banner.id, ...rw });
-        if (rw.kind === "S") stats.S++;
+        if (rw.kind === "S") { stats.S++; if (rw.pity) { stats.pSum += rw.pity; stats.pN++; } }
         else if (rw.kind === "A_CHAR" || rw.kind === "A_ARC") stats.A++;
         else if (rw.kind === "B_ARC") stats.B++;
       };
@@ -1372,7 +1441,7 @@
       if (busy || !confirm(S("Reset semua hasil simulasi?", "Reset all simulation results?"))) return;
       st = GE.restoreState(null, board, R);
       st = GE.switchBoard(st, banner.boardId, board);
-      hist = []; stats = { S: 0, A: 0, B: 0 };
+      hist = []; stats = { S: 0, A: 0, B: 0, pSum: 0, pN: 0 };
       save(); place(st.pos); counters(); renderSide();
       $("#gcOut").innerHTML = `<p class="txt">${S("Tekan Roll untuk mulai.", "Press Roll to start.")}</p>`;
       $("#gcDie").innerHTML = dieIdle();
@@ -1388,38 +1457,18 @@
     async function shareImage() {
       if (busy) return;
       const featured = eMap[banner.featuredS];
-      const top = hist.filter((h) => h.kind === "S" || h.kind === "A_CHAR" || h.kind === "A_ARC").slice(0, 10);
-      const info = (h) => (h.kind === "A_ARC" ? aMap[h.id] : eMap[h.id]);
-      const W = 1000, CW = 180, CH = 190, PAD = 30, perRow = 5, rows = Math.max(1, Math.ceil(top.length / perRow)), HEAD = 150, FOOT = 50, H = HEAD + rows * CH + FOOT;
-      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-      const g = cv.getContext("2d");
-      const imgs = {};
-      await Promise.all([...new Set(top.map((h) => info(h) && info(h).icon).filter(Boolean))].map((src) => new Promise((res) => { const im = new Image(); im.onload = () => { imgs[src] = im; res(); }; im.onerror = res; im.src = img(src); })));
-      g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
-      g.textBaseline = "middle"; g.textAlign = "left";
-      g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Simulator Gacha NTE", PAD, 52);
-      g.fillStyle = banner.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(banner.name + " · " + featured.name.split(" (")[0], PAD, 98);
-      g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
-      g.fillText(`${st.total} roll · S-Class ${stats.S} · A-Class ${stats.A} · Annulith ≈ ${(st.total * R.cost.perRoll).toLocaleString("id-ID")}`, PAD, 128);
-      if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada S atau A. Terus roll!", "No S or A yet. Keep rolling!"), PAD, HEAD + 40); }
-      top.forEach((h, i) => {
-        const it = info(h), cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
-        const col = h.kind === "S" ? banner.accent : "#b45be0";
-        g.save(); g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.clip();
-        g.fillStyle = "#2c2c31"; g.fillRect(cx - 52, cy - 52, 104, 104);
-        if (it && imgs[it.icon]) g.drawImage(imgs[it.icon], cx - 52, cy - 52, 104, 104);
-        g.restore();
-        g.lineWidth = 4; g.strokeStyle = col; g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.stroke();
-        g.textAlign = "center"; g.fillStyle = "#ece6dd"; g.font = "700 14px 'Plus Jakarta Sans', Arial, sans-serif";
-        const nm = it ? it.name.split(" (")[0] : h.id;
-        g.fillText(nm.length > 18 ? nm.slice(0, 17) + "…" : nm, cx, cy + 74);
-        g.fillStyle = col; g.font = "600 12px 'JetBrains Mono', monospace";
-        g.fillText(`${h.kind === "S" ? "S-Class" : h.kind === "A_ARC" ? "A Arc" : "A-Class"} · #${h.n}`, cx, cy + 94);
-        g.textAlign = "left";
+      const sList = hist.filter((h) => h.kind === "S").reverse(); // urut dari yang paling lama
+      const pct = (v) => (st.total ? (v / st.total * 100).toFixed(2) + "%" : "—");
+      await pityShareImage({
+        title: "Simulator Gacha NTE", sub: banner.name + " · " + featured.name.split(" (")[0], accent: banner.accent,
+        rows: [
+          { label: "S-Class", color: "#ffc24d", total: stats.S, percent: pct(stats.S), avg: avgTxt(stats.pSum, stats.pN, 2) },
+          { label: "A-Class", color: "#c25be8", total: stats.A, percent: pct(stats.A), avg: "—" },
+        ],
+        chips: sList.map((h) => ({ name: (eMap[h.id] ? eMap[h.id].name.split(" (")[0] : h.id), num: h.pity || "?", color: h.pity ? pityColorE(h.pity, h.pityKind === "hard") : "#8f8b84", hard: h.pityKind === "hard" })),
+        legend: [{ color: PITY_COL.green, text: S("Awal (1-30)", "Early (1-30)") }, { color: PITY_COL.yellow, text: S("Tengah (31-70)", "Mid (31-70)") }, { color: PITY_COL.orange, text: S("Soft pity (71-89)", "Soft pity (71-89)") }, { color: PITY_COL.red, text: "Hard pity (90)" }],
+        file: "gacha-nte.png", emptyText: S("Belum ada S-Class. Terus roll!", "No S-Class yet. Keep rolling!"),
       });
-      g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
-      g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - FOOT / 2);
-      cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "gacha-nte.png"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
     }
 
     $("#gcR1").onclick = () => doRolls(1);
@@ -1462,14 +1511,14 @@
 
     // ---- penyimpanan lokal
     const KEY = "nte_gacha_arc_v1";
-    let st = AE.newArcState(), hist = [], tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0 };
+    let st = AE.newArcState(), hist = [], tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0, pSum: 0, pN: 0, uSum: 0, uN: 0 };
     try {
       const raw = JSON.parse(localStorage.getItem(KEY) || "null");
       st = AE.restoreArcState(raw && raw.state, rules);
       if (st.boxes > 0 && raw) {
         if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && Number.isInteger(h.n) && Array.isArray(h.arcs)).slice(0, 60);
         const t = raw.tot;
-        if (t && Object.keys(tot).every((k) => Number.isInteger(t[k]) && t[k] >= 0)) tot = { ...t };
+        if (t) Object.keys(tot).forEach((k) => { if (Number.isInteger(t[k]) && t[k] >= 0) tot[k] = t[k]; }); // kunci baru boleh kosong di simpanan lama
         const b = banners.find((x) => x.id === raw.banner);
         if (b) banner = b;
       }
@@ -1483,7 +1532,7 @@
       const e = entryOf(a.rarity, a.idx), arc = e.arc ? aMap[e.arc] : null;
       const name = arc ? arc.name : `Arc ${a.rarity} · ${e.type}`;
       const art = arc ? `<img src="${esc(img(arc.icon))}" alt="" width="84" height="84">` : `<div class="ga-gen">${typeIcon[e.type] ? `<img src="${esc(img(typeIcon[e.type]))}" alt="" width="40" height="40">` : ""}<b>${a.rarity}</b></div>`;
-      const bonus = a.bonus.warp ? `+${a.bonus.warp} Warp` : a.bonus.lost ? `+${a.bonus.lost} Lost` : "";
+      const bonus = (a.rarity === "S" && a.pity ? `Pity ${a.pity}${a.up && a.upPity ? " · UP " + a.upPity : ""}${a.hard ? " · hard" : ""} · ` : "") + (a.bonus.warp ? `+${a.bonus.warp} Warp` : a.bonus.lost ? `+${a.bonus.lost} Lost` : "");
       return `<div class="ga-card ga-${a.rarity.toLowerCase()}${a.up ? " ga-up" : ""}" style="--i:${i}"><div class="ga-art">${art}${a.up ? `<i class="ga-upb">UP</i>` : ""}<span class="ga-r">${a.rarity}</span></div><b>${esc(name)}</b><small>${esc(bonus)}</small></div>`;
     }
 
@@ -1571,8 +1620,9 @@
         res.arcs.forEach((a) => {
           tot[a.rarity]++; if (a.up) tot.UP++;
           tot.warp += a.bonus.warp || 0; tot.lost += a.bonus.lost || 0;
+          if (a.rarity === "S") { tot.pSum += a.pity; tot.pN++; if (a.up) { tot.uSum += a.upPity; tot.uN++; } }
         });
-        hist.unshift({ n: st.boxes, arcs: res.arcs.map((a) => ({ r: a.rarity, up: a.up, i: a.idx })) });
+        hist.unshift({ n: st.boxes, arcs: res.arcs.map((a) => ({ r: a.rarity, up: a.up, i: a.idx, p: a.pity, u: a.upPity, h: !!a.hard })) });
         if (hist.length > 60) hist.length = 60;
         save();
         await play(res);
@@ -1581,46 +1631,29 @@
     }
     function resetAll() {
       if (busy || !confirm(S("Reset semua hasil simulasi Arc?", "Reset all Arc simulation results?"))) return;
-      st = AE.newArcState(); hist = []; tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0 };
+      st = AE.newArcState(); hist = []; tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0, pSum: 0, pN: 0, uSum: 0, uN: 0 };
       save(); pity(); side();
       $r("#gaCards").innerHTML = ""; $r("#gaHint").hidden = false;
     }
     async function shareImage() {
       if (busy) return;
-      const ups = [];
-      hist.forEach((h) => h.arcs.forEach((a) => { if (a.r === "S") ups.push({ ...a, n: h.n }); }));
-      const top = ups.slice(0, 10);
-      const W = 1000, CW = 180, CH = 190, PAD = 30, perRow = 5, rows = Math.max(1, Math.ceil(top.length / perRow)), HEAD = 150, FOOT = 50, H = HEAD + rows * CH + FOOT;
-      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-      const g = cv.getContext("2d");
-      const imgs = {};
-      const srcs = [...new Set(top.map((a) => { const e = entryOf("S", a.i); return e.arc && aMap[e.arc] ? aMap[e.arc].icon : null; }).filter(Boolean))];
-      await Promise.all(srcs.map((src) => new Promise((res) => { const im = new Image(); im.onload = () => { imgs[src] = im; res(); }; im.onerror = res; im.src = img(src); })));
-      g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
-      g.textBaseline = "middle"; g.textAlign = "left";
-      g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Gacha Arc NTE", PAD, 52);
-      g.fillStyle = banner.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(banner.name + " · " + featured().name, PAD, 98);
-      g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
-      g.fillText(`${st.boxes} Pull · S-Class ${tot.S} (UP ${tot.UP}) · A ${tot.A} · B ${tot.B}`, PAD, 128);
-      if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada Arc S. Terus Pull!", "No S-Class Arc yet. Keep pulling!"), PAD, HEAD + 40); }
-      top.forEach((a, i) => {
-        const e = entryOf("S", a.i), arc = e.arc ? aMap[e.arc] : null, cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
-        g.save(); g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.clip();
-        g.fillStyle = "#2c2c31"; g.fillRect(cx - 52, cy - 52, 104, 104);
-        if (arc && imgs[arc.icon]) g.drawImage(imgs[arc.icon], cx - 52, cy - 52, 104, 104);
-        g.restore();
-        g.lineWidth = 4; g.strokeStyle = banner.accent; g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.stroke();
-        g.textAlign = "center"; g.fillStyle = "#ece6dd"; g.font = "700 14px 'Plus Jakarta Sans', Arial, sans-serif";
-        const nm = arc ? arc.name : `Arc S · ${e.type}`;
-        g.fillText(nm.length > 18 ? nm.slice(0, 17) + "…" : nm, cx, cy + 74);
-        g.fillStyle = banner.accent; g.font = "600 12px 'JetBrains Mono', monospace";
-        g.fillText(`${a.up ? "UP" : "S-Class"} · Pull #${a.n}`, cx, cy + 94);
-        g.textAlign = "left";
+      const sList = [];
+      hist.slice().reverse().forEach((h) => h.arcs.forEach((a) => { if (a.r === "S") sList.push({ ...a, n: h.n }); }));
+      const perArc = st.boxes ? (tot.S / (st.boxes * rules.perBox) * 100).toFixed(2) + "%" : "—";
+      const perArcA = st.boxes ? (tot.A / (st.boxes * rules.perBox) * 100).toFixed(2) + "%" : "—";
+      await pityShareImage({
+        title: "Gacha Arc NTE", sub: banner.name + " · " + featured().name, accent: banner.accent,
+        rows: [
+          { label: "S-Class", color: "#ffc24d", total: tot.S, percent: perArc, avg: avgTxt(tot.pSum, tot.pN, 2) },
+          { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: tot.UP, percent: st.boxes ? (tot.UP / (st.boxes * rules.perBox) * 100).toFixed(2) + "%" : "—", avg: avgTxt(tot.uSum, tot.uN, 2) },
+          { label: "A-Class", color: "#c25be8", total: tot.A, percent: perArcA, avg: "—" },
+        ],
+        chips: sList.map((a) => { const e = entryOf("S", a.i), arc = e.arc ? aMap[e.arc] : null; return { name: (arc ? arc.name : `Arc S · ${e.type}`) + (a.up && a.u ? ` · UP ${a.u}` : ""), num: a.p || "?", color: a.p ? pityColorA(a.p, a.h) : "#8f8b84", hard: !!a.h }; }),
+        legend: [{ color: PITY_COL.green, text: S("Awal (Pull 1-2)", "Early (Pull 1-2)") }, { color: PITY_COL.yellow, text: S("Tengah (3-4)", "Mid (3-4)") }, { color: PITY_COL.orange, text: S("Hampir hard pity (5)", "Near hard pity (5)") }, { color: PITY_COL.red, text: "Hard pity (6)" }],
+        file: "gacha-arc-nte.png", emptyText: S("Belum ada Arc S. Terus Pull!", "No S-Class Arc yet. Keep pulling!"),
       });
-      g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
-      g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - FOOT / 2);
-      cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "gacha-arc-nte.png"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
     }
+    function featuredName() { return featured().name; }
 
     $r("#gaPull").onclick = pull;
     $r("#gaSkip").onclick = () => { skip = true; };
@@ -1629,7 +1662,7 @@
     // tampilkan hasil Pull terakhir bila ada
     if (hist.length) {
       $r("#gaHint").hidden = true;
-      $r("#gaCards").innerHTML = hist[0].arcs.map((a, i) => cardHtml({ rarity: a.r, up: a.up, idx: a.i, bonus: rules.bonus[a.r] }, i)).join("");
+      $r("#gaCards").innerHTML = hist[0].arcs.map((a, i) => cardHtml({ rarity: a.r, up: a.up, idx: a.i, bonus: rules.bonus[a.r], pity: a.p, upPity: a.u, hard: a.h }, i)).join("");
     }
     pity(); side();
   }

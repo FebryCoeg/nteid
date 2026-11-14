@@ -203,7 +203,11 @@
     const tile = ix.byId[landed];
     const reward = decideReward(state, tile, rules, rng, sEvent);
     const out = applyRoll({ ...state, pos: landed }, reward, rules, rng);
-    return { n: out.state.total, die, path, landed, reward: out.reward, gift: out.gift, skinBonus: out.skinBonus, skinClaims: out.skinClaims,
+    // S-Class: catat pity saat didapat (jumlah roll sejak S terakhir, termasuk roll ini) dan jenisnya
+    const rw = out.reward.kind === "S"
+      ? { ...out.reward, pity: state.sinceS + 1, pityKind: forced ? "hard" : state.mode === "modified" ? "soft" : "normal" }
+      : out.reward;
+    return { n: out.state.total, die, path, landed, reward: rw, gift: out.gift, skinBonus: out.skinBonus, skinClaims: out.skinClaims,
       forced, modeAfter: out.state.mode, extra: [], state: out.state };
   }
 

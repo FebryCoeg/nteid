@@ -466,3 +466,22 @@ test("banner Scarborough Fair: outfit = Drifting Petals (database), livery pakai
   assert.ok(sk.livery.icon);
   assert.ok(fs.existsSync(path.join(ROOT, "nte", sk.livery.icon)));
 });
+
+// ---------------------------------------------------------------- Catatan pity saat S didapat (untuk gambar bagikan)
+test("roll S mencatat pity: normal, soft pity (papan Modified), dan hard pity", () => {
+  // S langsung di roll pertama
+  const first = E.roll(E.newState(), mkBoard(Array(8).fill("hero")), R, () => 0, { blockRule: "enterFirst" });
+  assert.equal(first.reward.kind, "S");
+  assert.deepEqual([first.reward.pity, first.reward.pityKind], [1, "normal"]);
+  // 70 roll tanpa S lalu S di roll ke-71: papan Modified = soft pity
+  let st = E.newState();
+  const B = mkBoard(Array(8).fill("hero"));
+  for (let i = 0; i < 70; i++) st = E.roll(st, B, R, NEVER, { blockRule: "enterFirst" }).state;
+  const soft = E.roll(st, B, R, () => 0, { blockRule: "enterFirst" });
+  assert.deepEqual([soft.reward.pity, soft.reward.pityKind], [71, "soft"]);
+  // 89 roll tanpa S: roll ke-90 dipaksa = hard pity
+  let s2 = E.newState();
+  for (let i = 0; i < 89; i++) s2 = E.roll(s2, B, R, NEVER, { blockRule: "enterFirst" }).state;
+  const hard = E.roll(s2, B, R, NEVER, { blockRule: "enterFirst" });
+  assert.deepEqual([hard.reward.pity, hard.reward.pityKind], [90, "hard"]);
+});

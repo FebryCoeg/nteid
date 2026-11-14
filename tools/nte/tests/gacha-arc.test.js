@@ -116,3 +116,17 @@ test("data Arc: Arc S sesuai daftar pemilik situs; Arc A dan B diambil dari data
   }
   assert.ok(data.banners.some((b) => b.id === data.default));
 });
+
+test("pity tercatat per Arc S: S pity di kotak ke-6 = hard pity, UP pity di kotak ke-8 = hard pity", () => {
+  let st = AE.newArcState();
+  const boxes = [];
+  for (let i = 1; i <= 8; i++) { const r = AE.openBox(st, rules, banner, NEVER); st = r.state; boxes.push(r); }
+  const s6 = boxes[5].arcs.find((a) => a.rarity === "S");
+  assert.deepEqual([s6.pity, s6.hard], [6, true]);
+  const up8 = boxes[7].arcs.find((a) => a.up);
+  assert.deepEqual([up8.pity, up8.upPity, up8.hard], [2, 8, true]); // S terakhir di kotak ke-6 -> 2 kotak lalu UP
+  // S alami di kotak pertama: pity 1, bukan hard
+  const lucky = AE.openBox(AE.newArcState(), rules, banner, () => 0);
+  const s1 = lucky.arcs.find((a) => a.rarity === "S");
+  assert.deepEqual([s1.pity, s1.hard], [1, false]);
+});
