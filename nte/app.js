@@ -1228,6 +1228,7 @@
       cBI: S("Angka Break Intensity karakter itu. Tidak tahu? Isi 0.", "That character's Break Intensity number. Not sure? Enter 0."),
       cBB: S("Bonus damage Break dalam persen. Biasanya 0.", "Break damage bonus in percent. Usually 0."),
     };
+    const ARCRANK = { 5: "S", 4: "A", 3: "B" };
     const sw = (id, inner) => `<span class="csel"><img class="cth" id="t_${id}" alt="" hidden><select id="${id}">${inner}</select></span>`;
     const hb = (id) => `<button type="button" class="chi" aria-label="${S("Penjelasan", "Help")}" aria-expanded="false">!</button>`;
     const hd = (id) => `<div class="chelp" hidden>${esc(HELP[id] || "")}</div>`;
@@ -1279,7 +1280,7 @@
     const esper = (slug) => list.find((e) => e.slug === slug);
     function fillArc() {
       const e = esper($c("cE").value), want = ((BUILDS[e.slug] || {}).arcs || [])[0];
-      $c("cA").innerHTML = opt("", S("Tanpa Arc", "No Arc"), false) + arcList.filter((x) => x.type === e.arcType).map((a) => opt(a.slug, a.name, a.slug === want)).join("");
+      $c("cA").innerHTML = opt("", S("Tanpa Arc", "No Arc"), false) + arcList.filter((x) => x.type === e.arcType).sort((x, y) => y.rarity - x.rarity || x.name.localeCompare(y.name)).map((a) => opt(a.slug, `[${ARCRANK[a.rarity] || "?"}] ${a.name}`, a.slug === want)).join("");
       const el = e.element === "Anima" ? "Nature" : e.element;
       $c("cEl").innerHTML = ["Cosmos", "Nature", "Incantation", "Chaos", "Psyche", "Lakshana", "Normal"].map((k) => opt(k, k === "Nature" ? "Anima" : k, k === el)).join("");
       const sk = SD.espers[e.id].skills;
