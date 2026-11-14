@@ -1322,6 +1322,7 @@
         ${field("bL" + i, "Level", 80)}${field("bI" + i, "Break Intensity", 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBI") + "</label>")}${field("bB" + i, S("Bonus Break (%)", "Break bonus (%)"), 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBB") + "</label>")}
       </div>`).join("");
     main.innerHTML = head(S("KALKULATOR", "CALCULATOR"), S("Kalkulator Damage", "Damage Calculator"), S("Hitung damage satu serangan karakter ke musuh, dari data base game. Tanpa rotasi: satu karakter, satu skill.", "Calculate one character's damage per hit against an enemy from base game data. No rotation: one character, one skill."), null) + `
+      <p class="calc-beta"><b>${S("Masih tahap uji coba.", "Still in testing.")}</b> ${S("Rumusnya sudah dicocokkan dengan pertarungan nyata, tapi belum semua efek dihitung (Awakening, efek Arc dan modul, Stain, damage Mental/True). Anggap hasilnya perkiraan.", "The formula has been checked against a real fight, but not every effect is counted yet (Awakening, Arc and module effects, Stain, Mental/True damage). Treat results as estimates.")}</p>
       <div class="calc">
         <section class="calc-card"><h3>${S("1 · Karakter dan skill", "1 · Character and skill")}</h3>
           <div class="calc-grid">
@@ -1339,7 +1340,7 @@
           <p class="txt calc-note">${S("Isi total dari layar karakter di game (persen, tanpa tanda %). Stat dasar karakter dan Arc diambil otomatis.", "Enter totals from the in-game character screen (percent, no % sign). Base character and Arc stats are filled in automatically.")}</p>
           <div class="calc-grid">
             ${field("cAP", S("ATK % dari modul dan buff", "ATK % from modules and buffs"), 0)}${field("cAF", S("ATK flat dari modul/buff", "Flat ATK from modules/buffs"), 0, S("bukan Base ATK", "not Base ATK"))}
-            ${field("cAT", S("ATK total dari game", "Total ATK from game"), "", S("opsional, mengabaikan dua kolom di atas", "optional, overrides the two fields above"))}
+            ${field("cAT", S("ATK total dari game", "Total ATK from game"), "", S("opsional", "optional"))}
             ${field("cCR", S("CRIT Rate (%)", "CRIT Rate (%)"), 5, S("angka di status", "as shown in stats"))}${field("cCD", S("CRIT DMG (%)", "CRIT DMG (%)"), 50, S("angka di status", "as shown in stats"))}
             ${field("cDB", S("Bonus DMG total (%)", "Total DMG bonus (%)"), 0, S("elemen + umum + skill", "element + general + skill"))}${field("cFB", S("Bonus Final DMG (%)", "Final DMG bonus (%)"), 0)}
             ${field("cDI", S("Abaikan DEF (%)", "DEF ignore (%)"), 0)}${field("cDR", S("Kurangi DEF musuh (%)", "DEF reduction (%)"), 0)}
