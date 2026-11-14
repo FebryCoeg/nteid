@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300">
+<defs>
+<linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23232c"/><stop offset="1" stop-color="#0c0c11"/></linearGradient>
+<linearGradient id="lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe0f0" stop-opacity=".55"/><stop offset="1" stop-color="#7f93a8" stop-opacity=".28"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3d77a"/><stop offset=".5" stop-color="#c79a2c"/><stop offset="1" stop-color="#f3d77a"/></linearGradient>
+<linearGradient id="slot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a46"/><stop offset="1" stop-color="#1b1b22"/></linearGradient>
+<radialGradient id="emb" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6a5a"/><stop offset="1" stop-color="#b3141a"/></radialGradient>
+</defs>
+<ellipse cx="240" cy="278" rx="206" ry="16" fill="#000" opacity=".4"/>
+<!-- sisi atas (tutup kaca) -->
+<path d="M44 124 L100 62 L400 62 L456 124 Z" fill="url(#lid)" stroke="url(#gold)" stroke-width="4" stroke-linejoin="round"/>
+<g stroke="#e8f2ff" stroke-width="1.4" opacity=".55">
+<path d="M70 124 L116 70M96 124 L132 70M122 124 L148 70M148 124 L164 70M174 124 L180 70M200 124 L196 70M226 124 L212 70M252 124 L228 70M278 124 L244 70M304 124 L260 70M330 124 L276 70M356 124 L292 70M382 124 L308 70M408 124 L324 70M434 124 L340 70"/>
+<path d="M60 108 H440M78 92 H422M92 78 H408"/>
+</g>
+<!-- badan depan -->
+<path d="M30 124 H470 V258 Q470 270 458 270 H42 Q30 270 30 258 Z" fill="url(#body)" stroke="url(#gold)" stroke-width="4"/>
+<path d="M30 140 H470" stroke="url(#gold)" stroke-width="2.4" opacity=".8"/>
+<path d="M30 252 H470" stroke="url(#gold)" stroke-width="2.4" opacity=".8"/>
+<!-- segitiga merah di pojok -->
+<path d="M30 124 L52 124 L30 146 Z" fill="#d8282e"/>
+<!-- lambang kiri -->
+<g transform="translate(78 200)">
+<circle r="34" fill="#0d0d12" stroke="url(#gold)" stroke-width="5"/>
+<circle r="26" fill="none" stroke="#f3d77a" stroke-width="2" stroke-dasharray="6 5"/>
+<circle r="14" fill="url(#emb)" stroke="#3a0a0c" stroke-width="2"/>
+<path d="M0 -8 L2.4 -2.4 L8 0 L2.4 2.4 L0 8 L-2.4 2.4 L-8 0 L-2.4 -2.4 Z" fill="#240608"/>
+<path d="M-34 0 H-42M34 0 H42M0 -34 V-42M0 34 V42" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>
+</g>
+<!-- 10 slot berpanah -->
+<g id="slots">
+<g fill="url(#slot)" stroke="#efe6c2" stroke-width="1.6">
+<rect x="128" y="152" width="26" height="84" rx="5"/><rect x="158" y="152" width="26" height="84" rx="5"/><rect x="188" y="152" width="26" height="84" rx="5"/><rect x="218" y="152" width="26" height="84" rx="5"/><rect x="248" y="152" width="26" height="84" rx="5"/>
+<rect x="278" y="152" width="26" height="84" rx="5"/><rect x="308" y="152" width="26" height="84" rx="5"/><rect x="338" y="152" width="26" height="84" rx="5"/><rect x="368" y="152" width="26" height="84" rx="5"/><rect x="398" y="152" width="26" height="84" rx="5"/>
+</g>
+<g fill="none" stroke="#f3d77a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<path d="M135 166l6 5-6 5M141 166l6 5-6 5"/><path d="M165 166l6 5-6 5M171 166l6 5-6 5"/><path d="M195 166l6 5-6 5M201 166l6 5-6 5"/><path d="M225 166l6 5-6 5M231 166l6 5-6 5"/><path d="M255 166l6 5-6 5M261 166l6 5-6 5"/>
+<path d="M285 166l6 5-6 5M291 166l6 5-6 5"/><path d="M315 166l6 5-6 5M321 166l6 5-6 5"/><path d="M345 166l6 5-6 5M351 166l6 5-6 5"/><path d="M375 166l6 5-6 5M381 166l6 5-6 5"/><path d="M405 166l6 5-6 5M411 166l6 5-6 5"/>
+</g>
+<g fill="#f3d77a" opacity=".85">
+<rect x="134" y="196" width="14" height="4" rx="2"/><rect x="164" y="196" width="14" height="4" rx="2"/><rect x="194" y="196" width="14" height="4" rx="2"/><rect x="224" y="196" width="14" height="4" rx="2"/><rect x="254" y="196" width="14" height="4" rx="2"/>
+<rect x="284" y="196" width="14" height="4" rx="2"/><rect x="314" y="196" width="14" height="4" rx="2"/><rect x="344" y="196" width="14" height="4" rx="2"/><rect x="374" y="196" width="14" height="4" rx="2"/><rect x="404" y="196" width="14" height="4" rx="2"/>
+</g>
+</g>
+<!-- detail kanan -->
+<g fill="#f3d77a" opacity=".8"><rect x="438" y="222" width="22" height="3" rx="1.5"/><rect x="438" y="230" width="16" height="3" rx="1.5"/><rect x="438" y="238" width="22" height="3" rx="1.5"/></g>
+</svg>

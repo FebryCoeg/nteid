@@ -1241,13 +1241,13 @@
     const dieIdle = () => dieIcon(40) || "🎲";
     const chipsHtml = () => banners.map((b) => `<button type="button" class="chip gc-bn" data-bn="${esc(b.id)}" aria-pressed="${b.id === banner.id}">${esc(b.name)} · ${esc(eMap[b.featuredS].name.split(" (")[0])}</button>`).join("");
     main.innerHTML = intro + `
-      <p class="calc-beta gc-wide"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
+      <p class="calc-beta gc-wide" id="gcBeta"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar aturan di game (papan Android Dreams, dipakai juga untuk papan lain). Masih perkiraan: susunan papan Modified, posisi pintu masuk/keluar blok, jumlah isi sebagian Lost Piece Box, serta daftar karakter dan Arc A/B di papan.", "Odds come from the in-game rules screen (Android Dreams board, also used for other boards). Still estimates: the Modified board layout, block entrance/exit positions, some Lost Piece Box amounts, and the A/B character and Arc pool on the board.")}</p>
       <div class="gc-toolbar">
-        <div class="gc-tb"><span class="mono gc-lbl">BANNER</span><div class="gc-tabs" id="gcBanners">${chipsHtml()}</div></div>
-        <div class="gc-tb"><span class="mono gc-lbl">${S("JENIS", "TYPE")}</span><div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" aria-selected="true" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" aria-selected="false" disabled>Arc · ${S("segera hadir", "coming soon")}</button></div></div>
+        <div class="gc-tb" id="gcBannerGroup"><span class="mono gc-lbl">BANNER</span><div class="gc-tabs" id="gcBanners">${chipsHtml()}</div></div>
+        <div class="gc-tb"><span class="mono gc-lbl">${S("JENIS", "TYPE")}</span><div class="gc-tabs" role="tablist"><button type="button" class="chip" role="tab" id="gcTabE" aria-pressed="true">Esper</button><button type="button" class="chip" role="tab" id="gcTabA" aria-pressed="false">Arc</button></div></div>
       </div>
       <p class="txt calc-note" id="gcNote" hidden>${S("Susunan papan banner ini masih perkiraan (memakai susunan papan yang sudah diketahui).", "This banner's board layout is still an estimate (it uses the known board layout).")}</p>
-      <div class="gc">
+      <div class="gc" id="gcEsper">
         <div class="gc-col gc-left">
         <section class="calc-card gc-main" id="gcMain">
           <div class="gc-top"><h3 id="gcTitle"></h3><span class="mono" id="gcMode"></span></div>
@@ -1266,7 +1266,8 @@
             <div class="gc-btns" style="margin-top:12px"><button type="button" class="chip" id="gcShare" aria-pressed="true">${S("Bagikan hasil", "Share result")}</button><button type="button" class="chip" id="gcReset">Reset</button></div></section>
           <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gcHist" class="gc-out gc-hist"></div></section>
         </div>
-      </div>`;
+      </div>
+      <div id="gaRoot" hidden></div>`;
 
     let busy = false;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1424,9 +1425,210 @@
     $("#gcReset").onclick = resetAll;
     $("#gcShare").onclick = shareImage;
     $("#gcBanners").onclick = (ev) => { const b = ev.target.closest(".gc-bn"); if (b) switchBanner(b.dataset.bn); };
+    // tab Esper / Arc (Arc dimuat saat pertama dibuka)
+    let arcMounted = false;
+    const showTab = (t) => {
+      const isArc = t === "arc";
+      $("#gcEsper").hidden = isArc; $("#gaRoot").hidden = !isArc; $("#gcBannerGroup").hidden = isArc; $("#gcBeta").hidden = isArc;
+      $("#gcNote").hidden = isArc || banner.boardConfirmed !== false;
+      $("#gcTabE").setAttribute("aria-pressed", String(!isArc)); $("#gcTabA").setAttribute("aria-pressed", String(isArc));
+      if (isArc && !arcMounted) { arcMounted = true; mountGachaArc($("#gaRoot"), arcs); }
+    };
+    $("#gcTabE").onclick = () => showTab("esper");
+    $("#gcTabA").onclick = () => showTab("arc");
+    if (new URLSearchParams(location.search).get("t") === "arc") showTab("arc");
     mountBoard();
     counters();
     renderSide();
+  }
+
+  // ---------------- GACHA ARC (Miracle Box) ----------------
+  // Satu Pull = satu kotak berisi 10 Arc. Aturan dan angka dari nte/data/gacha-arc.json.
+  async function mountGachaArc(root, arcs) {
+    const AE = window.GachaArcEngine, GE = window.GachaEngine;
+    const fail = (t) => { root.innerHTML = `<p class="txt">${t}</p>`; };
+    if (!AE || !GE) return fail(S("Mesin gacha Arc gagal dimuat. Muat ulang halaman.", "The Arc gacha engine failed to load. Reload the page."));
+    let data;
+    try { data = await load("gacha-arc"); } catch (e) { return fail(S("Data gacha Arc tidak bisa dimuat.", "Arc gacha data could not be loaded.")); }
+    const aMap = Object.fromEntries(arcs.map((a) => [a.slug, a]));
+    const typeIcon = {};
+    arcs.forEach((a) => { if (a.typeIcon) typeIcon[a.type] = a.typeIcon; });
+    const banners = data.banners.filter((b) => aMap[b.featuredArc] && aMap[b.featuredArc].rarity === 5);
+    if (!banners.length) return fail(S("Data banner Arc tidak valid.", "Arc banner data is not valid."));
+    let banner = banners.find((b) => b.id === data.default) || banners[0];
+    const rules = data.rules;
+
+    // ---- penyimpanan lokal
+    const KEY = "nte_gacha_arc_v1";
+    let st = AE.newArcState(), hist = [], tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0 };
+    try {
+      const raw = JSON.parse(localStorage.getItem(KEY) || "null");
+      st = AE.restoreArcState(raw && raw.state, rules);
+      if (st.boxes > 0 && raw) {
+        if (Array.isArray(raw.hist)) hist = raw.hist.filter((h) => h && Number.isInteger(h.n) && Array.isArray(h.arcs)).slice(0, 60);
+        const t = raw.tot;
+        if (t && Object.keys(tot).every((k) => Number.isInteger(t[k]) && t[k] >= 0)) tot = { ...t };
+        const b = banners.find((x) => x.id === raw.banner);
+        if (b) banner = b;
+      }
+    } catch (e) { st = AE.newArcState(); }
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ state: st, hist, tot, banner: banner.id })); } catch (e) {} };
+
+    const numFmt = (n) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
+    const featured = () => aMap[banner.featuredArc];
+    const entryOf = (rarity, idx) => banner.pools[rarity][idx];
+    function cardHtml(a, i) {
+      const e = entryOf(a.rarity, a.idx), arc = e.arc ? aMap[e.arc] : null;
+      const name = arc ? arc.name : `Arc ${a.rarity} · ${e.type}`;
+      const art = arc ? `<img src="${esc(img(arc.icon))}" alt="" width="84" height="84">` : `<div class="ga-gen">${typeIcon[e.type] ? `<img src="${esc(img(typeIcon[e.type]))}" alt="" width="40" height="40">` : ""}<b>${a.rarity}</b></div>`;
+      const bonus = a.bonus.warp ? `+${a.bonus.warp} Warp` : a.bonus.lost ? `+${a.bonus.lost} Lost` : "";
+      return `<div class="ga-card ga-${a.rarity.toLowerCase()}${a.up ? " ga-up" : ""}" style="--i:${i}"><div class="ga-art">${art}${a.up ? `<i class="ga-upb">UP</i>` : ""}<span class="ga-r">${a.rarity}</span></div><b>${esc(name)}</b><small>${esc(bonus)}</small></div>`;
+    }
+
+    root.innerHTML = `
+      <p class="calc-beta gc-wide"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar Arc Research Program (Echo Special) di game. Masih perkiraan: nama Arc S/A/B selain Arc featured, pembagian A/B di luar jaminan, dan jumlah kunci per Pull.", "Odds come from the Arc Research Program (Echo Special) screen in game. Still estimates: names of the S/A/B Arcs other than the featured one, the A/B split outside the guarantee, and keys per Pull.")}</p>
+      <div class="gc">
+        <div class="gc-col gc-left">
+          <section class="calc-card gc-main" id="gaMain">
+            <div class="gc-top"><h3>${esc(banner.name)} · <span class="gc-feat">${esc(featured().name)}</span></h3><span class="mono">MIRACLE BOX</span></div>
+            <div class="ga-stage" id="gaStage"><div class="ga-hint" id="gaHint">${S("Tekan Pull untuk membuka Miracle Box.", "Press Pull to open the Miracle Box.")}</div><div class="ga-cards" id="gaCards"></div><div class="ga-flash" id="gaFlash"></div></div>
+            <div class="gc-bar"><div class="gc-btns"><button type="button" class="chip" id="gaPull" aria-pressed="true">Pull · ${rules.keysPerPull} ${S("kunci", "keys")}</button><button type="button" class="chip" id="gaSkip">${S("Lewati animasi", "Skip animation")}</button></div></div>
+            <div class="ga-pities"><div><div class="mono">${S("Pity S-Class", "S-Class pity")}</div><div class="gc-meter"><i id="gaMS"></i></div><p class="mono" id="gaTS"></p></div><div><div class="mono">${S("Pity Arc UP", "UP Arc pity")}</div><div class="gc-meter"><i id="gaMU"></i></div><p class="mono" id="gaTU"></p></div></div>
+          </section>
+        </div>
+        <div class="gc-col gc-right">
+          <section class="calc-card gc-side"><h3>${S("Aturan singkat", "Rules in short")}</h3><p class="txt calc-note">${S("Satu Pull membuka satu kotak berisi 10 Arc, minimal 1 Arc A ke atas. S dijamin dalam 6 Pull, Arc UP dijamin dalam 8 Pull. Pity dipakai bersama semua Limited Issue.", "One Pull opens one box of 10 Arcs, at least 1 A-Class or above. S is guaranteed within 6 Pulls, the UP Arc within 8. Pity is shared across all Limited Issues.")}</p></section>
+          <section class="calc-card gc-side"><h3>${S("Statistik", "Stats")}</h3><div id="gaStats" class="gc-stats"></div>
+            <div class="gc-btns" style="margin-top:12px"><button type="button" class="chip" id="gaShare" aria-pressed="true">${S("Bagikan hasil", "Share result")}</button><button type="button" class="chip" id="gaReset">Reset</button></div></section>
+          <section class="calc-card gc-side"><h3>${S("Riwayat", "History")}</h3><div id="gaHist" class="gc-out gc-hist"></div></section>
+        </div>
+      </div>`;
+    root.querySelector("#gaMain").style.setProperty("--gc-accent", banner.accent);
+
+    const $r = (s) => root.querySelector(s);
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    let busy = false, skip = false;
+    const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function pity() {
+      $r("#gaMS").style.width = (st.sinceS / rules.s.pityBoxes * 100) + "%";
+      $r("#gaMU").style.width = (st.sinceUp / rules.up.pityBoxes * 100) + "%";
+      $r("#gaTS").textContent = `${st.sinceS}/${rules.s.pityBoxes} · ${S("dijamin di Pull ke-", "guaranteed on Pull ")}${rules.s.pityBoxes}`;
+      $r("#gaTU").textContent = `${st.sinceUp}/${rules.up.pityBoxes} · ${S("dijamin di Pull ke-", "guaranteed on Pull ")}${rules.up.pityBoxes}`;
+    }
+    function side() {
+      const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
+      $r("#gaStats").innerHTML = chip(S("Pull dibuka", "Pulls opened"), String(st.boxes)) + chip(S("Kunci terpakai", "Keys used"), numFmt(st.boxes * rules.keysPerPull))
+        + chip("S-Class", String(tot.S)) + chip(S("Arc UP", "UP Arc"), String(tot.UP)) + chip("A-Class", String(tot.A)) + chip("B-Class", String(tot.B))
+        + chip("Warp Pieces", numFmt(tot.warp)) + chip("Lost Pieces", numFmt(tot.lost));
+      $r("#gaHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.map((h) => {
+        const c = { S: 0, A: 0, B: 0, UP: 0 };
+        h.arcs.forEach((a) => { c[a.r]++; if (a.up) c.UP++; });
+        return `<li><div class="gc-rw${c.S ? " s" : c.A ? " a" : ""}"><i class="gc-badge">#${h.n}</i><span><b>S ${c.S}${c.UP ? " (UP " + c.UP + ")" : ""} · A ${c.A} · B ${c.B}</b></span></div></li>`;
+      }).join("")}</ol>` : `<p class="txt">${S("Belum ada Pull.", "No Pulls yet.")}</p>`;
+    }
+    function boom(stage) {
+      const flash = $r("#gaFlash");
+      flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on");
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 18; i++) {
+        const s = document.createElement("i");
+        s.className = "ga-shard";
+        const ang = (i / 18) * Math.PI * 2 + Math.random() * 0.3, d = 140 + Math.random() * 160;
+        s.style.setProperty("--dx", Math.cos(ang) * d + "px");
+        s.style.setProperty("--dy", Math.sin(ang) * d + "px");
+        s.style.setProperty("--rot", (Math.random() * 720 - 360) + "deg");
+        frag.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+      stage.appendChild(frag);
+    }
+    async function play(res) {
+      const stage = $r("#gaStage"), cards = $r("#gaCards"), hint = $r("#gaHint");
+      hint.hidden = true; cards.innerHTML = "";
+      if (!reduce() && !skip) {
+        const box = document.createElement("img");
+        box.className = "ga-box"; box.alt = ""; box.src = img("img/gacha/arc-box.svg");
+        stage.appendChild(box);
+        void box.offsetWidth;
+        box.classList.add("in"); await sleep(700);
+        if (!skip) { box.classList.remove("in"); box.classList.add("spin"); await sleep(1000); }
+        box.classList.remove("spin", "in"); box.classList.add("boom"); boom(stage); await sleep(380);
+        box.remove();
+      }
+      cards.innerHTML = res.arcs.map(cardHtml).join("");
+      if (res.arcs.some((a) => a.rarity === "S")) { const f = $r("#gaFlash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
+    }
+    async function pull() {
+      if (busy) return;
+      busy = true; skip = false; $r("#gaPull").disabled = true;
+      try {
+        const res = AE.openBox(st, rules, banner, Math.random);
+        st = res.state;
+        res.arcs.forEach((a) => {
+          tot[a.rarity]++; if (a.up) tot.UP++;
+          tot.warp += a.bonus.warp || 0; tot.lost += a.bonus.lost || 0;
+        });
+        hist.unshift({ n: st.boxes, arcs: res.arcs.map((a) => ({ r: a.rarity, up: a.up, i: a.idx })) });
+        if (hist.length > 60) hist.length = 60;
+        save();
+        await play(res);
+        pity(); side();
+      } finally { busy = false; $r("#gaPull").disabled = false; }
+    }
+    function resetAll() {
+      if (busy || !confirm(S("Reset semua hasil simulasi Arc?", "Reset all Arc simulation results?"))) return;
+      st = AE.newArcState(); hist = []; tot = { S: 0, A: 0, B: 0, UP: 0, warp: 0, lost: 0 };
+      save(); pity(); side();
+      $r("#gaCards").innerHTML = ""; $r("#gaHint").hidden = false;
+    }
+    async function shareImage() {
+      if (busy) return;
+      const ups = [];
+      hist.forEach((h) => h.arcs.forEach((a) => { if (a.r === "S") ups.push({ ...a, n: h.n }); }));
+      const top = ups.slice(0, 10);
+      const W = 1000, CW = 180, CH = 190, PAD = 30, perRow = 5, rows = Math.max(1, Math.ceil(top.length / perRow)), HEAD = 150, FOOT = 50, H = HEAD + rows * CH + FOOT;
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const g = cv.getContext("2d");
+      const imgs = {};
+      const srcs = [...new Set(top.map((a) => { const e = entryOf("S", a.i); return e.arc && aMap[e.arc] ? aMap[e.arc].icon : null; }).filter(Boolean))];
+      await Promise.all(srcs.map((src) => new Promise((res) => { const im = new Image(); im.onload = () => { imgs[src] = im; res(); }; im.onerror = res; im.src = img(src); })));
+      g.fillStyle = "#121214"; g.fillRect(0, 0, W, H);
+      g.textBaseline = "middle"; g.textAlign = "left";
+      g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText("Gacha Arc NTE", PAD, 52);
+      g.fillStyle = banner.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(banner.name + " · " + featured().name, PAD, 98);
+      g.fillStyle = "#c9c4bb"; g.font = "600 17px 'Plus Jakarta Sans', Arial, sans-serif";
+      g.fillText(`${st.boxes} Pull · S-Class ${tot.S} (UP ${tot.UP}) · A ${tot.A} · B ${tot.B}`, PAD, 128);
+      if (!top.length) { g.fillStyle = "#8f8b84"; g.fillText(S("Belum ada Arc S. Terus Pull!", "No S-Class Arc yet. Keep pulling!"), PAD, HEAD + 40); }
+      top.forEach((a, i) => {
+        const e = entryOf("S", a.i), arc = e.arc ? aMap[e.arc] : null, cx = PAD + 10 + (i % perRow) * CW + CW / 2, cy = HEAD + Math.floor(i / perRow) * CH + 62;
+        g.save(); g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.clip();
+        g.fillStyle = "#2c2c31"; g.fillRect(cx - 52, cy - 52, 104, 104);
+        if (arc && imgs[arc.icon]) g.drawImage(imgs[arc.icon], cx - 52, cy - 52, 104, 104);
+        g.restore();
+        g.lineWidth = 4; g.strokeStyle = banner.accent; g.beginPath(); g.arc(cx, cy, 52, 0, Math.PI * 2); g.stroke();
+        g.textAlign = "center"; g.fillStyle = "#ece6dd"; g.font = "700 14px 'Plus Jakarta Sans', Arial, sans-serif";
+        const nm = arc ? arc.name : `Arc S · ${e.type}`;
+        g.fillText(nm.length > 18 ? nm.slice(0, 17) + "…" : nm, cx, cy + 74);
+        g.fillStyle = banner.accent; g.font = "600 12px 'JetBrains Mono', monospace";
+        g.fillText(`${a.up ? "UP" : "S-Class"} · Pull #${a.n}`, cx, cy + 94);
+        g.textAlign = "left";
+      });
+      g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
+      g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H - FOOT / 2);
+      cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "gacha-arc-nte.png"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
+    }
+
+    $r("#gaPull").onclick = pull;
+    $r("#gaSkip").onclick = () => { skip = true; };
+    $r("#gaReset").onclick = resetAll;
+    $r("#gaShare").onclick = shareImage;
+    // tampilkan hasil Pull terakhir bila ada
+    if (hist.length) {
+      $r("#gaHint").hidden = true;
+      $r("#gaCards").innerHTML = hist[0].arcs.map((a, i) => cardHtml({ rarity: a.r, up: a.up, idx: a.i, bonus: rules.bonus[a.r] }, i)).join("");
+    }
+    pity(); side();
   }
 
   // ---------------- TENTANG ----------------
