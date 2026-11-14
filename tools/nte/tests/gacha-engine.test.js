@@ -158,3 +158,28 @@ test("Roll Again menambah dadu gratis dan total roll", () => {
   assert.equal(r.state.dice, 1);
   assert.equal(r.state.total, 1);
 });
+
+// ---------------------------------------------------------------- Task 3: data papan
+const board = JSON.parse(fs.readFileSync(path.join(ROOT, "nte", "data", "gacha-board.json"), "utf8"));
+
+test("papan: id valid, rute tanpa duplikat, panah berpasangan", () => {
+  const ids = new Set(board.tiles.map((t) => t.id));
+  assert.equal(ids.size, board.tiles.length, "id kotak ganda");
+  for (const id of board.route) assert.ok(ids.has(id), `id rute ${id} tak ada`);
+  assert.equal(new Set(board.route).size, board.route.length, "rute berisi id ganda");
+  for (const b of board.blocks) {
+    assert.ok(ids.has(b.enter) && ids.has(b.exit), "panah blok tak ada");
+    for (const id of b.tiles) assert.ok(ids.has(id), `id blok ${id} tak ada`);
+    assert.ok(board.route.includes(b.enter) && board.route.includes(b.exit), "panah harus ada di rute utama");
+  }
+  const types = Object.fromEntries(board.tiles.map((t) => [t.id, t.type]));
+  assert.equal(board.blocks.filter((b) => types[b.enter] === "arrowIn" && types[b.exit] === "arrowOut").length, board.blocks.length);
+});
+
+test("papan: komposisi kotak rute sebanding dengan peluang mendarat resmi", () => {
+  const route = board.route.map((id) => board.tiles.find((t) => t.id === id));
+  const share = (type) => (route.filter((t) => t.type === type).length / route.length) * 100;
+  assert.ok(Math.abs(share("apprentice") - 45.93) < 8, `apprentice ${share("apprentice")}`);
+  assert.ok(Math.abs(share("hero") - 20.07) < 8, `hero ${share("hero")}`);
+  assert.ok(Math.abs(share("lost") - 15.47) < 8, `lost ${share("lost")}`);
+});
