@@ -28,6 +28,14 @@ Database fan-made game *Neverness to Everness* (NTE) berbahasa Indonesia, dibuat
 - **Tampilan responsif** untuk laptop maupun HP.
 - **Data dan gambar langsung dari file game**, diolah dengan skrip Python (`tools/nte/`) menjadi JSON dan gambar WebP.
 
+## Pemeliharaan
+
+- **Setelah mengubah `index.html`, `nte/app.js`, `nte/app.css`, atau data**, jalankan `python tools/nte/make_pages.py --bump`. Skrip ini menyalin `index.html` ke satu halaman statis per rute (`esper/<slug>/`, `arc/<slug>/`, dan seterusnya) dengan judul, deskripsi, dan canonical masing-masing, lalu menulis `sitemap.xml` dan `robots.txt`. Tanpa itu GitHub Pages membalas alamat dalam dengan status 404 dan Google bisa melewatkannya. `--bump` menaikkan nomor `?v=NN` agar cache browser diperbarui.
+- **Membangun ulang semua data**: `python tools/nte/rebuild_all.py` (tambahkan `--fresh` untuk mengambil versi NTE_Assets terbaru dan `--bump` untuk menaikkan nomor versi).
+- **Pembaruan otomatis**: workflow *Cek update data NTE* membuka Issue tiap Senin bila NTE_Assets berubah, dan *Perbarui data NTE* membangun ulang data lalu membuka Pull Request untuk diperiksa. Aktifkan dulu di Settings > Actions > General > Workflow permissions: "Allow GitHub Actions to create and approve pull requests".
+- **Laporan data salah**: tombol "Laporkan data salah" menyalin laporan dan membuka Discord. Agar laporan terkirim langsung, isi `LINK.reportWebhook` di `nte/app.js` dengan URL webhook channel Discord (URL itu terlihat publik di kode situs, jadi pakai channel khusus laporan dan hapus webhook-nya kalau disalahgunakan).
+- **Link hasil Kalkulator**: seluruh isian disimpan di alamat halaman (`/kalkulator?cE=...`), dan tombol "Salin link hasil" menyalinnya.
+
 ## Teknologi
 
 HTML, CSS, dan JavaScript murni tanpa framework · Python untuk mengolah data · GitHub Actions · Di-hosting gratis dengan GitHub Pages.

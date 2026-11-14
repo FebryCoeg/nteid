@@ -1,0 +1,84 @@
+name: Perbarui data NTE
+
+# Membangun ulang data situs bila NTE_Assets punya versi baru, lalu membuka Pull Request (tidak langsung ke main),
+# supaya perubahannya bisa diperiksa dulu sebelum diterbitkan.
+#
+# Syarat sekali saja: Settings > Actions > General > Workflow permissions >
+# centang "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "30 1 * * 1" # tiap Senin 08.30 WIB, setelah workflow cek update
+  workflow_dispatch: # bisa dijalankan manual dari tab Actions
+    inputs:
+      force:
+        description: "Bangun ulang walaupun tidak ada versi baru"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: nte-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pasang Pillow
+        run: pip install pillow
+
+      - name: Bandingkan dengan NTE_Assets terbaru
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/nte/check_update.py nte-update.md
+
+      - name: Bangun ulang data
+        if: steps.check.outputs.changed == 'true' || inputs.force == true
+        run: python tools/nte/rebuild_all.py --fresh --bump
+
+      - name: Buka Pull Request
+        if: steps.check.outputs.changed == 'true' || inputs.force == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.check.outputs.head }}
+          TITLE: ${{ steps.check.outputs.title }}
+        run: |
+          rm -f nte-update.md.tmp
+          if [ -z "$(git status --porcelain -- . ':!nte-update.md')" ]; then
+            echo "Tidak ada perubahan pada data situs."
+            exit 0
+          fi
+          short=$(echo "${HEAD_SHA:-manual}" | cut -c1-7)
+          branch="data-update-$short"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add -A -- . ':!nte-update.md'
+          git commit -m "chore(data): perbarui data dari NTE_Assets ${short}"
+          git push --force origin "$branch"
+          {
+            cat nte-update.md 2>/dev/null || echo "Data dibangun ulang dari NTE_Assets."
+            echo
+            echo "---"
+            echo "Dibuat otomatis oleh workflow **Perbarui data NTE**. Periksa dulu sebelum digabung:"
+            echo "- Teks baru yang belum diterjemahkan ada di \`tools/nte/untranslated.json\`."
+            echo "- Cek halaman Esper, Arc, dan Status Anomali di pratinjau lokal (\`python tools/nte/serve.py\`)."
+          } > pr-body.md
+          existing=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$existing" ]; then
+            gh pr create --base main --head "$branch" --title "${TITLE:-Perbarui data NTE}" --body-file pr-body.md
+          else
+            gh pr edit "$existing" --title "${TITLE:-Perbarui data NTE}" --body-file pr-body.md
+          fi
