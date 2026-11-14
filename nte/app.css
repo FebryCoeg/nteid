@@ -1372,3 +1372,4 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .top-actions .icon-btn { height: 34px; min-width: 34px; }
   .logo-img { height: 30px; }
 }
+@media (max-width: 1080px) { .top-nav + .top-actions { margin-left: auto; } }
