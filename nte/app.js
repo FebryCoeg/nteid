@@ -1176,12 +1176,11 @@
           `Rumus damage mengacu pada pembahasan komunitas <b>NGA</b> (forum game Tiongkok), dan hasil hitungannya sudah dicocokkan dengan contoh di sana. Angka musuh (HP, DEF, Resist, dan Break) diambil langsung dari tabel data game, dan HP satu boss Beyond the Rails sudah dicocokkan dengan rekaman pertarungan asli. Efek Awakening, Arc, dan modul belum dihitung otomatis, jadi hasil Kalkulator berupa perkiraan dan bukan angka pasti dari game.`,
           `The damage formula follows discussions in the <b>NGA</b> community (a Chinese gaming forum), and its results have been checked against examples there. Enemy numbers (HP, DEF, Resist and Break) come straight from the game's data tables, and one Beyond the Rails boss's HP was matched against a real recorded fight. Awakening, Arc and module effects are not applied automatically, so Calculator results are estimates, not exact in-game numbers.`)))}
         ${sec(S("Data salah atau masukan?", "Wrong data or feedback?"), p(S(
-          `Pakai tombol <b>Laporkan data salah</b> di bagian bawah halaman mana pun, atau bergabung ke ${a(LINK.community, "Discord NTE Indonesia")}.`,
-          `Use the <b>Report wrong data</b> button at the bottom of any page, or join the ${a(LINK.community, "NTE Indonesia Discord")}.`)) + `<p class="about-btns"><button type="button" class="chip" data-report>${S("Laporkan data salah", "Report wrong data")}</button><a class="chip" href="${LINK.community}" target="_blank" rel="noopener">Discord</a><a class="chip" href="${LINK.donate}" target="_blank" rel="noopener">${S("Dukung lewat Trakteer", "Support via Trakteer")}</a></p>`)}
+          `Pakai tombol <b>Laporkan data salah</b> di bagian bawah halaman mana pun, atau bergabung ke ${a(LINK.community, "Febry Coeg Server")}.`,
+          `Use the <b>Report wrong data</b> button at the bottom of any page, or join the ${a(LINK.community, "Febry Coeg Server")}.`)) + `<p class="about-btns"><button type="button" class="chip" data-report>${S("Laporkan data salah", "Report wrong data")}</button><a class="chip" href="${LINK.community}" target="_blank" rel="noopener">Discord</a><a class="chip" href="${LINK.donate}" target="_blank" rel="noopener">${S("Dukung lewat Trakteer", "Support via Trakteer")}</a></p>`)}
         ${sec(S("Teknologi", "Technology"), li([
           S("HTML, CSS, dan JavaScript murni tanpa framework", "Plain HTML, CSS and JavaScript, no framework"),
           S("Python untuk mengolah data dan gambar", "Python for processing data and images"),
-          S("GitHub Actions untuk pengecekan dan pembaruan data, GitHub Pages untuk hosting", "GitHub Actions for data checks and updates, GitHub Pages for hosting"),
         ]))}
       </div>`;
   }
