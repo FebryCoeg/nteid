@@ -1619,3 +1619,17 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 }
 @media (max-width: 560px) { .ga-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px; } .ga-card { padding: 6px 3px 4px; } .ga-card b { font-size: 0.58rem; } .ga-stage { min-height: 420px; } }
 @media (max-width: 340px) { .ga-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* ---- ponsel: kartu mendatar, 2 kolom x 5 baris (10 kartu tanpa sisa) ---- */
+@media (max-width: 560px) {
+  .ga-stage { min-height: 0; align-items: flex-start; }
+  .ga-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; align-content: start; }
+  .ga-card { grid-template-columns: 54px minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; justify-items: start; text-align: left; gap: 1px 8px; padding: 6px; min-height: 66px; }
+  .ga-art { grid-row: 1 / 3; width: 54px; max-width: 54px; }
+  .ga-card b { text-align: left; font-size: 0.62rem; align-self: end; }
+  .ga-card small { align-self: start; font-size: 0.58rem; }
+  .ga-r { left: 2px; bottom: 2px; font-size: 0.55rem; padding: 0 4px; }
+  .ga-upb { font-size: 0.5rem; padding: 0 3px; }
+  .ga-gen img { width: 32px; height: 32px; }
+  .ga-hint { position: static; padding: 40px 16px; }
+}
+@media (max-width: 560px) { .ga-stage:has(.ga-box) { min-height: 320px; } }
