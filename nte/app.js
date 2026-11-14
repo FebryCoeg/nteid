@@ -1486,7 +1486,7 @@
     }
 
     root.innerHTML = `
-      <p class="calc-beta gc-wide"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar Arc Research Program (Echo Special) di game. Masih perkiraan: nama Arc S/A/B selain Arc featured, pembagian A/B di luar jaminan, dan jumlah kunci per Pull.", "Odds come from the Arc Research Program (Echo Special) screen in game. Still estimates: names of the S/A/B Arcs other than the featured one, the A/B split outside the guarantee, and keys per Pull.")}</p>
+      <p class="calc-beta gc-wide"><b>${S("Ini simulasi, bukan gacha asli.", "This is a simulation, not the real gacha.")}</b> ${S("Angka dari layar Arc Research Program (Echo Special) di game. Masih perkiraan: daftar Arc A (memakai semua Arc A di database), pembagian A/B di luar jaminan, dan jumlah kunci per Pull.", "Odds come from the Arc Research Program (Echo Special) screen in game. Still estimates: the A-Class Arc list (uses every A-Class Arc in the database), the A/B split outside the guarantee, and keys per Pull.")}</p>
       <div class="gc">
         <div class="gc-col gc-left">
           <section class="calc-card gc-main" id="gaMain">

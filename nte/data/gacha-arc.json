@@ -5,12 +5,39 @@
   "rules": {
     "perBox": 10,
     "keysPerPull": 10,
-    "s": { "base": 0.03, "upShare": 0.25, "pityBoxes": 6 },
-    "up": { "pityBoxes": 8 },
-    "a": { "base": 0.07, "extra": 0.0545, "everyBoxMin": 1 },
-    "b": { "base": 0.9 },
-    "overall": { "S": 0.0419, "A": 0.1347, "B": 0.8234, "UP": 0.0168 },
-    "bonus": { "S": { "warp": 40 }, "A": { "warp": 4 }, "B": { "lost": 20 } },
+    "s": {
+      "base": 0.03,
+      "upShare": 0.25,
+      "pityBoxes": 6
+    },
+    "up": {
+      "pityBoxes": 8
+    },
+    "a": {
+      "base": 0.07,
+      "extra": 0.0545,
+      "everyBoxMin": 1
+    },
+    "b": {
+      "base": 0.9
+    },
+    "overall": {
+      "S": 0.0419,
+      "A": 0.1347,
+      "B": 0.8234,
+      "UP": 0.0168
+    },
+    "bonus": {
+      "S": {
+        "warp": 40
+      },
+      "A": {
+        "warp": 4
+      },
+      "B": {
+        "lost": 20
+      }
+    },
     "calibration": "Pembagian A/B di luar jaminan 1 Arc A per kotak disesuaikan (a.extra) agar cocok dengan angka resmi 13,47% / 82,34%. Perkiraan."
   },
   "banners": [
@@ -19,31 +46,129 @@
       "name": "Echo Special",
       "featuredArc": "echoes-on-hold",
       "accent": "#ffc24d",
-      "poolConfirmed": false,
+      "poolConfirmed": {
+        "S": true,
+        "A": false,
+        "B": true
+      },
       "pools": {
         "S": [
-          { "type": "Solid", "arc": "echoes-on-hold", "up": true },
-          { "type": "Solid", "arc": null },
-          { "type": "Liquid", "arc": null },
-          { "type": "Gas", "arc": null },
-          { "type": "Synthesis", "arc": null },
-          { "type": "Plasma", "arc": null }
+          {
+            "type": "Solid",
+            "arc": "echoes-on-hold",
+            "up": true
+          },
+          {
+            "type": "Synthesis",
+            "arc": "camellia-society"
+          },
+          {
+            "type": "Gas",
+            "arc": "good-boy-s-grand-adventure"
+          },
+          {
+            "type": "Plasma",
+            "arc": "raging-flames"
+          },
+          {
+            "type": "Liquid",
+            "arc": "youthful-fantasy"
+          },
+          {
+            "type": "Solid",
+            "arc": "reality-refuge"
+          }
         ],
         "A": [
-          { "type": "Solid", "arc": null },
-          { "type": "Liquid", "arc": null },
-          { "type": "Gas", "arc": null },
-          { "type": "Synthesis", "arc": null },
-          { "type": "Plasma", "arc": null }
+          {
+            "type": "Synthesis",
+            "arc": "a-time-will-come"
+          },
+          {
+            "type": "Liquid",
+            "arc": "call-of-the-twisted-city"
+          },
+          {
+            "type": "Liquid",
+            "arc": "clear-skies"
+          },
+          {
+            "type": "Gas",
+            "arc": "cosmos-daze-wild-reverie"
+          },
+          {
+            "type": "Plasma",
+            "arc": "drawn-blade"
+          },
+          {
+            "type": "Gas",
+            "arc": "failing-you-heavy-in-my-heart"
+          },
+          {
+            "type": "Liquid",
+            "arc": "mind-royale"
+          },
+          {
+            "type": "Plasma",
+            "arc": "oraora"
+          },
+          {
+            "type": "Liquid",
+            "arc": "shiny-days"
+          },
+          {
+            "type": "Synthesis",
+            "arc": "the-fools-spring"
+          },
+          {
+            "type": "Solid",
+            "arc": "the-forgotten"
+          },
+          {
+            "type": "Synthesis",
+            "arc": "the-good-the-bad-the-bitter"
+          },
+          {
+            "type": "Synthesis",
+            "arc": "the-great-thief"
+          },
+          {
+            "type": "Solid",
+            "arc": "time-bandit"
+          },
+          {
+            "type": "Synthesis",
+            "arc": "umbrella"
+          },
+          {
+            "type": "Gas",
+            "arc": "watch-your-heads"
+          }
         ],
         "B": [
-          { "type": "Solid", "arc": null },
-          { "type": "Liquid", "arc": null },
-          { "type": "Gas", "arc": null },
-          { "type": "Synthesis", "arc": null },
-          { "type": "Plasma", "arc": null }
+          {
+            "type": "Liquid",
+            "arc": "real-music"
+          },
+          {
+            "type": "Gas",
+            "arc": "be-happy"
+          },
+          {
+            "type": "Synthesis",
+            "arc": "dangerous-game"
+          },
+          {
+            "type": "Solid",
+            "arc": "first-step-to-success"
+          },
+          {
+            "type": "Plasma",
+            "arc": "us"
+          }
         ]
-      }
+      },
+      "poolNote": "Arc S dari daftar pemilik situs. Arc B = semua Arc bintang 3 di database (ada tepat 5). Arc A = semua Arc bintang 4 di database; daftar A di game hanya menampilkan 5, jadi ini perkiraan."
     }
   ]
 }

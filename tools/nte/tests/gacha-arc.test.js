@@ -92,16 +92,26 @@ test("restoreArcState: data rusak kembali ke awal, data wajar dipertahankan", ()
   }
 });
 
-test("data Arc: banner valid (UP ada di data Arc, daftar 6/5/5, tepat satu UP)", () => {
+test("data Arc: Arc S sesuai daftar pemilik situs; Arc A dan B diambil dari database (bintang 4 dan 3)", () => {
+  const bySlug = Object.fromEntries(arcsData.map((x) => [x.slug, x]));
   for (const b of data.banners) {
-    const up = arcsData.find((a) => a.slug === b.featuredArc);
+    const up = bySlug[b.featuredArc];
     assert.ok(up && up.rarity === 5, "featuredArc harus Arc bintang 5 di arcs.json");
     assert.equal(b.pools.S.length, 6);
-    assert.equal(b.pools.A.length, 5);
-    assert.equal(b.pools.B.length, 5);
     assert.equal(b.pools.S.filter((e) => e.up).length, 1);
     assert.equal(b.pools.S.find((e) => e.up).arc, b.featuredArc);
-    for (const k of ["S", "A", "B"]) for (const e of b.pools[k]) assert.ok(["Solid", "Liquid", "Gas", "Synthesis", "Plasma"].includes(e.type));
+    assert.deepEqual(b.pools.S.map((e) => e.arc).sort(), ["camellia-society", "echoes-on-hold", "good-boy-s-grand-adventure", "raging-flames", "reality-refuge", "youthful-fantasy"]);
+    for (const [k, rarity] of [["S", 5], ["A", 4], ["B", 3]]) {
+      assert.ok(b.pools[k].length >= 1);
+      for (const e of b.pools[k]) {
+        assert.ok(e.arc && bySlug[e.arc], `Arc ${k} tak ada di database: ${e.arc}`);
+        assert.equal(bySlug[e.arc].rarity, rarity, `${e.arc} bukan bintang ${rarity}`);
+        assert.equal(e.type, bySlug[e.arc].type, `jenis ${e.arc}`);
+      }
+      assert.equal(new Set(b.pools[k].map((e) => e.arc)).size, b.pools[k].length, "Arc ganda di daftar " + k);
+    }
+    assert.equal(b.pools.B.length, arcsData.filter((x) => x.rarity === 3).length, "B = semua Arc bintang 3");
+    assert.equal(b.pools.A.length, arcsData.filter((x) => x.rarity === 4).length, "A = semua Arc bintang 4");
     assert.match(b.accent, /^#[0-9a-fA-F]{6}$/);
   }
   assert.ok(data.banners.some((b) => b.id === data.default));
