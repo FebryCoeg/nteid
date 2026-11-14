@@ -33,7 +33,7 @@ EXPECT = {
 
 # (x, y, jenis, opsi). Posisi = pusat kotak di screenshot 1920x1080.
 # Rute utama, searah jarum jam mulai dari kiri atas. "ai"/"ao" = panah masuk/keluar (tidak tergambar di peta ringkas,
-# posisi perkiraan di sisi kolom; confirmed.arrows = false).
+# posisi perkiraan di sisi kolom, sejajar dengan kotak rute di sebelahnya; confirmed.arrows = false).
 ROUTE = [
     (793, 346, "lost", {"amount": 30}), (844, 345, "apprentice"), (896, 345, "apprentice"), (947, 346, "hero"),
     (998, 347, "roll1", {"slumber": True}), (1049, 345, "apprentice"), (1100, 347, "arclight"), (1153, 346, "lost", {"amount": 30}),
@@ -43,8 +43,8 @@ ROUTE = [
     (1357, 344, "apprentice"), (1408, 347, "lost"), (1460, 346, "journeyA"),
     (1460, 396, "apprentice"), (1460, 448, "hero"), (1460, 499, "apprentice"),
     (1512, 499, "apprentice"), (1563, 500, "lost", {"amount": 50}),
-    (1563, 549, "apprentice"), (1605, 575, "arrowIn", {"block": "right"}),
-    (1563, 601, "journeyA"), (1563, 653, "hero"), (1605, 678, "arrowOut", {"block": "right"}),
+    (1563, 549, "apprentice"), (1607, 549, "arrowIn", {"block": "right"}),
+    (1563, 601, "journeyA"), (1563, 653, "hero"), (1607, 653, "arrowOut", {"block": "right"}),
     (1563, 704, "apprentice"), (1563, 755, "apprentice"), (1563, 807, "lost"),
     (1512, 807, "arclight", {"slumber": True}), (1460, 806, "apprentice"), (1408, 807, "hero"), (1357, 806, "apprentice"), (1306, 806, "apprentice"),
     (1306, 756, "lost"),
@@ -52,9 +52,9 @@ ROUTE = [
     (998, 704, "apprentice"),
     (947, 704, "apprentice"), (895, 705, "hero"), (845, 704, "journeyA"), (793, 704, "apprentice"),
     (793, 654, "lost", {"amount": 30}), (793, 602, "apprentice"), (793, 552, "lost", {"amount": 50}), (793, 500, "hero"),
-    (751, 474, "arrowIn", {"block": "left"}),
+    (751, 447, "arrowIn", {"block": "left"}),
     (793, 447, "apprentice"), (793, 397, "journeyA"),
-    (751, 371, "arrowOut", {"block": "left"}),
+    (751, 346, "arrowOut", {"block": "left"}),
 ]
 
 # Blok ujung, urutan jalan searah jarum jam dari kotak pertama yang dimasuki.
