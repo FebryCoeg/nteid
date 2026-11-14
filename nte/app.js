@@ -1320,15 +1320,15 @@
           <p class="txt calc-note">${S(`Butuh sekitar ${hits} serangan seperti ini untuk menghabiskan HP musuh.`, `About ${hits} hits like this to deplete the enemy's HP.`)}</p>`;
       }
       // Break: jumlah semua karakter (harus 4)
-      let tot = 0, rows = "", n = 0;
+      let tot = 0, rows = "", n = 0, eq = "";
       [0, 1, 2, 3].forEach((i) => {
         const slug = $c("bE" + i).value;
         if (!slug) return; n++;
         const b = esper(slug), L = clamp(val("bL" + i), 1, 80);
         const d = BREAK_BASE[L - 1] * (1 + val("bI" + i) / 300 + val("bB" + i) / 100) * (s.unbal / 3) * defZone(L, s.def, val("cDR") / 100, val("cDI") / 100) * resZone(s.res[RESKEY[b.element] || "normal"] ?? 0.2, val("cRR") / 100);
-        tot += d; rows += `<div class="cbr"><span>${esc(b.name.split(" (")[0])} Lv${L}</span><b>${num(d)}</b></div>`;
+        tot += d; rows += `<div class="cbr"><span>${esc(b.name.split(" (")[0])} Lv${L}</span><b>${num(d)}</b></div>`; eq = `${BREAK_BASE[L - 1]} × (1 + Intensity/300 + bonus) × (Break musuh ${s.unbal} / 3) × DEF × RES`;
       });
-      $c("bOut").innerHTML = n === 4 ? `${rows}<div class="cres"><div class="avg"><span>${S("Total Break tim", "Team Break total")}</span><b>${num(tot)}</b></div></div>` : `<p class="txt calc-note">${S(`Pilih 4 karakter dulu (sekarang ${n}/4).`, `Pick 4 characters first (${n}/4 now).`)}</p>${rows}`;
+      $c("bOut").innerHTML = n === 4 ? `${rows}<div class="cres"><div class="avg"><span>${S("Total Break tim", "Team Break total")}</span><b>${num(tot)}</b></div></div><p class="mono calc-eq">${eq}</p><p class="txt calc-note">${S("Break musuh, DEF, dan RES diambil dari musuh yang kamu pilih di bagian 3. Pengurangan Break oleh Discord belum dihitung.", "Enemy Break, DEF and RES come from the enemy chosen in section 3. Discord's Break reduction is not included yet.")}</p>` : `<p class="txt calc-note">${S(`Pilih 4 karakter dulu (sekarang ${n}/4).`, `Pick 4 characters first (${n}/4 now).`)}</p>${rows}`;
     }
     $c("cE").addEventListener("change", () => { fillArc(); calc(); });
     $c("cG").addEventListener("change", () => { fillRows(); calc(); });
