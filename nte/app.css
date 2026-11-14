@@ -1420,3 +1420,7 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .chelp[hidden] { display: none; }
 .calc-grid, .cbrk { align-items: start; }
 .cf { justify-content: flex-start; }
+.csel { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.csel select { flex: 1; min-width: 0; }
+.cth { flex: none; width: 30px; height: 30px; border-radius: 8px; object-fit: contain; background: var(--panel-2); box-shadow: var(--ring); }
+.cth[hidden] { display: none; }

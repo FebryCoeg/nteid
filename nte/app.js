@@ -1228,6 +1228,7 @@
       cBI: S("Angka Break Intensity karakter itu. Tidak tahu? Isi 0.", "That character's Break Intensity number. Not sure? Enter 0."),
       cBB: S("Bonus damage Break dalam persen. Biasanya 0.", "Break damage bonus in percent. Usually 0."),
     };
+    const sw = (id, inner) => `<span class="csel"><img class="cth" id="t_${id}" alt="" hidden><select id="${id}">${inner}</select></span>`;
     const hb = (id) => `<button type="button" class="chi" aria-label="${S("Penjelasan", "Help")}" aria-expanded="false">!</button>`;
     const hd = (id) => `<div class="chelp" hidden>${esc(HELP[id] || "")}</div>`;
     const field = (id, label, val, hint) => `<label class="cf"><span>${label}${hint ? ` <em>(${hint})</em>` : ""}${HELP[id] ? hb(id) : ""}</span><input id="${id}" type="number" step="any" value="${val}" inputmode="decimal">${HELP[id] ? hd(id) : ""}</label>`;
@@ -1235,16 +1236,16 @@
     const defE = list.find((e) => e.slug === "elyms") || list[0];
     const brk = [0, 1, 2, 3].map((i) => `<div class="cbrk">
         <b>${S("Karakter", "Character")} ${i + 1}</b>
-        <label class="cf"><span>Esper</span><select id="bE${i}"><option value="">—</option>${eso("")}</select></label>
+        <label class="cf"><span>Esper</span>${sw("bE" + i, `<option value="">—</option>${eso("")}`)}</label>
         ${field("bL" + i, "Level", 80)}${field("bI" + i, "Break Intensity", 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBI") + "</label>")}${field("bB" + i, S("Bonus Break (%)", "Break bonus (%)"), 0).replace("</span>", hb() + "</span>").replace("</label>", hd("cBB") + "</label>")}
       </div>`).join("");
     main.innerHTML = head(S("KALKULATOR", "CALCULATOR"), S("Kalkulator Damage", "Damage Calculator"), S("Hitung damage satu serangan karakter ke musuh, dari data base game. Tanpa rotasi: satu karakter, satu skill.", "Calculate one character's damage per hit against an enemy from base game data. No rotation: one character, one skill."), null) + `
       <div class="calc">
         <section class="calc-card"><h3>${S("1 · Karakter dan skill", "1 · Character and skill")}</h3>
           <div class="calc-grid">
-            <label class="cf"><span>Esper</span><select id="cE">${eso(defE.slug)}</select></label>
+            <label class="cf"><span>Esper</span>${sw("cE", eso(defE.slug))}</label>
             ${field("cL", S("Level karakter", "Character level"), 80, "1–80")}
-            <label class="cf"><span>Arc <em>(${S("sesuai tipe karakter", "matches character type")})</em></span><select id="cA"></select></label>
+            <label class="cf"><span>Arc <em>(${S("sesuai tipe karakter", "matches character type")})</em></span>${sw("cA", "")}</label>
             ${field("cAL", S("Level Arc", "Arc level"), 80, "1–80")}
             <label class="cf"><span>${S("Jenis skill", "Skill type")}</span><select id="cG"></select></label>
             ${field("cSL", S("Level skill", "Skill level"), 10, "1–10")}
@@ -1263,7 +1264,7 @@
           </div></section>
         <section class="calc-card"><h3>${S("3 · Musuh", "3 · Enemy")}</h3>
           <div class="calc-grid">
-            <label class="cf"><span>${S("Musuh", "Enemy")}</span><select id="cM">${enemies.map((x, i) => opt(i, x.name, x.name === "Morphix")).join("")}</select></label>
+            <label class="cf"><span>${S("Musuh", "Enemy")}</span>${sw("cM", enemies.map((x, i) => opt(i, x.name, x.name === "Morphix")).join(""))}</label>
             <label class="cf"><span>${S("Varian", "Variant")}</span><select id="cV"></select></label>
             <label class="cf"><span>${S("Level musuh", "Enemy level")}</span><select id="cEL"></select></label>
           </div>
@@ -1300,7 +1301,15 @@
       $c("cEL").innerHTML = ks.map((k, i) => opt(k, "Lv " + k, i === ks.length - 1)).join("");
     }
     function enemyStat() { const m = enemies[+$c("cM").value], x = m.variants[+$c("cV").value || 0]; return x.levels[$c("cEL").value] || x.levels[Object.keys(x.levels).pop()]; }
+    function thumb(id, src) { const t = $c("t_" + id); if (!t) return; if (src) { t.src = img(src); t.hidden = false; } else t.hidden = true; }
+    function thumbs() {
+      thumb("cE", (esper($c("cE").value) || {}).icon);
+      const a = arcList.find((x) => x.slug === $c("cA").value); thumb("cA", a && a.icon);
+      thumb("cM", (enemies[+$c("cM").value] || {}).image);
+      [0, 1, 2, 3].forEach((i) => thumb("bE" + i, ($c("bE" + i).value && (esper($c("bE" + i).value) || {}).icon) || ""));
+    }
     function calc() {
+      thumbs();
       const e = esper($c("cE").value), st = SD.espers[e.id], lc = clamp(val("cL"), 1, 80), s = enemyStat();
       const arc = $c("cA").value ? SD.arcs[$c("cA").value] : null, la = clamp(val("cAL"), 1, 80);
       const base = $c("cB").value, bs = st[base][lc - 1], arcAtk = base === "atk" && arc ? arc.atk[la - 1] : 0;
