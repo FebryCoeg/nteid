@@ -22,7 +22,7 @@ SKILL = {"ultimate": "ultimate", "skill": "redirect", "basic attack": "basic", "
 LABEL = {"Ascension Materials (Lv. 20–80)": ("Material Ascension (Lv. 20–80)", "Ascension Materials (Lv. 20–80)"),
          "Ability Materials (4 Skill Lv. 10)": ("Material Ability (4 Skill Lv. 10)", "Ability Materials (4 Skill Lv. 10)"),
          "Best Bond Gift": ("Hadiah Bond terbaik", "Best Bond gift")}
-TEAMNAME = {"Best Team": ("Tim terbaik", "Best team"), "Team 1": ("Tim 1", "Team 1")}
+TEAMNAME = {"Best Team": ("Tim terbaik", "Best team"), "Team 1": ("Tim 1", "Team 1"), "Team 2": ("Tim 2", "Team 2")}
 
 
 def T(i, e):
@@ -131,7 +131,7 @@ def apply(out):
                     b["skills"] = skills(v)
                 elif k == "Best Teams":
                     mm = re.match(r"^\*\s+Best Teams \((.+?)\):\s*(.+)$", s)
-                    b["teams"] = parse_team(mm.group(2), mm.group(1), slug, unknown)
+                    b["teams"] += parse_team(mm.group(2), mm.group(1), slug, unknown)
                 continue
             if mode == "awk":
                 m2 = re.match(r"^\s+\d+\.\s+A(\d)\s+\(.*?\)\s+\[Prioritas \d\]:\s*(.*)$", s)

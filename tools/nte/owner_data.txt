@@ -375,11 +375,12 @@
 19. Elyms
 
 * Role: S-Rank / Cosmos Buff / Burst DPS / DMG Boost / Instant Cycle
-* Best Arcs: Echoes on Hold (Signature), Day Off, The Rain That Shook the World, First Step to Success
-* Best Modules: Speedy Hedgehog, Lost Radiance, Shadow Creed
+* Best Arcs: Echoes on Hold (Signature), Marching Beyond Time, Blow up the Crowd, The Rain That Shook the World, Fluff of Fearlessness, Hethereau's Keeper
+* Best Modules: Lost Radiance
 * Main Stats: ATK%, Cosmos DMG, CRIT Rate / CRIT DMG
 * Sub Stats Priority: ATK% → CRIT Rate / CRIT DMG
 * Best Teams (Akane Rin Remora): Elyms + Shinku (Cosmos DPS), Akane Rin (Lakshana Main DPS), Iroi (Support)
+* Best Teams (Team 2): Elyms + Blackbird + Akane Rin + Iroi
 * Skill Priority: Ultimate → Skill → QTE → Basic Attack
 * Best Awakening Nodes (Urutan Prioritas 1–6):
    1. A4 (302: Wish Redirected) [Prioritas 1]: Selama Elyms berada di dalam party dan hidup, CRIT DMG seluruh tim meningkat sebesar 20%.

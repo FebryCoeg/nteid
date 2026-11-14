@@ -549,6 +549,7 @@
           ${AF.levels.map((l, i) => `<div class="af-lv"><div class="af-no"><i>${i + 1}</i><small>${nf(l.max)} ${S("poin", "pts")}</small></div><div class="matrow">${l.items.map(([id, n]) => tile(id, n, false)).join("")}</div></div>`).join("")}</div>`;
       },
       build: () => {
+        if (e.slug === "exe") return `<div class="af-sec"><div class="empty">${S("Coming soon. Exe belum rilis, jadi build-nya belum ditampilkan.", "Coming soon. Exe has not been released yet, so the build is not shown.")}</div></div>`;
         const manual = BUILDS[e.slug];
         const hasManual = manual && ((manual.arcs || []).length || (manual.sets || []).length || (manual.stats || []).length || (manual.awks || []).length || (manual.skills || []).length);
         const bd = hasManual ? manual : (DRAFTS[e.slug] || null);
@@ -690,7 +691,7 @@
       const b = ev.target.closest(".skill-top"); if (!b) return;
       const c = b.closest(".skillcard"); c.classList.toggle("open"); b.setAttribute("aria-expanded", c.classList.contains("open"));
     });
-    if (tabs.length) show(tabs[0][0]);
+    if (tabs.length) show(tabs.some(([id]) => id === "build") ? "build" : tabs[0][0]);
     initSk();
     if (ST) {
       const upd = () => {
