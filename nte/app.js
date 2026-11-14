@@ -1150,7 +1150,7 @@
     setTitle(S("Status Anomali", "Anomaly Stats"));
     const list = await load("enemies");
     const TYPES = { weekly: S("Boss mingguan", "Weekly boss"), boss: S("Boss", "Boss"), elite: S("Elite", "Elite"), normal: S("Musuh biasa", "Regular") };
-    const RES = [["normal", S("Normal", "Normal")], ["cosmos", "Cosmos"], ["nature", "Nature"], ["incantation", "Incantation"], ["chaos", "Chaos"], ["psyche", "Psyche"], ["lakshana", "Lakshana"]];
+    const RES = [["normal", S("Normal", "Normal")], ["cosmos", "Cosmos"], ["nature", "Anima"], ["incantation", "Incantation"], ["chaos", "Chaos"], ["psyche", "Psyche"], ["lakshana", "Lakshana"]];
     const num = (n) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
     const pct = (r) => `${Math.round(r * 1000) / 10}%`;
     main.innerHTML = head(S("STATUS ANOMALI", "ANOMALY STATS"), S("Informasi Status Anomali", "Anomaly Stats Info"), S("Status anomali dan monster di setiap level: HP, ATK, DEF, Resist per elemen, dan Break (Unbal). Angka langsung dari tabel game.", "Anomaly and monster stats at every level: HP, ATK, DEF, per-element Resist and Break (Unbal). Numbers straight from the game tables."), list.length) + `
@@ -1322,7 +1322,7 @@
       const rk = RESKEY[$c("cEl").value] || "normal";
       const bonus = 1 + val("cDB") / 100, cr = Math.min(1, Math.max(0, val("cCR") / 100)), cd = Math.max(0, val("cCD") / 100);
       const dz = defZone(lc, s.def, val("cDR") / 100, val("cDI") / 100), rz = resZone(s.res[rk] ?? 0.2, val("cRR") / 100), fin = 1 + val("cFB") / 100;
-      $c("cEn").innerHTML = `<div class="cen"><span>HP</span><b>${num(s.hp)}</b></div><div class="cen"><span>DEF</span><b>${num(s.def)}</b></div><div class="cen"><span>ATK</span><b>${num(s.atk)}</b></div><div class="cen"><span>Break</span><b>${s.unbal}</b></div>${Object.entries(s.res).map(([k, r]) => `<div class="cen${k === rk ? " on" : ""}"><span>RES ${k}</span><b>${Math.round(r * 1000) / 10}%</b></div>`).join("")}`;
+      $c("cEn").innerHTML = `<div class="cen"><span>HP</span><b>${num(s.hp)}</b></div><div class="cen"><span>DEF</span><b>${num(s.def)}</b></div><div class="cen"><span>ATK</span><b>${num(s.atk)}</b></div><div class="cen"><span>Break</span><b>${s.unbal}</b></div>${Object.entries(s.res).map(([k, r]) => `<div class="cen${k === rk ? " on" : ""}"><span>RES ${k === "nature" ? "Anima" : k}</span><b>${Math.round(r * 1000) / 10}%</b></div>`).join("")}`;
       if (ratio == null) { $c("cOut").innerHTML = `<p class="txt">${S("Pilih serangan yang rasionya bisa dihitung.", "Pick an attack with a calculable ratio.")}</p>`; }
       else {
         const noCrit = stat * (ratio / 100) * bonus * dz * rz * fin, crit = noCrit * (1 + cd), avg = noCrit * (1 + cr * cd);
