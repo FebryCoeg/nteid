@@ -2,7 +2,13 @@
   "name": "Android Dreams (aturan papan Limited, dipakai juga untuk Scarborough Fair)",
   "source": "Layar aturan papan di game (Board Details > Rules), dikirim pemilik situs 2026-11-15",
   "confirmed": true,
-  "s": { "baseRate": 0.0099, "modifiedRate": 0.1959, "modifiedAfter": 70, "hardPity": 90, "avgRate": 0.0187 },
+  "s": {
+    "baseRate": 0.0099,
+    "modifiedRate": 0.1959,
+    "modifiedAfter": 70,
+    "hardPity": 90,
+    "avgRate": 0.0187
+  },
   "landing": {
     "apprentice": 0.4593,
     "hero": 0.2007,
@@ -16,24 +22,81 @@
     "livery": 0.0033,
     "slumber": 0.0315
   },
-  "journey": { "s": 0.0119, "a": 0.0967 },
+  "journey": {
+    "s": 0.0119,
+    "a": 0.0967
+  },
   "tileContent": {
-    "apprentice": { "s": 0.002, "bArc": 0.998 },
-    "hero": { "s": 0.03, "bArc": 0.97, "warp": 2 }
+    "apprentice": {
+      "s": 0.002,
+      "bArc": 0.998
+    },
+    "hero": {
+      "s": 0.03,
+      "bArc": 0.97,
+      "warp": 2
+    }
   },
-  "aRates": { "char": 0.1167, "arc": 0.1131, "total": 0.2298, "bArc": 0.6533 },
-  "gift": { "every": 10, "aChar": 0.2, "aArc": 0.8 },
-  "dup": { "sMindShard": 1, "sWarp": 40, "sWarpLate": 80, "lateFrom": 8, "aMindShard": 1, "aWarp": 6, "aWarpLate": 12, "aArcBonusWarp": 4, "bArcBonusLost": 20 },
+  "aRates": {
+    "char": 0.1167,
+    "arc": 0.1131,
+    "total": 0.2298,
+    "bArc": 0.6533
+  },
+  "gift": {
+    "every": 10,
+    "aChar": 0.2,
+    "aArc": 0.8
+  },
+  "dup": {
+    "sMindShard": 1,
+    "sWarp": 40,
+    "sWarpLate": 80,
+    "lateFrom": 8,
+    "aMindShard": 1,
+    "aWarp": 6,
+    "aWarpLate": 12,
+    "aArcBonusWarp": 4,
+    "bArcBonusLost": 20
+  },
   "skin": {
-    "outfit": { "atRolls": 200, "dupWarp": 16, "firstTime": 0.0068 },
-    "livery": { "atRolls": 120, "dupWarp": 16, "firstTime": 0.01 },
-    "glider": { "atRolls": 50, "dupWarp": 4, "firstTime": 0.0296 }
+    "outfit": {
+      "atRolls": 200,
+      "dupWarp": 16,
+      "firstTime": 0.0068
+    },
+    "livery": {
+      "atRolls": 120,
+      "dupWarp": 16,
+      "firstTime": 0.01
+    },
+    "glider": {
+      "atRolls": 50,
+      "dupWarp": 4,
+      "firstTime": 0.0296
+    }
   },
-  "slumber": { "guardianAhead": 9, "catchWithin": 3, "guardianStep": 2, "catchWarp": 30, "simplified": true },
-  "cost": { "perRoll": 160, "roll10": { "dice": 5, "currency": 800 } },
+  "slumber": {
+    "guardianAhead": 9,
+    "catchWithin": 3,
+    "guardianStep": 2,
+    "catchWarp": 30,
+    "simplified": true
+  },
+  "cost": {
+    "perRoll": 160,
+    "roll10": {
+      "dice": 5,
+      "currency": 800
+    }
+  },
   "pool": {
     "featuredS": "elyms",
     "confirmed": false,
     "note": "Karakter A, Arc A, dan Arc B yang ada di papan belum diketahui; pool memakai semua Esper rank A, Arc bintang 4 (A), dan Arc bintang 3 (B) sebagai perkiraan."
+  },
+  "icons": {
+    "lostPieces": "img/item/silver_chequer.webp",
+    "annulith": "img/item/icon_ringstone.webp"
   }
 }

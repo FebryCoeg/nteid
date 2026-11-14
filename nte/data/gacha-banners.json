@@ -12,16 +12,16 @@
       "boardConfirmed": true,
       "skins": {
         "outfit": {
-          "name": null,
-          "icon": null,
-          "confirmed": false,
-          "note": "Outfit Daily Outfit banner ini belum diketahui namanya (Elyms punya Y2K Mystique, Drifting Petals, dan Windflower di database)."
+          "name": "Drifting Petals",
+          "icon": "img/item/256_fashion_1090_2.webp",
+          "confirmed": true
         },
         "livery": {
           "name": null,
-          "icon": null,
+          "icon": "img/gacha/tile-livery.svg",
+          "iconOnly": true,
           "confirmed": false,
-          "note": "Livery kendaraan Elyms belum ada di data game yang dipakai situs."
+          "note": "Nama livery Elyms belum ada di data game; halaman hanya menampilkan ikonnya."
         },
         "glider": {
           "name": "Joy Buoy",

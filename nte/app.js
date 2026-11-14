@@ -1224,12 +1224,12 @@
       else if (rw.kind === "A_CHAR") d = ch(eMap[rw.id], "A");
       else if (rw.kind === "A_ARC") d = ch(aMap[rw.id], "A Arc");
       else if (rw.kind === "B_ARC") d = ch(aMap[rw.id], "B Arc");
-      else if (rw.kind === "LOST") d = { t: "Lost Pieces ×" + rw.lost, tag: "" };
+      else if (rw.kind === "LOST") d = { t: "Lost Pieces ×" + rw.lost, ic: R.icons && R.icons.lostPieces, tag: "" };
       else if (rw.kind === "DICE") d = { t: S("Dadu gratis ×", "Free dice ×") + rw.dice, tag: "" };
       else if (rw.skin) {
         // skin karakter featured: nama dan ikon dari data banner; sumbernya (kotak atau bonus roll) selalu ditampilkan
         const sk = (banner.skins || {})[rw.skin] || {};
-        d = { t: sk.name || `${SKIN_LBL[rw.skin]} ${eMap[banner.featuredS].name.split(" (")[0]}`, ic: sk.icon, tag: "Skin", note: !sk.name ? S("nama belum diketahui", "name not known yet") : sk.confirmed === false ? S("perkiraan", "estimate") : "" };
+        d = { t: sk.name || `${SKIN_LBL[rw.skin]} ${eMap[banner.featuredS].name.split(" (")[0]}`, ic: sk.icon, tag: "Skin", note: !sk.name ? (sk.iconOnly ? "" : S("nama belum diketahui", "name not known yet")) : sk.confirmed === false ? S("perkiraan", "estimate") : "" };
         src = rw.claim ? S(`Dari bonus ${R.skin[rw.skin].atRolls} roll papan`, `From the ${R.skin[rw.skin].atRolls}-roll board bonus`) : S("Dari kotak ", "From tile ") + SKIN_TILE[rw.skin];
       } else d = { t: "—", tag: "" };
       const extra = [src, rw.mindShard ? `Mind Shard ×${rw.mindShard}` : "", rw.warp ? `Warp Pieces ×${rw.warp}` : "", rw.lost && rw.kind !== "LOST" ? `Lost Pieces ×${rw.lost}` : ""].filter(Boolean).join(" · ");
@@ -1343,16 +1343,16 @@
       $("#gcSkins").innerHTML = ["outfit", "livery", "glider"].map((k) => {
         const sk = (banner.skins || {})[k] || {};
         const have = ((st.obtained || {})["skin:" + k + ":" + banner.featuredS] || 0) > 0;
-        const note = !sk.name ? S("nama belum diketahui", "name not known yet") : sk.confirmed === false ? S("perkiraan", "estimate") : "";
+        const note = !sk.name ? (sk.iconOnly ? "" : S("nama belum diketahui", "name not known yet")) : sk.confirmed === false ? S("perkiraan", "estimate") : "";
         const rate = (R.landing[SKIN_LANDING[k]] * 100).toFixed(2);
         return `<div class="gc-sk"><div class="gc-skic">${sk.icon ? `<img src="${esc(img(sk.icon))}" alt="" loading="lazy" width="44" height="44">` : "?"}</div><div class="gc-skt"><b>${esc(sk.name || SKIN_LBL[k] + " " + feat)}</b>${note ? ` <em>${esc(note)}</em>` : ""}<small>${esc(S("Dari kotak ", "From tile ") + SKIN_TILE[k])} (${rate}% ${S("per roll", "per roll")}) · ${S("bonus", "bonus")} ${Math.min(rolls, R.skin[k].atRolls)}/${R.skin[k].atRolls} ${S("roll papan", "board rolls")}</small></div><span class="gc-skst${have ? " on" : ""}">${have ? S("Sudah dapat", "Owned") : S("Belum", "Not yet")}</span></div>`;
       }).join("");
     }
     function renderSide() {
       renderSkins();
-      const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
+      const chip = (a, b, ic) => `<div class="gc-st"><span>${ic ? `<img src="${esc(img(ic))}" alt="" width="16" height="16"> ` : ""}${esc(a)}</span><b>${esc(b)}</b></div>`;
       const avg = stats.S ? ` · ${S("rata-rata", "avg")} ${(st.total / stats.S).toFixed(1)}/S` : "";
-      $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Annulith (perkiraan)", "Annulith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"));
+      $("#gcStats").innerHTML = chip(S("Total roll", "Total rolls"), String(st.total)) + chip("S-Class", stats.S + avg) + chip("A-Class", String(stats.A)) + chip("B Arc", String(stats.B)) + chip(S("Annulith (perkiraan)", "Annulith (estimate)"), (st.total * R.cost.perRoll).toLocaleString(LANG === "en" ? "en-US" : "id-ID"), R.icons && R.icons.annulith);
       $("#gcHist").innerHTML = hist.length ? `<ol class="gc-list">${hist.slice(0, 40).map((h) => `<li><small class="mono">#${h.n}${h.gift ? " · Points Gift" : ""}</small>${describe(h)}</li>`).join("")}</ol>` : `<p class="txt">${S("Belum ada roll.", "No rolls yet.")}</p>`;
     }
     function resetAll() {

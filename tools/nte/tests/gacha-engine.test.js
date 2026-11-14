@@ -442,3 +442,21 @@ test("data banner: skin yang tercatat punya nama dan jalur ikon yang ada", () =>
     }
   }
 });
+
+// ---------------------------------------------------------------- Ikon mata uang dan skin dari database
+test("aturan: ikon Lost Pieces dan Annulith ada di database gambar situs", () => {
+  assert.ok(rules.icons, "rules.icons kosong");
+  for (const k of ["lostPieces", "annulith"]) {
+    assert.ok(rules.icons[k], `ikon ${k} belum diisi`);
+    assert.ok(fs.existsSync(path.join(ROOT, "nte", rules.icons[k])), `berkas ikon ${k} tak ada: ${rules.icons[k]}`);
+  }
+});
+
+test("banner Scarborough Fair: outfit = Drifting Petals (database), livery pakai ikon saja", () => {
+  const sk = banners.banners.find((b) => b.id === "scarborough-fair").skins;
+  assert.equal(sk.outfit.name, "Drifting Petals");
+  assert.equal(sk.outfit.icon, "img/item/256_fashion_1090_2.webp");
+  assert.equal(sk.livery.iconOnly, true);
+  assert.ok(sk.livery.icon);
+  assert.ok(fs.existsSync(path.join(ROOT, "nte", sk.livery.icon)));
+});

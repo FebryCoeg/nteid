@@ -1519,3 +1519,5 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .gc-skt em { font-style: normal; font-size: 0.62rem; color: var(--text-2); }
 .gc-skst { flex: none; font-size: 0.62rem; padding: 3px 8px; border-radius: 99px; background: #0003; color: var(--text-2); }
 .gc-skst.on { background: var(--gc-accent, var(--pink)); color: #fff; }
+
+.gc-st span img { vertical-align: -3px; border-radius: 4px; }
