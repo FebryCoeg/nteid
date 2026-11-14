@@ -105,6 +105,7 @@
     [/^\/properti\/?$/, viewProperty],
     [/^\/cerita\/?$/, viewStory],
     [/^\/anomali\/?$/, viewAnomalies],
+    [/^\/musuh\/?$/, viewEnemies],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
     [/^\/fashion\/?$/, viewFashion],
@@ -1131,6 +1132,46 @@
     });
   }
 
+  // ---------------- MUSUH ----------------
+  async function viewEnemies() {
+    setTitle(S("Musuh", "Enemies"));
+    const list = await load("enemies");
+    const TYPES = { weekly: S("Boss mingguan", "Weekly boss"), boss: S("Boss", "Boss"), elite: S("Elite", "Elite"), normal: S("Musuh biasa", "Regular") };
+    const RES = [["normal", S("Normal", "Normal")], ["cosmos", "Cosmos"], ["nature", "Nature"], ["incantation", "Incantation"], ["chaos", "Chaos"], ["psyche", "Psyche"], ["lakshana", "Lakshana"]];
+    const num = (n) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
+    const pct = (r) => `${Math.round(r * 1000) / 10}%`;
+    main.innerHTML = head(S("MUSUH", "ENEMIES"), S("Musuh", "Enemies"), S("Status musuh di setiap level: HP, ATK, DEF, Resist per elemen, dan Break (Unbal). Angka langsung dari tabel game.", "Enemy stats at every level: HP, ATK, DEF, per-element Resist and Break (Unbal). Numbers straight from the game tables."), list.length) + `
+      <div class="toolbar">${filterBox(S("Cari musuh…", "Search enemies…"))}${chips(Object.entries(TYPES).map(([v, label]) => ({ v, label })), "type", undefined, S("Semua jenis", "All types"))}</div>
+      <div class="wide-grid" id="grid"></div>`;
+    useFilters((st) => {
+      const out = list.filter((e) => match(st.q, e.name) && (!st.type || e.type === st.type));
+      $("#grid").innerHTML = out.map((e) => {
+        const lv = e.variants.flatMap((v) => Object.keys(v.levels).map(Number));
+        return `<button class="wcard en-card" type="button" data-n="${esc(e.name)}"><div class="wcard-body"><small>${esc(TYPES[e.type] || "")}</small><b>${esc(e.name)}</b><p>Lv ${Math.min(...lv)}–${Math.max(...lv)} · ${e.variants.length} ${S("varian", "variants")}</p></div></button>`;
+      }).join("") || `<div class="empty">${S("Tidak ada musuh yang cocok.", "No matching enemies.")}</div>`;
+      setCount(out.length);
+    });
+    $("#grid").addEventListener("click", (ev) => {
+      const b = ev.target.closest(".en-card"); if (!b) return;
+      const e = list.find((x) => x.name === b.dataset.n);
+      let vi = 0;
+      const draw = () => {
+        const v = e.variants[vi], lvls = Object.entries(v.levels);
+        const hasImm = lvls.some(([, s]) => Object.keys(s.imm || {}).length);
+        $("#enBody").innerHTML = `${e.variants.length > 1 ? `<div class="chips en-var">${e.variants.map((x, i) => `<button class="chip" type="button" data-i="${i}" aria-pressed="${i === vi}">${esc(tx(x.label))} · ${Object.keys(x.levels).length} Lv</button>`).join("")}</div>` : ""}
+          <p class="mono en-id">${esc(v.ids.join(" · "))}</p>
+          <div class="en-wrap"><table class="en-tbl"><thead><tr><th>Lv</th><th>HP</th><th>ATK</th><th>DEF</th>${RES.map(([, n]) => `<th>${esc(n)}</th>`).join("")}<th>Break</th></tr></thead><tbody>
+          ${lvls.map(([lv, s]) => `<tr><td><b>${lv}</b></td><td>${num(s.hp)}</td><td>${num(s.atk)}</td><td>${num(s.def)}</td>${RES.map(([k]) => `<td>${pct(s.res[k] || 0)}</td>`).join("")}<td>${s.unbal}</td></tr>`).join("")}
+          </tbody></table></div>
+          ${hasImm ? `<p class="txt en-note">${S("Ada imunitas elemen pada sebagian level (lihat data game).", "Some levels have elemental immunities (see game data).")}</p>` : ""}`;
+      };
+      sheet({ name: e.name }, `<span class="mono">${esc(TYPES[e.type] || "")}</span>`,
+        `<p class="txt en-note">${S("Level mengikuti tabel game (level dunia untuk musuh dunia, level boss untuk boss mingguan). Resist 20% berarti DMG elemen itu dikurangi 20%. Break = batas bar Unbal sebelum musuh jatuh.", "Levels follow the game table (world level for open-world enemies, boss level for weekly bosses). 20% Resist means that element's DMG is reduced by 20%. Break = Unbal bar size before the enemy topples.")}</p><div id="enBody"></div>`);
+      draw();
+      $("#enBody").addEventListener("click", (ev2) => { const c = ev2.target.closest(".en-var .chip"); if (c) { vi = +c.dataset.i; draw(); } });
+    });
+  }
+
   // ---------------- PROPERTI ----------------
   async function viewProperty() {
     setTitle(S("Properti", "Property"));
@@ -1163,7 +1204,7 @@
   const ST_TEXT = {
     "Lewati ke konten": "Skip to content", "Database NTE": "NTE Database", "Beranda": "Home",
     "Esper": "Espers", "Arc": "Arcs", "Modul": "Modules", "Item": "Items", "Furnitur": "Furniture", "Kendaraan": "Vehicles", "Properti": "Property",
-    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
+    "Katalog": "Catalog", "Informasi": "Information", "Cerita": "Story", "Anomali": "Anomalies", "Musuh": "Enemies", "Istilah": "Glossary", "Pencapaian": "Achievements", "Makanan": "Food", "Versi": "Versions", "Versi & Patch": "Versions & Patches",
     "MENU · INDEKS ARSIP": "MENU · ARCHIVE INDEX", "LAINNYA": "MORE",
     "Portofolio Febry Coeg": "Febry Coeg's Portfolio", "Profil, sosial media, game, dan video YouTube": "Profile, socials, games and YouTube videos",
     "Join Discord NTE Indonesia ↗": "Join the NTE Indonesia Discord ↗", "Donate lewat Trakteer ↗": "Donate via Trakteer ↗",
