@@ -1278,7 +1278,7 @@
       $("#gcBoard").innerHTML = board.tiles.map(tileHtml).join("") + `<div class="gc-piece" id="gcPiece"><img src="${esc(img(featured.icon))}" alt=""></div>`;
       piece = $("#gcPiece");
       $("#gcTitle").innerHTML = `${esc(banner.name)} · <span class="gc-feat">${esc(featured.name.split(" (")[0])}</span>`;
-      $("#gcMain").style.setProperty("--gc-accent", banner.accent);
+      $(".gc").style.setProperty("--gc-accent", banner.accent);
       $("#gcNote").hidden = banner.boardConfirmed !== false;
       $$("#gcBanners .gc-bn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.bn === banner.id)));
       place(st.pos);
