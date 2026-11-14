@@ -154,6 +154,11 @@ def main():
         "source": "Peta 'Board Tile Guide' di game, dibaca dari screenshot pemilik situs 2026-11-15",
         "width": 1920, "height": 1080, "area": list(AREA),
         "start": route[0],
+        # keputusan dari tes peluang mendarat (tools/nte/board_stats.js): bidak yang mendarat tepat di panah masuk berhenti
+        # di kotak pertama blok dan roll berikutnya berjalan di dalam blok; peluang S per roll mengikuti angka resmi
+        # (papan Modified belum diketahui susunannya).
+        "blockRule": "enterFirst",
+        "sMode": "calibrated",
         "tiles": tiles, "route": route, "blocks": blocks,
         "confirmed": {"arrows": False, "modifiedLayout": False, "lostAmounts": False},
     }

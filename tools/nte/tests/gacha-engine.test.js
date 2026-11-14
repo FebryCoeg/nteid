@@ -210,12 +210,12 @@ test("moveToken: aturan traverse melewati seluruh blok dan berhenti di panah kel
 });
 
 test("moveToken: hanya melewati panah masuk tidak masuk blok", () => {
-  assert.deepEqual(E.moveToken(B1, 2, 3, "enterFirst"), { path: [3, 4, 5], landed: 5 });
+  assert.deepEqual(E.moveToken(B1, 2, 3, "enterFirst"), { path: [3, 4, 6], landed: 6 });
 });
 
 test("moveToken: dari dalam blok lanjut ke kotak berikutnya, keluar lewat panah keluar, kembali ke rute", () => {
-  assert.deepEqual(E.moveToken(B1, 9, 2, "enterFirst"), { path: [10, 5], landed: 5 });
-  assert.deepEqual(E.moveToken(B1, 9, 3, "enterFirst"), { path: [10, 5, 6], landed: 6 });
+  assert.deepEqual(E.moveToken(B1, 9, 1, "enterFirst"), { path: [10], landed: 10 });
+  assert.deepEqual(E.moveToken(B1, 9, 3, "enterFirst"), { path: [10, 6, 7], landed: 7 });
 });
 
 test("roll paksa pity: bidak tidak bergerak dan hasilnya S", () => {
@@ -270,4 +270,38 @@ test("tanpa S, bidak tidak pernah berhenti di kotak Journey Together S", () => {
     const r = E.roll(E.newState(), B, R, E.createRng(s), { blockRule: "enterFirst" });
     if (r.reward.kind !== "S") assert.notEqual(r.landed, 2);
   }
+});
+
+// ---------------------------------------------------------------- Task 5: peluang mendarat dan keputusan aturan
+const stats = require(path.join(ROOT, "tools", "nte", "board_stats.js"));
+
+test("panah keluar bukan tempat berhenti: dilewati saat berjalan dari rute maupun dari blok", () => {
+  assert.deepEqual(E.moveToken(B1, 4, 1, "enterFirst"), { path: [6], landed: 6 });
+  assert.deepEqual(E.moveToken(B1, 9, 2, "enterFirst"), { path: [10, 6], landed: 6 });
+});
+
+test("peristiwa S lebih suka kotak Journey Together S (masuk blok) bila terjangkau", () => {
+  // dari 0: dadu 3 mendarat di panah masuk (3) -> kotak pertama blok (journeyS); dadu 4 mendarat di hero
+  const B = mkBoard(["lost", "lost", "lost", "arrowIn", "hero", "arrowOut", "lost", "lost"],
+    [{ side: "right", enter: 3, exit: 5, tiles: [8, 9, 10] }], ["journeyS", "livery", "hero"]);
+  // undian S = 0 (kena), pemilihan dadu = 0.99 (cenderung pilihan terakhir): harus tetap memilih blok
+  const r = E.roll(E.newState(), B, R, seq([0, 0.99]), { blockRule: "enterFirst" });
+  assert.equal(r.reward.kind, "S");
+  assert.equal(r.landed, 8);
+});
+
+test("papan terpilih: aturan blok dan mode S tercatat di data papan", () => {
+  assert.equal(board.blockRule, "enterFirst");
+  assert.equal(board.sMode, "calibrated");
+});
+
+test("peluang mendarat cocok angka resmi (aturan enterFirst)", () => {
+  const p = stats.landingStats("enterFirst", 400000, 11);
+  const near = (k, tol) => assert.ok(Math.abs((p[k] || 0) - stats.OFFICIAL[k]) <= tol, `${k}: simulasi ${(p[k] || 0).toFixed(2)} resmi ${stats.OFFICIAL[k]}`);
+  near("apprentice", 3);
+  near("hero", 3);
+  near("lost", 3);
+  assert.ok(Math.abs((p.journeyS || 0) + (p.journeyA || 0) - 10.86) <= 3, "journey");
+  for (const k of ["arclight", "fashion", "roll1", "roll5", "outfit", "livery"]) near(k, 1);
+  assert.equal(p.arrowOut || 0, 0, "bidak tak boleh berhenti di panah keluar");
 });

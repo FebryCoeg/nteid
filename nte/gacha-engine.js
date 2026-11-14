@@ -139,8 +139,12 @@
   function nextTile(board, id) {
     const ix = index(board);
     const ib = ix.inBlock[id];
-    if (ib) return ib.i + 1 < ib.block.tiles.length ? ib.block.tiles[ib.i + 1] : ib.block.exit;
-    return board.route[(ix.routeAt[id] + 1) % board.route.length];
+    let nxt;
+    if (ib) nxt = ib.i + 1 < ib.block.tiles.length ? ib.block.tiles[ib.i + 1] : ib.block.exit;
+    else nxt = board.route[(ix.routeAt[id] + 1) % board.route.length];
+    // panah keluar bukan tempat berhenti (angka resmi tidak punya kotak itu): langsung ke kotak sesudahnya
+    if (ix.byId[nxt].type === "arrowOut") nxt = board.route[(ix.routeAt[nxt] + 1) % board.route.length];
+    return nxt;
   }
 
   // Bidak berjalan `die` langkah searah rute. Hanya mendarat TEPAT di panah masuk yang memasukkan bidak ke blok:
@@ -180,6 +184,10 @@
         return sEvent ? S_CAPABLE[type] : type !== "journeyS";
       });
       if (!cands.length) cands = opts;
+      if (sEvent) {
+        const j = cands.filter((o) => ix.byId[o.m.landed].type === "journeyS");
+        if (j.length) cands = j; // S lewat kotak Journey Together bila terjangkau, selain itu lewat chest
+      }
       const o = cands[Math.floor(rng() * cands.length)];
       die = o.d; path = o.m.path; landed = o.m.landed;
     }
