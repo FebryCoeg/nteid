@@ -1633,3 +1633,30 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
   .ga-hint { position: static; padding: 40px 16px; }
 }
 @media (max-width: 560px) { .ga-stage:has(.ga-box) { min-height: 320px; } }
+
+/* ---- tracker gacha ---- */
+.tk-add { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; margin-bottom: 12px; }
+.tk-add .chip { justify-content: center; min-height: 42px; }
+.tk-up[hidden] { display: none; }
+.tk-listbox { max-height: 520px; overflow: auto; }
+.tk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.tk-row { display: grid; grid-template-columns: 24px 34px minmax(0, 1fr) 64px auto; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: var(--panel-2); font-size: 0.8rem; }
+.tk-i { color: var(--text-2); font-size: 0.65rem; text-align: center; }
+.tk-row img, .tk-ph { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; background: #0003; }
+.tk-nm { display: grid; gap: 1px; min-width: 0; }
+.tk-nm b { overflow-wrap: anywhere; }
+.tk-nm em { font-style: normal; font-size: 0.62rem; color: #ffc24d; }
+.tk-nm small { color: var(--text-2); font-size: 0.64rem; }
+.tk-pin { width: 100%; box-sizing: border-box; padding: 6px 4px; border-radius: 8px; border: 2px solid var(--c, #666); background: var(--panel); color: var(--text); text-align: center; font-weight: 800; font: inherit; font-weight: 800; }
+.tk-act { display: flex; gap: 4px; }
+.tk-act button { width: 28px; height: 28px; border-radius: 8px; border: 0; background: #0004; color: var(--text); cursor: pointer; }
+.tk-act button[disabled] { opacity: 0.3; cursor: default; }
+.tk-pity { margin-top: 14px; display: grid; gap: 10px; }
+.tk-bar .gc-meter { position: relative; }
+.tk-bar .gc-meter u { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fb923c; text-decoration: none; }
+.tk-barh { display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 6px; color: var(--text-2); }
+.tk-barh b { color: var(--text); }
+.tk-warn { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.tk-warn li { font-size: 0.74rem; line-height: 1.5; padding: 8px 10px; border-radius: 10px; background: #f8717122; border: 1px solid #f8717166; color: #ffb4b4; }
+.tk-chart canvas { max-width: 100%; }
+@media (max-width: 560px) { .tk-row { grid-template-columns: 22px 30px minmax(0, 1fr) 56px; } .tk-act { grid-column: 1 / -1; justify-content: flex-end; } }

@@ -126,6 +126,7 @@
     [/^\/musuh\/?$/, viewEnemies],
     [/^\/kalkulator\/?$/, viewCalc],
     [/^\/gacha\/?$/, viewGacha],
+    [/^\/tracker\/?$/, viewTracker],
     [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
@@ -1231,6 +1232,7 @@
     o.legend.forEach((l) => { g.fillStyle = l.color; g.beginPath(); g.arc(lx + 7, ly, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = "#c9c4bb"; g.fillText(l.text, lx + 20, ly + 1); lx += 34 + g.measureText(l.text).width; });
     g.fillStyle = "#8f8b84"; g.font = "600 14px 'JetBrains Mono', monospace"; g.textAlign = "right";
     g.fillText("Hethereau · nteid.site/gacha · simulasi, bukan gacha asli", W - PAD, H0 - 24);
+    if (o.preview) return cv;
     cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = o.file; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }, "image/png");
   }
   // ringkasan "terendah / tertinggi / median" dari pity yang diketahui
@@ -1710,6 +1712,214 @@
       $r("#gaCards").innerHTML = hist[0].arcs.map((a, i) => cardHtml({ rarity: a.r, up: a.up, idx: a.i, bonus: rules.bonus[a.r], pity: a.p, upPity: a.u, hard: a.h }, i)).join("");
     }
     pity(); side();
+  }
+
+  // ---------------- TRACKER GACHA ----------------
+  // Pengguna mencatat total pull dan hanya S-Class yang didapat (nama + pity); statistik, pity sekarang, dan diagram dihitung otomatis.
+  // Data hanya di localStorage browser; tidak ada yang dikirim ke server.
+  async function viewTracker() {
+    setTitle(S("Tracker Gacha", "Gacha Tracker"));
+    const [espers, arcs, arcData] = await Promise.all([load("espers"), load("arcs"), load("gacha-arc").catch(() => null)]);
+    const T = window.NteTracker;
+    const intro = head(S("TRACKER", "TRACKER"), S("Tracker Gacha", "Gacha Tracker"), S("Catat total pull dan S-Class yang kamu dapat. Pity, statistik, dan diagram dihitung otomatis. Data hanya tersimpan di browsermu.", "Log your total pulls and the S-Class you got. Pity, stats and the chart are calculated for you. Data stays in your browser only."), null);
+    if (!T) { main.innerHTML = intro + `<p class="txt">${S("Modul tracker gagal dimuat. Muat ulang halaman.", "The tracker module failed to load. Reload the page.")}</p>`; return; }
+
+    const eMap = Object.fromEntries(espers.map((e) => [e.slug, e]));
+    const aMap = Object.fromEntries(arcs.map((a) => [a.slug, a]));
+    const featuredArc = arcData && arcData.banners && (arcData.banners.find((b) => b.id === arcData.default) || arcData.banners[0] || {}).featuredArc;
+    const sEspers = espers.filter((e) => e.rank === "S").map((e) => ({ id: e.slug, name: e.name.split(" (")[0] })).sort((a, b) => a.name.localeCompare(b.name));
+    const sArcs = arcs.filter((a) => a.rarity === 5).map((a) => ({ id: a.slug, name: a.name })).sort((a, b) => (b.id === featuredArc) - (a.id === featuredArc) || a.name.localeCompare(b.name));
+
+    // ---- penyimpanan lokal
+    const KEY = "nte_tracker_v1";
+    let data = T.emptyData();
+    try { const r = T.normalizeImport(JSON.parse(localStorage.getItem(KEY) || "null")); if (r.data) data = r.data; } catch (e) {}
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify(T.exportData(data))); } catch (e) {} };
+    let tab = new URLSearchParams(location.search).get("t") === "arc" ? "arc" : "esper";
+
+    const hardOf = () => T.LIM[tab].hard;
+    const nameOf = (e) => (tab === "esper" ? (eMap[e.id] ? eMap[e.id].name.split(" (")[0] : e.id) : (aMap[e.arc] ? aMap[e.arc].name : e.arc));
+    const iconOf = (e) => (tab === "esper" ? (eMap[e.id] && eMap[e.id].icon) : (aMap[e.arc] && aMap[e.arc].icon));
+    const colorOf = (it) => (tab === "esper" ? pityColorE(it.p, it.kind === "hard") : pityColorA(it.p, it.kind === "hard"));
+    const numFmt = (n, d = 0) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+    main.innerHTML = intro + `
+      <div class="gc-toolbar"><div class="gc-tb"><span class="mono gc-lbl">${S("BANNER", "BANNER")}</span><div class="gc-tabs"><button type="button" class="chip" id="tkTabE" aria-pressed="false">${S("Esper (papan dadu)", "Esper (dice board)")}</button><button type="button" class="chip" id="tkTabA" aria-pressed="false">${S("Arc (Miracle Box)", "Arc (Miracle Box)")}</button></div></div></div>
+      <p class="calc-beta gc-wide" id="tkHow"></p>
+      <div class="gc">
+        <div class="gc-col gc-left">
+          <section class="calc-card"><h3>${S("1 · Total pull", "1 · Total pulls")}</h3>
+            <div class="calc-grid"><label class="cf"><span id="tkTotalLbl"></span><input id="tkTotal" type="number" min="0" step="1" inputmode="numeric"></label><label class="cf"><span>${S("Jumlah A-Class (opsional)", "A-Class count (optional)")}</span><input id="tkA" type="number" min="0" step="1" inputmode="numeric"></label></div></section>
+          <section class="calc-card"><h3>${S("2 · S-Class yang didapat", "2 · S-Class obtained")}</h3>
+            <p class="txt calc-note" id="tkAddNote"></p>
+            <div class="tk-add" id="tkAdd"></div>
+            <div id="tkList" class="tk-listbox"></div></section>
+        </div>
+        <div class="gc-col gc-right">
+          <section class="calc-card"><h3>${S("Statistik", "Stats")}</h3><div id="tkStats" class="gc-stats"></div><div id="tkPity" class="tk-pity"></div><div id="tkWarn"></div></section>
+          <section class="calc-card"><h3>${S("Simpan dan bagikan", "Save and share")}</h3>
+            <div class="gc-btns"><button type="button" class="chip" id="tkShare" aria-pressed="true">${S("Bagikan gambar", "Share image")}</button><button type="button" class="chip" id="tkExport">${S("Ekspor (.json)", "Export (.json)")}</button><button type="button" class="chip" id="tkImport">${S("Impor (.json)", "Import (.json)")}</button><button type="button" class="chip" id="tkReset">${S("Reset tab ini", "Reset this tab")}</button></div>
+            <input type="file" id="tkFile" accept="application/json,.json" hidden>
+            <p class="txt calc-note" style="margin-top:10px">${S("Data tersimpan di browser ini saja. Ekspor berkasnya untuk dipindah ke perangkat lain.", "Data is stored in this browser only. Export the file to move it to another device.")}</p></section>
+        </div>
+      </div>
+      <section class="calc-card" style="margin-top:14px"><h3>${S("Diagram pity", "Pity chart")}</h3><div id="tkChart" class="tk-chart"></div></section>`;
+
+    const $t = (s) => main.querySelector(s);
+    const kd = () => data[tab];
+
+    // ---- formulir tambah S-Class (dibuat ulang saat ganti tab)
+    function buildAdd() {
+      const opts = (tab === "esper" ? sEspers : sArcs).map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+      const arcExtra = tab === "arc" ? `<label class="cf tk-up"><span>${S("Arc UP?", "UP Arc?")}</span><select id="tkUpSel"><option value="0">${S("Bukan", "No")}</option><option value="1" ${featuredArc ? "selected" : ""}>${S("Ya (Arc UP)", "Yes (UP Arc)")}</option></select></label><label class="cf tk-up" id="tkUpWrap"><span>${S("Pity UP (1-8)", "UP pity (1-8)")}</span><input id="tkUpP" type="number" min="1" max="${T.LIM.arc.upHard}" step="1" inputmode="numeric"></label>` : "";
+      $t("#tkAdd").innerHTML = `<label class="cf"><span>${tab === "esper" ? S("Karakter S-Class", "S-Class character") : S("Arc S-Class", "S-Class Arc")}</span><select id="tkName">${opts}</select></label>
+        <label class="cf"><span>${S(`Pity (1-${hardOf()})`, `Pity (1-${hardOf()})`)}</span><input id="tkP" type="number" min="1" max="${hardOf()}" step="1" inputmode="numeric"></label>${arcExtra}
+        <button type="button" class="chip" id="tkAddBtn" aria-pressed="true">${S("Tambah", "Add")}</button>`;
+      if (tab === "arc") { const sel = $t("#tkUpSel"), wrap = $t("#tkUpWrap"); const sync = () => { wrap.hidden = sel.value !== "1"; }; sel.onchange = sync; sync(); }
+      $t("#tkAddBtn").onclick = addEntry;
+      $t("#tkP").onkeydown = (ev) => { if (ev.key === "Enter") addEntry(); };
+      $t("#tkAddNote").textContent = tab === "esper"
+        ? S("Pity = berapa roll sejak S-Class sebelumnya, termasuk roll saat S itu keluar (angka 1 sampai 90). Isi berurutan dari yang paling lama.", "Pity = how many rolls since the previous S-Class, including the roll it dropped on (1 to 90). Add them in order, oldest first.")
+        : S("Pity = berapa Pull (kotak) sejak Arc S sebelumnya, termasuk Pull saat S itu keluar (1 sampai 6). Untuk Arc UP isi juga pity UP (1 sampai 8). Isi berurutan dari yang paling lama.", "Pity = how many Pulls (boxes) since the previous S-Class Arc, including the Pull it dropped on (1 to 6). For the UP Arc also enter the UP pity (1 to 8). Add them in order, oldest first.");
+      $t("#tkTotalLbl").textContent = tab === "esper" ? S("Total roll di banner Esper", "Total rolls on the Esper banner") : S("Total Pull (kotak) di banner Arc", "Total Pulls (boxes) on the Arc banner");
+      $t("#tkHow").innerHTML = `<b>${S("Cukup catat S-Class.", "Just log the S-Class.")}</b> ${S("Dari ratusan pull biasanya hanya belasan yang S. Isi total pull, lalu tambahkan tiap S-Class dengan angka pity-nya; sisanya dihitung otomatis.", "Out of hundreds of pulls only a dozen or so are S. Enter the total pulls, then add each S-Class with its pity; the rest is calculated for you.")}`;
+    }
+
+    function addEntry() {
+      const p = parseInt($t("#tkP").value, 10), id = $t("#tkName").value;
+      if (!id) return toast(S("Pilih nama dulu.", "Pick a name first."));
+      if (!(p >= 1 && p <= hardOf())) return toast(S(`Pity harus 1 sampai ${hardOf()}.`, `Pity must be 1 to ${hardOf()}.`));
+      let e;
+      if (tab === "esper") e = { id, p };
+      else {
+        e = { arc: id, p };
+        if ($t("#tkUpSel").value === "1") {
+          const u = parseInt($t("#tkUpP").value, 10);
+          if (!(u >= 1 && u <= T.LIM.arc.upHard)) return toast(S(`Pity UP harus 1 sampai ${T.LIM.arc.upHard}.`, `UP pity must be 1 to ${T.LIM.arc.upHard}.`));
+          e.up = true; e.u = u;
+        }
+      }
+      kd().entries.push(e);
+      $t("#tkP").value = "";
+      save(); refresh(); $t("#tkP").focus();
+    }
+
+    // ---- tampilan daftar, statistik, dan diagram
+    function refresh() {
+      const d = kd(), r = T.compute(tab, d);
+      $t("#tkTotal").value = d.total || ""; $t("#tkA").value = d.a || "";
+      $t("#tkList").innerHTML = d.entries.length ? `<ol class="tk-list">${d.entries.map((e, i) => {
+        const it = r.items[i] || { ...e, n: 0, kind: "normal" };
+        return `<li class="tk-row"><span class="tk-i">${i + 1}</span>${iconOf(e) ? `<img src="${esc(img(iconOf(e)))}" alt="" width="34" height="34" loading="lazy">` : `<span class="tk-ph"></span>`}<span class="tk-nm"><b>${esc(nameOf(e))}</b>${e.up ? ` <em>UP ${e.u}</em>` : ""}<small>${S("pull ke-", "pull #")}${numFmt(it.n)}${it.kind === "hard" ? " · hard pity" : it.kind === "soft" ? " · soft pity" : ""}</small></span><input class="tk-pin" type="number" min="1" max="${hardOf()}" value="${e.p}" data-i="${i}" aria-label="pity" style="--c:${colorOf(it)}"><span class="tk-act"><button type="button" data-act="up" data-i="${i}" ${i === 0 ? "disabled" : ""} aria-label="naik">↑</button><button type="button" data-act="down" data-i="${i}" ${i === d.entries.length - 1 ? "disabled" : ""} aria-label="turun">↓</button><button type="button" data-act="del" data-i="${i}" aria-label="hapus">✕</button></span></li>`;
+      }).join("")}</ol>` : `<p class="txt">${S("Belum ada S-Class. Tambahkan di atas.", "No S-Class yet. Add one above.")}</p>`;
+
+      const chip = (a, b) => `<div class="gc-st"><span>${esc(a)}</span><b>${esc(b)}</b></div>`;
+      const na = (v, dd) => (v === null || v === undefined ? "—" : numFmt(v, dd));
+      $t("#tkStats").innerHTML = chip("S-Class", String(r.S)) + chip("Percent", r.percent === null ? "—" : numFmt(r.percent, 2) + "%") + chip("Pity AVG", na(r.avg, 2))
+        + chip(S("Terendah", "Lowest"), na(r.min)) + chip(S("Nilai tengah", "Middle value"), na(r.median, r.median % 1 ? 1 : 0)) + chip(S("Tertinggi", "Highest"), na(r.max));
+      const bar = (cur, hard, soft, label) => `<div class="tk-bar"><div class="tk-barh"><span>${esc(label)}</span><b>${cur}/${hard}</b></div><div class="gc-meter"><i style="width:${Math.min(100, cur / hard * 100)}%"></i>${soft ? `<u style="left:${soft / hard * 100}%"></u>` : ""}</div></div>`;
+      if (tab === "esper") {
+        const L = T.LIM.esper;
+        $t("#tkPity").innerHTML = bar(r.currentPity, L.hard, L.soft - 1, S("Pity sekarang", "Current pity"))
+          + `<p class="txt calc-note">${r.currentPity >= L.soft ? S("Soft pity aktif (papan Modified, peluang S naik). ", "Soft pity active (Modified board, S rate up). ") : S(`Soft pity mulai setelah ${L.soft - 1} roll tanpa S. `, `Soft pity starts after ${L.soft - 1} rolls without S. `)}${S(`Hard pity dijamin ${r.toHard} roll lagi.`, `Hard pity is guaranteed in ${r.toHard} more rolls.`)}${r.avg !== null ? " " + S(`Rata-rata resmi sekitar 53,5; punyamu ${numFmt(r.avg, 1)}.`, `The official average is about 53.5; yours is ${numFmt(r.avg, 1)}.`) : ""}</p>`;
+      } else {
+        const L = T.LIM.arc;
+        $t("#tkPity").innerHTML = bar(r.currentPity, L.hard, 0, S("Pity S sekarang", "Current S pity")) + bar(r.currentUpPity, L.upHard, 0, S("Pity UP sekarang", "Current UP pity"))
+          + `<p class="txt calc-note">${S("S dijamin dalam 6 Pull, Arc UP dijamin dalam 8 Pull.", "S is guaranteed within 6 Pulls, the UP Arc within 8 Pulls.")}</p>`;
+      }
+      $t("#tkWarn").innerHTML = r.errors.length ? `<ul class="tk-warn">${r.errors.map((m) => `<li>${esc(m)}</li>`).join("")}</ul>` : "";
+      $t("#tkTabE").setAttribute("aria-pressed", String(tab === "esper")); $t("#tkTabA").setAttribute("aria-pressed", String(tab === "arc"));
+      drawChart(r);
+    }
+
+    const chartOpts = (r, preview) => {
+      const d = kd();
+      const pctOf = (v) => (d.total > 0 ? numFmt(v / d.total * 100, 2) + "%" : "—");
+      if (tab === "esper") {
+        return {
+          title: "Tracker Gacha NTE", sub: S("Esper · papan dadu", "Esper · dice board"), accent: "#ff5a7a", preview,
+          rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctOf(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctOf(d.a), avg: "—" }],
+          extra: pityExtra(r.items.map((i) => i.p)),
+          items: r.items.map((i) => ({ num: i.p, color: pityColorE(i.p, i.kind === "hard"), hard: i.kind === "hard", src: iconOf(i), n: i.n })),
+          max: 90, ticks: [0, 30, 60, 90],
+          zones: [{ v: 71, color: PITY_COL.orange, text: "soft pity 71" }, { v: 90, color: PITY_COL.red, text: "hard pity 90" }],
+          legend: [{ color: PITY_COL.green, text: S("Awal (1-30)", "Early (1-30)") }, { color: PITY_COL.yellow, text: S("Tengah (31-70)", "Mid (31-70)") }, { color: PITY_COL.orange, text: S("Soft pity (71-89)", "Soft pity (71-89)") }, { color: PITY_COL.red, text: "Hard pity (90)" }],
+          file: "tracker-esper-nte.png", emptyText: S("Belum ada S-Class. Tambahkan di tracker.", "No S-Class yet. Add some in the tracker."),
+        };
+      }
+      const arcsN = d.total * 10, pctA = (v) => (arcsN > 0 ? numFmt(v / arcsN * 100, 2) + "%" : "—");
+      const ups = r.items.filter((i) => i.up);
+      return {
+        title: "Tracker Gacha NTE", sub: S("Arc · Miracle Box", "Arc · Miracle Box"), accent: "#ffc24d", preview,
+        rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctA(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: ups.length, percent: pctA(ups.length), avg: ups.length ? numFmt(ups.reduce((a, i) => a + i.u, 0) / ups.length, 2) : "—" }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctA(d.a), avg: "—" }],
+        extra: pityExtra(r.items.map((i) => i.p)),
+        items: r.items.map((i) => ({ num: i.p, color: pityColorA(i.p, i.kind === "hard"), hard: i.kind === "hard", gold: !!i.up, src: iconOf(i), tag: i.up ? "UP " + i.u : "", n: i.n })),
+        max: 6, ticks: [0, 2, 4, 6],
+        zones: [{ v: 5, color: PITY_COL.orange, text: "5" }, { v: 6, color: PITY_COL.red, text: "6" }],
+        legend: [{ color: PITY_COL.green, text: S("Awal (Pull 1-2)", "Early (Pull 1-2)") }, { color: PITY_COL.yellow, text: S("Tengah (3-4)", "Mid (3-4)") }, { color: PITY_COL.orange, text: S("Hampir hard pity (5)", "Near hard pity (5)") }, { color: PITY_COL.red, text: "Hard pity (6)" }, { color: "#ffc24d", text: S("Cincin emas = Arc UP", "Gold ring = UP Arc") }],
+        file: "tracker-arc-nte.png", emptyText: S("Belum ada Arc S. Tambahkan di tracker.", "No S-Class Arc yet. Add some in the tracker."),
+      };
+    };
+    let chartTok = 0;
+    function drawChart(r) {
+      const tok = ++chartTok;
+      setTimeout(async () => {
+        if (tok !== chartTok) return;
+        try {
+          const cv = await pityChartImage(chartOpts(r, true));
+          if (tok !== chartTok || !cv) return;
+          cv.style.cssText = "width:100%;height:auto;border-radius:12px;display:block";
+          $t("#tkChart").replaceChildren(cv);
+        } catch (e) { $t("#tkChart").textContent = ""; }
+      }, 250);
+    }
+
+    // ---- interaksi
+    $t("#tkTabE").onclick = () => { tab = "esper"; buildAdd(); refresh(); };
+    $t("#tkTabA").onclick = () => { tab = "arc"; buildAdd(); refresh(); };
+    const intInput = (el, key) => { el.onchange = () => { const v = parseInt(el.value, 10); kd()[key] = Number.isInteger(v) && v >= 0 && v <= 1e6 ? v : 0; save(); refresh(); }; };
+    intInput($t("#tkTotal"), "total"); intInput($t("#tkA"), "a");
+    $t("#tkList").onclick = (ev) => {
+      const b = ev.target.closest("button[data-act]"); if (!b) return;
+      const i = +b.dataset.i, arr = kd().entries;
+      if (b.dataset.act === "del") arr.splice(i, 1);
+      else if (b.dataset.act === "up" && i > 0) [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
+      else if (b.dataset.act === "down" && i < arr.length - 1) [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]];
+      save(); refresh();
+    };
+    $t("#tkList").onchange = (ev) => {
+      const inp = ev.target.closest(".tk-pin"); if (!inp) return;
+      const v = parseInt(inp.value, 10), e = kd().entries[+inp.dataset.i];
+      if (e && v >= 1 && v <= hardOf()) { e.p = v; save(); } else toast(S(`Pity harus 1 sampai ${hardOf()}.`, `Pity must be 1 to ${hardOf()}.`));
+      refresh();
+    };
+    $t("#tkShare").onclick = async () => { const r = T.compute(tab, kd()); await pityChartImage(chartOpts(r, false)); };
+    $t("#tkExport").onclick = () => {
+      const blob = new Blob([JSON.stringify(T.exportData(data), null, 2)], { type: "application/json" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "nte-tracker.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    };
+    $t("#tkImport").onclick = () => $t("#tkFile").click();
+    $t("#tkFile").onchange = (ev) => {
+      const f = ev.target.files && ev.target.files[0]; ev.target.value = "";
+      if (!f) return;
+      if (f.size > 2 * 1024 * 1024) return toast(S("Berkas terlalu besar (maks. 2 MB).", "File is too large (max 2 MB)."));
+      const rd = new FileReader();
+      rd.onload = () => {
+        let res;
+        try { res = T.normalizeImport(JSON.parse(String(rd.result))); } catch (e) { res = { error: S("Berkas bukan JSON yang valid.", "The file is not valid JSON.") }; }
+        if (res.error) return toast(res.error);
+        if (!confirm(S("Impor akan menggantikan semua data tracker (Esper dan Arc) di browser ini. Lanjutkan?", "Importing will replace all tracker data (Esper and Arc) in this browser. Continue?"))) return;
+        data = res.data; save(); refresh();
+        toast(S("Data berhasil diimpor.", "Data imported."));
+      };
+      rd.onerror = () => toast(S("Gagal membaca berkas.", "Could not read the file."));
+      rd.readAsText(f);
+    };
+    $t("#tkReset").onclick = () => {
+      if (!confirm(S("Hapus semua catatan di tab ini?", "Delete all entries in this tab?"))) return;
+      data[tab] = { total: 0, a: 0, entries: [] }; save(); refresh();
+    };
+    buildAdd(); refresh();
   }
 
   // ---------------- TENTANG ----------------
