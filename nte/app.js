@@ -1506,6 +1506,7 @@
         rows: [
           { label: "S-Class", color: "#ffc24d", total: stats.S, percent: pct(stats.S), avg: avgTxt(stats.pSum, stats.pN, 2) },
           { label: "A-Class", color: "#c25be8", total: stats.A, percent: pct(stats.A), avg: "—" },
+          { label: S("B-Class (Arc)", "B-Class (Arc)"), color: "#5ba8e8", total: stats.B, percent: pct(stats.B), avg: "—" },
         ],
         stat: [nfmt(st.total) + " pull", nfmt(st.total * R.cost.perRoll) + " Annulith"],
         extra: pityExtra(slog.map((e) => e.p)),
@@ -1695,6 +1696,7 @@
           { label: "S-Class", color: "#ffc24d", total: tot.S, percent: pctA(tot.S), avg: avgTxt(tot.pSum, tot.pN, 2) },
           { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: tot.UP, percent: pctA(tot.UP), avg: avgTxt(tot.uSum, tot.uN, 2) },
           { label: "A-Class", color: "#c25be8", total: tot.A, percent: pctA(tot.A), avg: "—" },
+          { label: "B-Class", color: "#5ba8e8", total: tot.B, percent: pctA(tot.B), avg: "—" },
         ],
         stat: [nfmt(st.boxes) + " pull"],
         extra: pityExtra(slog.map((e) => e.p)),
