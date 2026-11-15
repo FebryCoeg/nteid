@@ -1155,6 +1155,7 @@
   // o: { title, sub, accent, rows: [{ label, color, total, percent, avg }], items: [{ num, color, hard, gold, src, tag, n, unknown }],
   //      max, ticks, zones: [{ v, color, text }], extra, legend: [{ color, text }], file, emptyText }
   // Satu batang per S-Class yang didapat: makin tinggi pity, makin tinggi batangnya. Ikon di ujung batang. Semua dimuat dalam satu gambar.
+  const nfmt = (n) => Number(n).toLocaleString(LANG === "en" ? "en-US" : "id-ID");
   async function pityChartImage(o) {
     const PAD = 40, YA = 64, CW = 58, CHH = 240, ICON = 17, ROWH = 34, GAPR = 18, HEAD = 130, PANH = 40 + CHH + 70;
     const n = o.items.length;
@@ -1175,6 +1176,7 @@
     g.textBaseline = "middle"; g.textAlign = "left";
     g.fillStyle = "#ece6dd"; g.font = "800 34px 'Unbounded', Arial, sans-serif"; g.fillText(o.title, PAD, 52);
     g.fillStyle = o.accent; g.font = "800 22px 'Unbounded', Arial, sans-serif"; g.fillText(o.sub, PAD, 98);
+    if (o.stat && o.stat.length) { g.textAlign = "right"; o.stat.forEach((t, i) => { g.fillStyle = i ? "#ffc24d" : "#ece6dd"; g.font = "800 24px 'Plus Jakarta Sans', Arial, sans-serif"; g.fillText(t, W - PAD, 46 + i * 36); }); g.textAlign = "left"; }
     // tabel ringkasan (Total / Percent / Pity AVG)
     const ty = HEAD - 12;
     g.fillStyle = "#1b1b24"; rr(PAD, ty, W - PAD * 2, tableH, 14); g.fill();
@@ -1505,6 +1507,7 @@
           { label: "S-Class", color: "#ffc24d", total: stats.S, percent: pct(stats.S), avg: avgTxt(stats.pSum, stats.pN, 2) },
           { label: "A-Class", color: "#c25be8", total: stats.A, percent: pct(stats.A), avg: "—" },
         ],
+        stat: [nfmt(st.total) + " pull", nfmt(st.total * R.cost.perRoll) + " Annulith"],
         extra: pityExtra(slog.map((e) => e.p)),
         items: slog.map((e) => ({ num: e.p, unknown: !e.p, color: e.p ? pityColorE(e.p, e.k === "hard") : "#8f8b84", hard: e.k === "hard", src: eMap[e.id] ? eMap[e.id].icon : null, n: e.n })),
         max: 90, ticks: [0, 30, 60, 90],
@@ -1693,6 +1696,7 @@
           { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: tot.UP, percent: pctA(tot.UP), avg: avgTxt(tot.uSum, tot.uN, 2) },
           { label: "A-Class", color: "#c25be8", total: tot.A, percent: pctA(tot.A), avg: "—" },
         ],
+        stat: [nfmt(st.boxes) + " pull"],
         extra: pityExtra(slog.map((e) => e.p)),
         items: slog.map((e) => { const en = entryOf("S", e.i), arc = en && en.arc ? aMap[en.arc] : null; return { num: e.p, unknown: !e.p, color: e.p ? pityColorA(e.p, e.h) : "#8f8b84", hard: !!e.h, gold: !!e.up, src: arc ? arc.icon : null, tag: e.up && e.u ? "UP " + e.u : "", n: e.n }; }),
         max: 6, ticks: [0, 2, 4, 6],
@@ -1719,7 +1723,7 @@
   // Data hanya di localStorage browser; tidak ada yang dikirim ke server.
   async function viewTracker() {
     setTitle(S("Tracker Gacha", "Gacha Tracker"));
-    const [espers, arcs, arcData] = await Promise.all([load("espers"), load("arcs"), load("gacha-arc").catch(() => null)]);
+    const [espers, arcs, arcData, gRules] = await Promise.all([load("espers"), load("arcs"), load("gacha-arc").catch(() => null), load("gacha-rules").catch(() => null)]);
     const T = window.NteTracker;
     const intro = head(S("TRACKER", "TRACKER"), S("Tracker Gacha", "Gacha Tracker"), S("Catat total pull dan S-Class yang kamu dapat. Pity, statistik, dan diagram dihitung otomatis. Data hanya tersimpan di browsermu.", "Log your total pulls and the S-Class you got. Pity, stats and the chart are calculated for you. Data stays in your browser only."), null);
     if (!T) { main.innerHTML = intro + `<p class="txt">${S("Modul tracker gagal dimuat. Muat ulang halaman.", "The tracker module failed to load. Reload the page.")}</p>`; return; }
@@ -1838,6 +1842,7 @@
       if (tab === "esper") {
         return {
           title: "Tracker Gacha NTE", sub: S("Esper · papan dadu", "Esper · dice board"), accent: "#ff5a7a", preview,
+          stat: [nfmt(d.total) + " pull"].concat(gRules && gRules.cost ? [nfmt(d.total * gRules.cost.perRoll) + " Annulith"] : []),
           rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctOf(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctOf(d.a), avg: "—" }],
           extra: pityExtra(r.items.map((i) => i.p)),
           items: r.items.map((i) => ({ num: i.p, color: pityColorE(i.p, i.kind === "hard"), hard: i.kind === "hard", src: iconOf(i), n: i.n })),
@@ -1851,6 +1856,7 @@
       const ups = r.items.filter((i) => i.up);
       return {
         title: "Tracker Gacha NTE", sub: S("Arc · Miracle Box", "Arc · Miracle Box"), accent: "#ffc24d", preview,
+        stat: [nfmt(d.total) + " pull"],
         rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctA(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: ups.length, percent: pctA(ups.length), avg: ups.length ? numFmt(ups.reduce((a, i) => a + i.u, 0) / ups.length, 2) : "—" }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctA(d.a), avg: "—" }],
         extra: pityExtra(r.items.map((i) => i.p)),
         items: r.items.map((i) => ({ num: i.p, color: pityColorA(i.p, i.kind === "hard"), hard: i.kind === "hard", gold: !!i.up, src: iconOf(i), tag: i.up ? "UP " + i.u : "", n: i.n })),
