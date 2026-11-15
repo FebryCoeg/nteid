@@ -1698,7 +1698,7 @@
           { label: "A-Class", color: "#c25be8", total: tot.A, percent: pctA(tot.A), avg: "—" },
           { label: "B-Class", color: "#5ba8e8", total: tot.B, percent: pctA(tot.B), avg: "—" },
         ],
-        stat: [nfmt(st.boxes) + " pull"],
+        stat: [nfmt(st.boxes) + " pull", nfmt(st.boxes * (rules.keysPerPull || 10)) + S(" kunci", " keys")],
         extra: pityExtra(slog.map((e) => e.p)),
         items: slog.map((e) => { const en = entryOf("S", e.i), arc = en && en.arc ? aMap[en.arc] : null; return { num: e.p, unknown: !e.p, color: e.p ? pityColorA(e.p, e.h) : "#8f8b84", hard: !!e.h, gold: !!e.up, src: arc ? arc.icon : null, tag: e.up && e.u ? "UP " + e.u : "", n: e.n }; }),
         max: 6, ticks: [0, 2, 4, 6],
