@@ -1723,7 +1723,7 @@
   // Data hanya di localStorage browser; tidak ada yang dikirim ke server.
   async function viewTracker() {
     setTitle(S("Tracker Gacha", "Gacha Tracker"));
-    const [espers, arcs, arcData, gRules] = await Promise.all([load("espers"), load("arcs"), load("gacha-arc").catch(() => null), load("gacha-rules").catch(() => null)]);
+    const [espers, arcs, arcData] = await Promise.all([load("espers"), load("arcs"), load("gacha-arc").catch(() => null)]);
     const T = window.NteTracker;
     const intro = head(S("TRACKER", "TRACKER"), S("Tracker Gacha", "Gacha Tracker"), S("Catat total pull dan S-Class yang kamu dapat. Pity, statistik, dan diagram dihitung otomatis. Data hanya tersimpan di browsermu.", "Log your total pulls and the S-Class you got. Pity, stats and the chart are calculated for you. Data stays in your browser only."), null);
     if (!T) { main.innerHTML = intro + `<p class="txt">${S("Modul tracker gagal dimuat. Muat ulang halaman.", "The tracker module failed to load. Reload the page.")}</p>`; return; }
@@ -1842,7 +1842,6 @@
       if (tab === "esper") {
         return {
           title: "Tracker Gacha NTE", sub: S("Esper · papan dadu", "Esper · dice board"), accent: "#ff5a7a", preview,
-          stat: [nfmt(d.total) + " pull"].concat(gRules && gRules.cost ? [nfmt(d.total * gRules.cost.perRoll) + " Annulith"] : []),
           rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctOf(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctOf(d.a), avg: "—" }],
           extra: pityExtra(r.items.map((i) => i.p)),
           items: r.items.map((i) => ({ num: i.p, color: pityColorE(i.p, i.kind === "hard"), hard: i.kind === "hard", src: iconOf(i), n: i.n })),
@@ -1856,7 +1855,6 @@
       const ups = r.items.filter((i) => i.up);
       return {
         title: "Tracker Gacha NTE", sub: S("Arc · Miracle Box", "Arc · Miracle Box"), accent: "#ffc24d", preview,
-        stat: [nfmt(d.total) + " pull"],
         rows: [{ label: "S-Class", color: "#ffc24d", total: r.S, percent: pctA(r.S), avg: r.avg === null ? "—" : numFmt(r.avg, 2) }, { label: S("Arc UP", "UP Arc"), color: "#ffe27a", total: ups.length, percent: pctA(ups.length), avg: ups.length ? numFmt(ups.reduce((a, i) => a + i.u, 0) / ups.length, 2) : "—" }, { label: "A-Class", color: "#c25be8", total: d.a, percent: pctA(d.a), avg: "—" }],
         extra: pityExtra(r.items.map((i) => i.p)),
         items: r.items.map((i) => ({ num: i.p, color: pityColorA(i.p, i.kind === "hard"), hard: i.kind === "hard", gold: !!i.up, src: iconOf(i), tag: i.up ? "UP " + i.u : "", n: i.n })),
