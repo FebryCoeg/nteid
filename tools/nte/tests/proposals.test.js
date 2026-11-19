@@ -91,3 +91,53 @@ test("duplicateOf: menemukan tim yang sudah tayang dengan anggota sama", () => {
   assert.equal(P.duplicateOf(["a", "d"], list), null);
   assert.equal(P.duplicateOf(["a", "b"], undefined), null);
 });
+
+// ---- usulan build ----
+const bctx = { arcs: ["crime-and-punishment", "ravenous-blade", "watch-your-heads", "echoes-on-hold", "x5"], sets: ["Suit1", "Suit3", "Suit11"], stats: ["CRIT DMG", "Psyche DMG", "ATK %", "HP %"], sub: ["DMG %", "ATK %", "Cycle Intensity", "CRIT Rate", "DEF"] };
+const bok = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }, { id: "Suit11", pieces: 2 }], stats: ["CRIT DMG", "Psyche DMG"], sub: ["DMG %", "ATK %"], why: "Cocok untuk boss.", credit: { name: "Budi", url: "https://www.facebook.com/budi" } };
+
+test("sanitizeBuild: build valid dipertahankan", () => {
+  const r = P.sanitizeBuild(bok, bctx);
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.build, bok);
+});
+
+test("sanitizeBuild: nama, kredit, dan link divalidasi seperti tim", () => {
+  assert.ok(P.sanitizeBuild({ ...bok, name: " " }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, name: "x".repeat(41) }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, credit: { name: "", url: "" } }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, credit: { name: "B", url: "https://evil.com/x" } }, bctx).errors.length);
+  assert.equal(P.sanitizeBuild({ ...bok, credit: { name: "B", url: "" } }, bctx).build.credit.url, "");
+});
+
+test("sanitizeBuild: Arc wajib 1 sampai 4, dikenal, tanpa ganda", () => {
+  for (const arcs of [[], ["a", "b", "c", "d", "e"], ["tidak-ada"], ["ravenous-blade", "ravenous-blade"], "ravenous-blade"])
+    assert.ok(P.sanitizeBuild({ ...bok, arcs }, bctx).errors.length, JSON.stringify(arcs));
+  assert.equal(P.sanitizeBuild({ ...bok, arcs: ["crime-and-punishment", "ravenous-blade", "watch-your-heads", "echoes-on-hold"] }, bctx).errors.length, 0);
+});
+
+test("sanitizeBuild: set modul maksimal 3, id dikenal, keping hanya 2 atau 4, tanpa ganda", () => {
+  const bad = [[{ id: "SuitX", pieces: 4 }], [{ id: "Suit3", pieces: 3 }], [{ id: "Suit3", pieces: 4 }, { id: "Suit3", pieces: 2 }], [{ id: "Suit1", pieces: 2 }, { id: "Suit3", pieces: 2 }, { id: "Suit11", pieces: 2 }, { id: "Suit1", pieces: 4 }], ["Suit3"], null];
+  for (const sets of bad) assert.ok(P.sanitizeBuild({ ...bok, sets }, bctx).errors.length, JSON.stringify(sets));
+  assert.equal(P.sanitizeBuild({ ...bok, sets: [] }, bctx).errors.length, 0);
+});
+
+test("sanitizeBuild: stat utama 1 sampai 3, sub-stat maksimal 4, harus dari daftar", () => {
+  assert.ok(P.sanitizeBuild({ ...bok, stats: [] }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, stats: ["CRIT DMG", "Psyche DMG", "ATK %", "HP %"] }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, stats: ["Bukan Stat"] }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, stats: ["CRIT DMG", "CRIT DMG"] }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, sub: ["DMG %", "ATK %", "Cycle Intensity", "CRIT Rate", "DEF"] }, bctx).errors.length);
+  assert.ok(P.sanitizeBuild({ ...bok, sub: ["Bukan"] }, bctx).errors.length);
+  assert.equal(P.sanitizeBuild({ ...bok, sub: [] }, bctx).errors.length, 0);
+});
+
+test("sanitizeBuild: catatan dirapikan dan dipotong; bukan objek tidak crash", () => {
+  assert.equal(P.sanitizeBuild({ ...bok, why: "a\nb\u0000" + "y".repeat(400) }, bctx).build.why.length, 300);
+  for (const bad of [null, undefined, 5, "x", []]) assert.ok(P.sanitizeBuild(bad, bctx).errors.length);
+});
+
+test("sanitizeBuild: bidang asing dibuang, tidak ikut tersimpan", () => {
+  const b = P.sanitizeBuild({ ...bok, evil: "<script>", isAdmin: true }, bctx).build;
+  assert.deepEqual(Object.keys(b).sort(), ["arcs", "credit", "name", "sets", "stats", "sub", "why"]);
+});

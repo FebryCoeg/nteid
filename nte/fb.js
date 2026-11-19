@@ -23,3 +23,12 @@ const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 export async function mine(user) { return rows(await F.getDocs(F.query(F.collection(db, COL), F.where("uid", "==", user.uid)))); }
 export async function pending() { return rows(await F.getDocs(F.query(F.collection(db, COL), F.where("status", "==", "pending")))); }
 export const setStatus = (id, status) => F.updateDoc(F.doc(db, COL, id), { status, reviewedAt: F.serverTimestamp() });
+
+// ---- usulan build lengkap (koleksi terpisah, satu per pengguna per karakter) ----
+const BCOL = "buildProposals";
+export async function submitBuild(user, esper, build, credit, id) {
+  await F.setDoc(F.doc(db, BCOL, id), { uid: user.uid, name: String(user.displayName || "Pengguna").slice(0, 80), esper, build, credit, status: "pending", createdAt: F.serverTimestamp() });
+}
+export async function mineBuilds(user) { return rows(await F.getDocs(F.query(F.collection(db, BCOL), F.where("uid", "==", user.uid)))); }
+export async function pendingBuilds() { return rows(await F.getDocs(F.query(F.collection(db, BCOL), F.where("status", "==", "pending")))); }
+export const setBuildStatus = (id, status) => F.updateDoc(F.doc(db, BCOL, id), { status, reviewedAt: F.serverTimestamp() });

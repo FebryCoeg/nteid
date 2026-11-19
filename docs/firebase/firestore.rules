@@ -1,6 +1,6 @@
 rules_version = '2';
 // Tempel di Firebase Console > Firestore Database > Rules, lalu Publish.
-// Hanya koleksi "proposals" dan "locks" yang boleh diakses; semua yang lain tertutup.
+// Hanya koleksi "proposals", "locks", dan "buildProposals" yang boleh diakses; semua yang lain tertutup.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -47,6 +47,27 @@ service cloud.firestore {
         && validKey(d);
     }
 
+    function validBuild(b) {
+      return b is map
+        && b.keys().hasOnly(['name', 'arcs', 'sets', 'stats', 'sub', 'why'])
+        && b.name is string && b.name.size() >= 1 && b.name.size() <= 40
+        && b.arcs is list && b.arcs.size() >= 1 && b.arcs.size() <= 4
+        && b.sets is list && b.sets.size() <= 3
+        && b.stats is list && b.stats.size() >= 1 && b.stats.size() <= 3
+        && b.sub is list && b.sub.size() <= 4
+        && b.why is string && b.why.size() <= 300;
+    }
+    function validBuildProposal(d) {
+      return d.keys().hasOnly(['uid', 'name', 'esper', 'build', 'credit', 'status', 'createdAt'])
+        && d.uid == request.auth.uid
+        && d.name is string && d.name.size() <= 80
+        && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
+        && d.status == 'pending'
+        && d.createdAt == request.time
+        && validBuild(d.build)
+        && validCredit(d.credit);
+    }
+
     match /proposals/{id} {
       // id dokumen wajib "<uid>_<esper>": satu usulan per pengguna per karakter, SEKALI SAJA.
       // Tidak ada aturan update/delete untuk pemilik, jadi usulan tidak bisa diganti atau dihapus lalu dikirim ulang.
@@ -73,6 +94,18 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.createdAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // Usulan build lengkap: satu per pengguna per karakter, sekali saja (id "<uid>_<esper>"), tanpa update/delete pemilik.
+    match /buildProposals/{id} {
+      allow create: if signedIn()
+        && id == request.auth.uid + '_' + request.resource.data.esper
+        && validBuildProposal(request.resource.data);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedAt'])
+        && request.resource.data.status in ['approved', 'rejected', 'pending'];
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow delete: if isAdmin();
     }
   }
