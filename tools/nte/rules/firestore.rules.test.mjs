@@ -9,8 +9,9 @@ const env = await initializeTestEnvironment({ projectId: "demo-nte", firestore: 
 const ADMIN = "febririansyah1999@gmail.com";
 const ctxOf = (uid, email, verified = true) => env.authenticatedContext(uid, { email, email_verified: verified }).firestore();
 const alice = ctxOf("alice", "alice@x.com"), bob = ctxOf("bob", "bob@x.com"), admin = ctxOf("adm", ADMIN), fakeAdmin = ctxOf("evil", ADMIN, false), anon = env.unauthenticatedContext().firestore();
-const build = { arcs: ["a"], sets: [{ id: "Suit3", pieces: 4 }], stats: ["ATK %"], awks: [1], skills: ["basic"] };
-const mk = (uid, over = {}) => ({ uid, name: "Alice", esper: "akane-rin", build, status: "pending", createdAt: serverTimestamp(), ...over });
+const team = { name: "Tim Nova", members: ["akane-rin", "blackbird"], roles: ["DPS", ""], why: "Stabil." };
+const credit = { name: "Budi", url: "https://www.facebook.com/budi" };
+const mk = (uid, over = {}) => ({ uid, name: "Alice", esper: "akane-rin", team, credit, status: "pending", createdAt: serverTimestamp(), ...over });
 const P = (db, id) => doc(db, "proposals", id);
 let n = 0; const t = async (name, fn) => { await fn(); n++; console.log("ok  " + name); };
 
@@ -21,8 +22,15 @@ await t("tidak boleh menulis atas nama orang lain (uid)", () => assertFails(setD
 await t("id dokumen harus uid_esper", () => assertFails(setDoc(P(bob, "acak123"), mk("bob"))));
 await t("status selain pending ditolak saat membuat", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { status: "approved" }))));
 await t("bidang asing ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { isAdmin: true }))));
-await t("build dengan bidang asing ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { build: { ...build, evil: 1 } }))));
-await t("daftar terlalu panjang ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { build: { ...build, arcs: Array(13).fill("a") } }))));
+await t("tim dengan bidang asing ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { team: { ...team, evil: 1 } }))));
+await t("anggota tim lebih dari 4 ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { team: { ...team, members: ["a", "b", "c", "d", "e"] } }))));
+await t("tim satu anggota ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { team: { ...team, members: ["a"] } }))));
+await t("catatan tim terlalu panjang ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { team: { ...team, why: "x".repeat(301) } }))));
+await t("kredit tanpa link diterima", () => assertSucceeds(setDoc(P(ctxOf("c1", "c1@x.com"), "c1_akane-rin"), mk("c1", { credit: { name: "Budi", url: "" } }))));
+await t("link bukan Facebook ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { credit: { name: "Budi", url: "https://evil.com/x" } }))));
+await t("link Facebook palsu (host menempel) ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { credit: { name: "Budi", url: "https://facebook.com.evil.com/x" } }))));
+await t("link javascript ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { credit: { name: "Budi", url: "javascript:alert(1)" } }))));
+await t("kredit dengan bidang asing ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { credit: { ...credit, x: 1 } }))));
 await t("nama terlalu panjang ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { name: "x".repeat(81) }))));
 await t("createdAt palsu ditolak", () => assertFails(setDoc(P(bob, "bob_akane-rin"), mk("bob", { createdAt: new Date("2000-01-01") }))));
 await t("pemilik boleh mengganti usulannya", () => assertSucceeds(setDoc(P(alice, "alice_akane-rin"), mk("alice", { name: "Alice B" }))));
@@ -34,7 +42,7 @@ await t("daftar usulan milik sendiri boleh", () => assertSucceeds(getDocs(query(
 await t("daftar semua usulan oleh pengguna biasa ditolak", () => assertFails(getDocs(collection(alice, "proposals"))));
 await t("admin boleh membaca antrean pending", () => assertSucceeds(getDocs(query(collection(admin, "proposals"), where("status", "==", "pending")))));
 await t("admin boleh mengubah status", () => assertSucceeds(updateDoc(P(admin, "alice_akane-rin"), { status: "approved", reviewedAt: serverTimestamp() })));
-await t("admin tidak boleh mengubah isi build", () => assertFails(updateDoc(P(admin, "alice_akane-rin"), { build: { ...build, arcs: [] } })));
+await t("admin tidak boleh mengubah isi tim", () => assertFails(updateDoc(P(admin, "alice_akane-rin"), { team: { ...team, name: "Lain" } })));
 await t("admin palsu (email belum terverifikasi) ditolak", () => assertFails(updateDoc(P(fakeAdmin, "alice_akane-rin"), { status: "rejected" })));
 await t("koleksi lain tertutup", () => assertFails(setDoc(doc(alice, "lain", "x"), { a: 1 })));
 await t("pemilik boleh menghapus usulannya, orang lain tidak", async () => { await assertFails(deleteDoc(P(bob, "alice_akane-rin"))); await assertSucceeds(deleteDoc(P(alice, "alice_akane-rin"))); });

@@ -11,8 +11,8 @@ export const onUser = (cb) => A.onAuthStateChanged(auth, cb);
 export const login = () => A.signInWithPopup(auth, new A.GoogleAuthProvider());
 export const logout = () => A.signOut(auth);
 
-export async function submit(user, esper, build, id) {
-  await F.setDoc(F.doc(db, COL, id), { uid: user.uid, name: String(user.displayName || "Pengguna").slice(0, 80), esper, build, status: "pending", createdAt: F.serverTimestamp() });
+export async function submit(user, esper, team, credit, id) {
+  await F.setDoc(F.doc(db, COL, id), { uid: user.uid, name: String(user.displayName || "Pengguna").slice(0, 80), esper, team, credit, status: "pending", createdAt: F.serverTimestamp() });
 }
 const rows = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 export async function mine(user) { return rows(await F.getDocs(F.query(F.collection(db, COL), F.where("uid", "==", user.uid)))); }

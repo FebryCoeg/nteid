@@ -2,43 +2,68 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const P = require("../../../nte/proposals-logic.js");
 
-const ctx = { arcs: ["crime-and-punishment", "ravenous-blade"], sets: ["Suit3", "Suit11"], stats: ["ATK %", "CRIT DMG", "CRIT Rate"] };
+const ctx = { espers: ["akane-rin", "blackbird", "lacrimosa", "zankou", "sakiri"] };
+const ok = { name: "Tim Nova", members: ["akane-rin", "blackbird", "lacrimosa", "zankou"], roles: ["DPS", "", "Sub", "Support"], why: "Reaksi Nova stabil.", credit: { name: "Budi", url: "https://www.facebook.com/budi.santoso" } };
 
-test("sanitizeBuild: build valid dipertahankan apa adanya", () => {
-  const raw = { arcs: ["ravenous-blade"], sets: [{ id: "Suit3", pieces: 4 }], stats: ["CRIT DMG"], awks: [1, 3], skills: ["basic", "ultimate"] };
-  const r = P.sanitizeBuild(raw, ctx);
-  assert.deepEqual(r.build, raw);
-  assert.equal(r.dropped, 0);
+test("sanitizeTeam: tim valid dipertahankan", () => {
+  const r = P.sanitizeTeam(ok, ctx, "akane-rin");
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.team, ok);
 });
 
-test("sanitizeBuild: nilai asing dan duplikat dibuang, dihitung", () => {
-  const r = P.sanitizeBuild({ arcs: ["ravenous-blade", "ravenous-blade", "bukan-arc"], sets: [{ id: "Suit3", pieces: 3 }, { id: "Xx", pieces: 4 }], stats: ["ATK %", "HACK"], awks: [0, 2, 7, 2], skills: ["basic", "evil"] }, ctx);
-  assert.deepEqual(r.build, { arcs: ["ravenous-blade"], sets: [], stats: ["ATK %"], awks: [2], skills: ["basic"] });
-  assert.equal(r.dropped, 9);
+test("sanitizeTeam: Esper halaman wajib ada di tim", () => {
+  const r = P.sanitizeTeam({ ...ok, members: ["blackbird", "lacrimosa", "zankou"] }, ctx, "akane-rin");
+  assert.ok(r.errors.length && r.team === null);
 });
 
-test("sanitizeBuild: bidang tambahan dan bukan objek diabaikan tanpa error", () => {
-  assert.deepEqual(P.sanitizeBuild({ arcs: [], sets: [], stats: [], awks: [], skills: [], admin: true, evil: "x" }, ctx).build, { arcs: [], sets: [], stats: [], awks: [], skills: [] });
-  for (const bad of [null, undefined, 5, "x", []]) assert.deepEqual(P.sanitizeBuild(bad, ctx).build, { arcs: [], sets: [], stats: [], awks: [], skills: [] });
+test("sanitizeTeam: anggota asing, ganda, atau jumlah salah ditolak", () => {
+  for (const members of [["akane-rin"], ["akane-rin", "akane-rin"], ["akane-rin", "bukan-esper"], ["akane-rin", "blackbird", "lacrimosa", "zankou", "sakiri"]]) {
+    const r = P.sanitizeTeam({ ...ok, members, roles: [] }, ctx, "akane-rin");
+    assert.ok(r.errors.length, JSON.stringify(members));
+  }
 });
 
-test("sanitizeBuild: jumlah dibatasi (arc 12, set 8, stat 12)", () => {
-  const many = Array.from({ length: 30 }, (_, i) => "a" + i);
-  const r = P.sanitizeBuild({ arcs: many }, { arcs: many, sets: [], stats: [] });
-  assert.equal(r.build.arcs.length, 12);
+test("sanitizeTeam: nama kosong/terlalu panjang ditolak, teks dirapikan", () => {
+  assert.ok(P.sanitizeTeam({ ...ok, name: "   " }, ctx, "akane-rin").errors.length);
+  assert.ok(P.sanitizeTeam({ ...ok, name: "x".repeat(41) }, ctx, "akane-rin").errors.length);
+  assert.ok(P.sanitizeTeam({ ...ok, credit: { name: "", url: "" } }, ctx, "akane-rin").errors.length);
+  const r = P.sanitizeTeam({ ...ok, name: "  Tim\u0000  \n Nova  ", why: "a\nb" }, ctx, "akane-rin");
+  assert.equal(r.team.name, "Tim Nova");
+  assert.equal(r.team.why, "a b");
 });
 
-test("isEmpty", () => {
-  assert.equal(P.isEmpty({ arcs: [], sets: [], stats: [], awks: [], skills: [] }), true);
-  assert.equal(P.isEmpty({ arcs: [], sets: [], stats: ["ATK %"], awks: [], skills: [] }), false);
+test("sanitizeTeam: role dan catatan dipotong, role disejajarkan dengan anggota", () => {
+  const r = P.sanitizeTeam({ ...ok, roles: ["x".repeat(50)], why: "y".repeat(500) }, ctx, "akane-rin");
+  assert.equal(r.team.roles.length, 4);
+  assert.equal(r.team.roles[0].length, 24);
+  assert.equal(r.team.why.length, 300);
 });
 
-test("diff: hanya bidang yang berubah", () => {
-  const a = { arcs: ["x"], sets: [], stats: ["ATK %"], awks: [], skills: [] };
-  const b = { arcs: ["x", "y"], sets: [], stats: ["ATK %"], awks: [1], skills: [] };
-  assert.deepEqual(P.diff(a, b).map((d) => d.field), ["arcs", "awks"]);
-  assert.deepEqual(P.diff(a, a), []);
-  assert.deepEqual(P.diff(undefined, a).map((d) => d.field), ["arcs", "stats"]);
+test("sanitizeTeam: bukan objek tidak crash", () => {
+  for (const bad of [null, undefined, 5, "x", []]) assert.ok(P.sanitizeTeam(bad, ctx, "akane-rin").errors.length);
+});
+
+test("sanitizeTeam: link Facebook opsional, tapi bila diisi harus valid", () => {
+  const noLink = P.sanitizeTeam({ ...ok, credit: { name: "Budi", url: "" } }, ctx, "akane-rin");
+  assert.deepEqual(noLink.errors, []);
+  assert.equal(noLink.team.credit.url, "");
+  const bad = P.sanitizeTeam({ ...ok, credit: { name: "Budi", url: "https://evil.com/x" } }, ctx, "akane-rin");
+  assert.ok(bad.errors.length);
+});
+
+test("facebookUrl: host resmi diterima dan dinormalkan", () => {
+  assert.equal(P.facebookUrl("https://www.facebook.com/budi.santoso"), "https://www.facebook.com/budi.santoso");
+  assert.equal(P.facebookUrl("facebook.com/budi"), "https://facebook.com/budi");
+  assert.equal(P.facebookUrl("http://m.facebook.com/profile.php?id=123#x"), "https://m.facebook.com/profile.php?id=123");
+  assert.equal(P.facebookUrl("https://fb.com/budi"), "https://fb.com/budi");
+  assert.equal(P.facebookUrl("  https://web.facebook.com/budi  "), "https://web.facebook.com/budi");
+});
+
+test("facebookUrl: host palsu, skema berbahaya, kredensial, dan jalur kosong ditolak", () => {
+  for (const u of ["https://facebook.com.evil.com/x", "https://evilfacebook.com/x", "https://facebook.com@evil.com/x", "https://user:pw@facebook.com/x",
+    "javascript:alert(1)", "data:text/html,x", "ftp://facebook.com/x", "https://facebook.com", "https://facebook.com/", "https://facebook.com:8080/x",
+    "https://facebооk.com/x", "https://" + "a".repeat(10) + ".com", "", "bukan url", "https://facebook.com/" + "a".repeat(250)])
+    assert.equal(P.facebookUrl(u), null, u);
 });
 
 test("docId: gabungan uid dan slug, karakter aneh ditolak", () => {

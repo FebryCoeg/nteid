@@ -465,6 +465,7 @@
     const AF = ST && ST.affinity;
     const BUILDS = await load("builds").catch(() => ({}));
     const DRAFTS = await load("builds_draft").catch(() => ({}));
+    const COMM = await load("teams_community").catch(() => ({}));
     const ARCS = await load("arcs");
     const MODS = await load("modules");
     const tabs = [
@@ -618,6 +619,10 @@
           })()}${bd.awkNote ? `<p class="txt bd-arcnote">${esc(tx(bd.awkNote))}</p>` : ""}<p class="mono">${S("URUTAN TETAP SEPERTI DI GAME · ANGKA = PRIORITAS REKOMENDASI", "GAME ORDER · NUMBER = RECOMMENDED PRIORITY")}</p><div class="bd-awks">${e.awakening.slice(0, 6).map((a, k) => { const r = bd.awkRank ? (bd.awkRank[k + 1] || 0) - 1 : bd.awks.indexOf(k + 1); return `<div class="bd-awk-row${r < 0 ? " nopick" : ""}"><i>${r >= 0 ? r + 1 : "–"}</i>${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}<span><b>${esc(a.name)}</b><small>AWAKENING ${k + 1}</small>${bd.awkDesc && bd.awkDesc[k + 1] ? `<p class="bd-awk-desc">${LANG === "en" ? rich(a.desc || "") : esc(bd.awkDesc[k + 1])}</p>` : ""}</span></div>`; }).join("")}
 </div></div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
+        }
+        {
+          const ct = ((COMM && COMM[e.slug]) || []).filter((t) => t && Array.isArray(t.members) && t.name);
+          html += `<div class="af-sec"><h4>${S("Tim dari komunitas", "Community teams")}</h4>${ct.length ? `<div class="bd-teams">${ct.map((t) => teamHtml(t, e.slug, list, creditHtml(t.credit))).join("")}</div>` : `<p class="txt">${S("Belum ada tim dari komunitas.", "No community teams yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan susunan tim", "Suggest a team")}</a></p></div>`;
         }
         html += `<p class="mono" style="margin-top:6px"><button type="button" class="chip" data-report>${S("Data build salah? Laporkan", "Wrong build data? Report")}</button></p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a, i) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="mono">${S("BONUS", "BONUS:")} ${[3, 6][i] || ""} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</p><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
@@ -899,15 +904,34 @@
     const SKG = ["basic", "redirect", "ultimate", "support"];
     main.innerHTML = `<div id="admQueue"></div><div id="admRoot"></div>`;
     const root = $("#admRoot");
-    // antrean usulan komunitas (Firebase dimuat hanya saat tombol ditekan)
+    // antrean usulan tim komunitas (Firebase dimuat hanya saat tombol ditekan)
     const qbox = $("#admQueue");
-    let applying = null, fbm = null, qList = null, qMsg = "";
+    let fbm = null, qList = null, qMsg = "";
     const PX = window.NteProposals;
-    const pctx = () => ({ arcs: arcs.map((a) => a.slug), sets: mods.sets.map((m) => m.id), stats: STATS });
+    const TPATH = "nte/data/teams_community.json";
+    const apiT = (method, body) => fetch(`https://api.github.com/repos/${REPO}/contents/${TPATH}${method === "GET" ? "?ref=main&t=" + Date.now() : ""}`, {
+      method, headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }, body: body ? JSON.stringify(body) : undefined,
+    });
+    const knownE = () => es.filter((x) => x.slug !== "exe").map((x) => x.slug);
+    async function publishTeam(p, team) {
+      const r = await apiT("GET"); let data = {}, sha = null;
+      if (r.status !== 404) { if (!r.ok) throw new Error("GitHub " + r.status); const j = await r.json(); data = JSON.parse(unb64(j.content) || "{}"); sha = j.sha; }
+      const arr = Array.isArray(data[p.esper]) ? data[p.esper] : [];
+      const entry = { ...team, pid: p.id }, i = arr.findIndex((x) => x && x.pid === p.id);
+      if (i >= 0) arr[i] = entry; else arr.push(entry);
+      data[p.esper] = arr;
+      const body = { message: `tim komunitas: ${p.esper} · ${team.name}`, content: b64(JSON.stringify(data, null, 1) + "\n"), branch: "main" };
+      if (sha) body.sha = sha;
+      const w = await apiT("PUT", body);
+      if (!w.ok) throw new Error("GitHub " + w.status);
+    }
     function renderQueue() {
-      const L = FIELD_LABEL();
-      qbox.innerHTML = `<div class="adm-box"><label>Usulan komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
-        ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => { const ch = PX.diff(builds[p.esper], p.build); return `<li><b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> dari ${esc(p.name || "?")}<br>${ch.length ? ch.map((c) => `<small>${esc(L[c.field])}: ${esc(buildFieldText(c.field, c.before, { arcs, sets: mods.sets }))} → <b>${esc(buildFieldText(c.field, c.after, { arcs, sets: mods.sets }))}</b></small>`).join("<br>") : "<small>Sama dengan build yang tayang.</small>"}<br><button class="btn" type="button" data-q-apply="${esc(p.id)}">Terapkan ke form</button> <button class="btn ghost" type="button" data-q-reject="${esc(p.id)}">Tolak</button></li>`; }).join("")}</ul>` : "<em>Tidak ada usulan menunggu.</em>") : ""}</div>`;
+      qbox.innerHTML = `<div class="adm-box"><label>Usulan tim komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
+        ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => {
+          const r = PX.sanitizeTeam({ ...p.team, credit: p.credit }, { espers: knownE() }, p.esper);
+          if (!r.team) return `<li><b>Usulan tidak valid</b> dari ${esc(p.name || "?")}: ${esc(r.errors.join(" "))}<br><button class="btn ghost" type="button" data-q-reject="${esc(p.id)}">Tolak</button></li>`;
+          return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${teamHtml(r.team, p.esper, es, creditHtml(r.team.credit))}<button class="btn" type="button" data-q-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-q-reject="${esc(p.id)}">Tolak</button></li>`;
+        }).join("")}</ul>` : "<em>Tidak ada usulan menunggu.</em>") : ""}</div>`;
     }
     renderQueue();
     qbox.addEventListener("click", async (ev) => {
@@ -920,13 +944,18 @@
           if (!fbm.isAdmin(u.user)) { await fbm.logout(); qMsg = "Akun ini bukan admin."; qList = null; renderQueue(); return; }
           qList = await fbm.pending(); qMsg = ""; renderQueue(); return;
         }
-        const id = t.dataset.qApply || t.dataset.qReject; if (!id) return;
+        const id = t.dataset.qOk || t.dataset.qReject; if (!id) return;
         const p = (qList || []).find((x) => x.id === id); if (!p) return;
         if (t.dataset.qReject) { if (await ask("Tolak usulan ini?", "Tolak", "Batal")) { await fbm.setStatus(id, "rejected"); qList = await fbm.pending(); renderQueue(); toast("Usulan ditolak."); } return; }
-        if (!es.some((x) => x.slug === p.esper)) { toast("Esper pada usulan tidak dikenal."); return; }
-        cur = p.esper; working = Object.assign(fresh(), PX.sanitizeBuild(p.build, pctx()).build); applying = { id, esper: p.esper };
-        render("USULAN DIMUAT. PERIKSA, LALU KLIK SIMPAN KE GITHUB (USULAN DITANDAI DISETUJUI SETELAH TERSIMPAN)"); root.scrollIntoView({ behavior: "smooth" });
-      } catch (e) { qMsg = fbErr(e); renderQueue(); }
+        if (!token) { toast("Isi token GitHub dulu di atas, lalu coba lagi."); return; }
+        const r = PX.sanitizeTeam({ ...p.team, credit: p.credit }, { espers: knownE() }, p.esper);
+        if (!r.team) { toast("Usulan tidak valid."); return; }
+        if (!(await ask(`Tayangkan tim "${r.team.name}" untuk ${p.esper}?`, "Tayangkan", "Batal"))) return;
+        t.disabled = true;
+        await publishTeam(p, r.team);
+        await fbm.setStatus(id, "approved");
+        qList = await fbm.pending(); qMsg = "Tersimpan ke GitHub. Situs diperbarui sekitar 1 menit."; renderQueue(); toast("Tim ditayangkan.");
+      } catch (e) { qMsg = /GitHub/.test(String(e && e.message)) ? "Gagal menyimpan ke GitHub: " + e.message + ". Periksa token (izin Contents: Read and write)." : fbErr(e); renderQueue(); }
     });
     function render(msg) {
       const e = es.find((x) => x.slug === cur);
@@ -1009,7 +1038,6 @@
         return;
       }
       const j = await r.json(); sha = j.content.sha; builds = copy; pick(); render("TERSIMPAN"); toast("Tersimpan. Situs diperbarui sekitar 1 menit.");
-      if (applying && applying.esper === cur && fbm) { const id = applying.id; applying = null; fbm.setStatus(id, "approved").then(async () => { qList = await fbm.pending(); renderQueue(); }).catch(() => toast("Build tersimpan, tapi gagal menandai usulan disetujui.")); }
     }
     const st = await pull();
     pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
@@ -1959,8 +1987,7 @@
     buildAdd(); refresh();
   }
 
-  // ---------------- USULAN BUILD KOMUNITAS ----------------
-  const BUILD_STATS = ["ATK %", "HP %", "DEF %", "CRIT Rate", "CRIT DMG", "DMG Bonus", "ATK", "HP", "DEF", "Energy Regen", "Healing Bonus", "Break"];
+  // ---------------- USULAN TIM KOMUNITAS ----------------
   let fbPromise = null;
   const fbLoad = () => (fbPromise ||= import(`${BASE}fb.js${ver}`).catch((e) => { fbPromise = null; throw e; }));
   const fbErr = (e) => {
@@ -1968,113 +1995,94 @@
     if (c.includes("popup-blocked")) return S("Popup login diblokir browser. Izinkan popup untuk situs ini lalu coba lagi.", "The login popup was blocked. Allow popups for this site and try again.");
     if (c.includes("popup-closed") || c.includes("cancelled")) return S("Login dibatalkan.", "Login cancelled.");
     if (c.includes("unauthorized-domain")) return S("Domain situs belum didaftarkan di Firebase (Authorized domains).", "This domain is not in Firebase Authorized domains.");
-    if (c.includes("permission-denied")) return S("Ditolak oleh aturan keamanan. Pastikan sudah login dengan email terverifikasi.", "Denied by security rules. Make sure you are signed in with a verified email.");
+    if (c.includes("permission-denied")) return S("Ditolak oleh aturan keamanan. Pastikan sudah login dengan email terverifikasi dan isian valid.", "Denied by security rules. Make sure you are signed in with a verified email and the form is valid.");
     return S("Terjadi kesalahan. Coba lagi nanti.", "Something went wrong. Try again later.");
   };
-  const buildFieldText = (f, v, ctx) => {
-    if (!v || !v.length) return "—";
-    if (f === "arcs") return v.map((s) => (ctx.arcs.find((a) => a.slug === s) || { name: s }).name).join(", ");
-    if (f === "sets") return v.map((x) => ((ctx.sets.find((m) => m.id === x.id) || { name: x.id }).name) + " " + x.pieces).join(", ");
-    return v.join(", ");
+  const teamHtml = (t, byEsper, list, extra) => `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(t.name)}</b></div>
+    <div class="bd-tm-mem">${t.members.map((sl, mi) => { const m = list.find((x) => x.slug === sl); const rl = (t.roles || [])[mi]; return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === byEsper ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small>${rl ? `<small class="bd-tm-role">${esc(rl)}</small>` : ""}</a>` : ""; }).join("")}</div>
+    ${t.why ? `<p class="bd-tm-metric">${esc(t.why)}</p>` : ""}${extra || ""}</div>`;
+  const creditHtml = (c) => {
+    if (!c || !c.name) return "";
+    const url = window.NteProposals ? window.NteProposals.facebookUrl(c.url || "") : null;
+    const nm = url ? `<a href="${esc(url)}" target="_blank" rel="noopener nofollow ugc">${esc(c.name)} ↗</a>` : esc(c.name);
+    return `<p class="bd-tm-credit mono">${S("SUSUNAN TIM OLEH", "TEAM BY")} ${nm}</p>`;
   };
-  const FIELD_LABEL = () => ({ arcs: "Arc", sets: S("Set modul", "Module sets"), stats: S("Stat prioritas", "Stat priority"), awks: "Awakening", skills: S("Urutan skill", "Skill order") });
 
   async function viewProposal() {
-    setTitle(S("Usulkan Build", "Suggest a Build"));
+    setTitle(S("Usulkan Tim", "Suggest a Team"));
     let meta = document.querySelector('meta[name="robots"]');
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.content = "noindex";
-    const [es, arcs, mods, SD, builds] = await Promise.all([load("espers"), load("arcs"), load("modules"), load("stats"), load("builds").catch(() => ({}))]);
+    const es = await load("espers");
     const P = window.NteProposals;
-    const intro = head("USULAN", S("Usulkan Build", "Suggest a Build"), S("Punya build karakter yang lebih baik? Login dengan Google, susun build-nya, lalu kirim. Admin akan meninjau sebelum tayang.", "Got a better character build? Sign in with Google, put it together and send it. An admin reviews it before it goes live."), null);
+    const intro = head("USULAN", S("Usulkan Tim", "Suggest a Team"), S("Punya susunan tim yang bagus? Login dengan Google, susun timnya, lalu kirim. Kalau disetujui admin, timmu tampil di halaman karakter lengkap dengan kreditmu.", "Got a great team? Sign in with Google, put it together and send it. If the admin approves it, your team appears on the character page with your credit."), null);
     if (!P) { main.innerHTML = intro + `<p class="txt">${S("Modul usulan gagal dimuat. Muat ulang halaman.", "The suggestion module failed to load. Reload the page.")}</p>`; return; }
     main.innerHTML = intro + `<div id="pbRoot"><p class="txt">${S("Memuat…", "Loading…")}</p></div>`;
     const root = $("#pbRoot");
     let fb;
     try { fb = await fbLoad(); } catch (e) { root.innerHTML = `<p class="txt">${S("Layanan login gagal dimuat (mungkin diblokir ekstensi atau offline). Coba lagi nanti.", "The login service failed to load (blocked by an extension or offline). Try again later.")}</p>`; return; }
 
-    const ctx = { arcs: arcs.map((a) => a.slug), sets: mods.sets.map((m) => m.id), stats: BUILD_STATS };
-    const SKG = ["basic", "redirect", "ultimate", "support"];
-    let user = null, cur = es[0].slug, working = null, showAll = false, q = "", mineList = [], msg = "";
-    const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
-    const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
-    pick();
-
+    const known = es.filter((e) => e.slug !== "exe").map((e) => e.slug);
+    const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
+    let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], msg = "", errs = [];
     const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
+    const keep = () => { const g = (id) => { const el = $(id); return el ? el.value : null; }; const v = { name: g("#pbName"), why: g("#pbWhy"), cname: g("#pbCname"), url: g("#pbUrl") }; Object.keys(v).forEach((k) => { if (v[k] !== null) form[k] = v[k]; }); members.forEach((sl) => { const el = $(`[data-role="${sl}"]`); if (el) roles[sl] = el.value; }); };
+
     function render() {
-      const e = es.find((x) => x.slug === cur);
       const auth = user
-        ? `<p class="txt">${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || user.email || "")}</b>${user.email_verified === false ? "" : ""}</p><div class="adm-row"><button class="btn ghost" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
+        ? `<p class="txt">${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || "")}</b></p><div class="adm-row"><button class="btn ghost" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
         : `<div class="adm-row"><button class="btn" id="pbIn" type="button">${S("Login dengan Google", "Sign in with Google")}</button></div>`;
       let html = `<div class="adm-box">${auth}
-        <p class="mono adm-note">${S("PRIVASI: USULAN MENYIMPAN ID AKUN DAN NAMA TAMPILAN GOOGLE-MU (DILIHAT ADMIN). EMAILMU TIDAK DITAMPILKAN KE PENGUNJUNG LAIN. FIREBASE TETAP MENCATAT AKUN YANG LOGIN.", "PRIVACY: A SUGGESTION STORES YOUR ACCOUNT ID AND GOOGLE DISPLAY NAME (SEEN BY THE ADMIN). YOUR EMAIL IS NOT SHOWN TO OTHER VISITORS. FIREBASE STILL RECORDS THE ACCOUNT THAT SIGNED IN.")}</p>${msg ? `<p class="mono adm-note">${esc(msg)}</p>` : ""}</div>`;
+        <p class="mono adm-note">${S("PRIVASI: USULAN MENYIMPAN ID AKUN DAN NAMA TAMPILAN GOOGLE-MU (DILIHAT ADMIN). EMAILMU TIDAK DITAMPILKAN. YANG TAMPIL DI SITUS HANYA NAMA KREDIT DAN LINK FACEBOOK YANG KAMU ISI SENDIRI.", "PRIVACY: A SUGGESTION STORES YOUR ACCOUNT ID AND GOOGLE DISPLAY NAME (SEEN BY THE ADMIN). YOUR EMAIL IS NOT SHOWN. THE SITE ONLY SHOWS THE CREDIT NAME AND FACEBOOK LINK YOU TYPE YOURSELF.")}</p>${msg ? `<p class="mono adm-note">${esc(msg)}</p>` : ""}</div>`;
       if (user) {
-        const fit = arcs.filter((a) => a.type === e.arcType).length;
-        html += `<div class="adm-box"><label>Esper</label>
-          <select id="pbEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
-          <p class="mono adm-note">${builds[cur] ? S("FORM DIISI DENGAN BUILD YANG SEKARANG TAYANG. UBAH SESUAI USULANMU.", "THE FORM STARTS FROM THE CURRENTLY PUBLISHED BUILD. EDIT IT TO MATCH YOUR SUGGESTION.") : S("KARAKTER INI BELUM PUNYA BUILD. ISI USULANMU.", "THIS CHARACTER HAS NO BUILD YET. FILL IN YOUR SUGGESTION.")}</p>
-          <label>${S("Arc (klik untuk menambah, urutan = prioritas)", "Arc (click to add, order = priority)")}</label>
-          <div class="adm-fit"><span>${esc(e.name)} ${S("memakai Arc", "uses Arc")} <b>${esc(e.arcType)}</b>: <b>${fit}</b></span><label class="adm-chk"><input type="checkbox" id="pbAll"${showAll ? " checked" : ""}> ${S("Tampilkan semua tipe", "Show all types")}</label></div>
-          <div class="adm-chips">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="adm-arc on q${a.rarity}" data-rm-arc="${i}"><img src="${img(a.icon)}" alt=""><span><i>${i + 1}</i>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>` : ""; }).join("") || `<em>${S("Belum ada", "None yet")}</em>`}</div>
-          <input type="search" id="pbQ" placeholder="${S("Cari Arc…", "Search Arc…")}" value="${esc(q)}" autocomplete="off">
-          <div class="adm-chips" id="pbArcList"></div>
-          <label>${S("Set modul", "Module sets")}</label>
-          <div class="adm-chips">${working.sets.map((x, i) => { const st = mods.sets.find((m) => m.id === x.id); return st ? `<button type="button" class="on" data-rm-set="${i}">${esc(st.name)} · ${x.pieces} ✕</button>` : ""; }).join("") || `<em>${S("Belum ada", "None yet")}</em>`}</div>
-          <div class="adm-row"><select id="pbSet">${mods.sets.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select><select id="pbPcs"><option value="4">4 ${S("keping", "pcs")}</option><option value="2">2 ${S("keping", "pcs")}</option></select><button class="btn" id="pbAddSet" type="button">${S("Tambah set", "Add set")}</button></div>
-          <label>${S("Awakening yang disarankan (klik berurutan sesuai prioritas)", "Suggested awakenings (click in priority order)")}</label>
-          <div class="adm-chips adm-awks">${e.awakening.slice(0, 6).map((a, i) => { const k = working.awks.indexOf(i + 1); return `<button type="button" class="adm-sk ${k >= 0 ? "on" : ""}" data-awk="${i + 1}"><span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}</span><span>${k >= 0 ? `<i>${k + 1}</i>` : ""}${esc(a.name)}<small>Awakening ${i + 1}</small></span></button>`; }).join("")}</div>
-          <label>${S("Urutan naik level skill", "Skill level-up order")}</label>
-          <div class="adm-chips adm-skills">${SKG.filter((g) => e.skills.some((x) => x.group === g)).map((g) => { const i = working.skills.indexOf(g); const sk = e.skills.find((x) => x.group === g); const ic = ((SD.espers[e.id] || {}).icons || {})[g]; return `<button type="button" class="adm-sk ${i >= 0 ? "on" : ""}" data-skill="${g}"><span class="skill-ico">${ic ? `<img src="${img(ic)}" alt="">` : ""}</span><span>${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(sk.name)}<small>${esc(LABEL.group[g] || g)}</small></span></button>`; }).join("")}</div>
-          <label>${S("Stat prioritas (klik berurutan)", "Stat priority (click in order)")}</label>
-          <div class="adm-chips">${BUILD_STATS.map((t) => { const i = working.stats.indexOf(t); return `<button type="button" class="${i >= 0 ? "on" : ""}" data-stat="${esc(t)}">${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(t)}</button>`; }).join("")}</div>
+        html += `<div class="adm-box"><label>${S("Tim ini untuk halaman karakter", "This team is for the character page of")}</label>
+          <select id="pbEsper">${es.filter((e) => e.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+          <label>${S("Anggota tim (2 sampai 4, karakter halaman wajib ikut)", "Team members (2 to 4; the page's character must be included)")}</label>
+          <div class="adm-chips">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(nm(sl))}</button>`; }).join("")}</div>
+          <label>${S("Peran tiap anggota (opsional, contoh: DPS, Support)", "Each member's role (optional, e.g. DPS, Support)")}</label>
+          <div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(nm(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}"></label>`).join("")}</div>
+          <label for="pbName">${S("Nama tim", "Team name")}</label><input type="text" id="pbName" maxlength="40" value="${esc(form.name)}" autocomplete="off">
+          <label for="pbWhy">${S("Kenapa tim ini bagus? (opsional, maks 300 huruf)", "Why is this team good? (optional, max 300 chars)")}</label><textarea id="pbWhy" maxlength="300" rows="3">${esc(form.why)}</textarea>
+          <label for="pbCname">${S("Nama untuk kredit (tampil di situs)", "Credit name (shown on the site)")}</label><input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">
+          <label for="pbUrl">${S("Link Facebook (opsional, harus alamat facebook.com)", "Facebook link (optional, must be a facebook.com address)")}</label><input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">
+          ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
           <div class="adm-row" style="margin-top:16px"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>
-          <p class="mono adm-note">${S("SATU USULAN AKTIF PER ESPER. MENGIRIM LAGI AKAN MENGGANTI USULANMU SEBELUMNYA.", "ONE ACTIVE SUGGESTION PER ESPER. SENDING AGAIN REPLACES YOUR PREVIOUS ONE.")}</p></div>`;
-        html += `<div class="adm-box"><label>${S("Usulanku", "My suggestions")}</label>${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><b>${esc((es.find((x) => x.slug === m.esper) || { name: m.esper }).name)}</b> · ${esc(STATUS()[m.status] || m.status)} <button class="btn ghost" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<em>${S("Belum ada usulan.", "No suggestions yet.")}</em>`}</div>`;
+          <p class="mono adm-note">${S("SATU USULAN AKTIF PER KARAKTER. MENGIRIM LAGI AKAN MENGGANTI USULANMU SEBELUMNYA. ADMIN BISA MENOLAK USULAN APA PUN.", "ONE ACTIVE SUGGESTION PER CHARACTER. SENDING AGAIN REPLACES YOUR PREVIOUS ONE. THE ADMIN CAN REJECT ANY SUGGESTION.")}</p></div>`;
+        html += `<div class="adm-box"><label>${S("Usulanku", "My suggestions")}</label>${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><b>${esc((m.team && m.team.name) || "?")}</b> · ${esc(nm(m.esper))} · ${esc(STATUS()[m.status] || m.status)} <button class="btn ghost" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<em>${S("Belum ada usulan.", "No suggestions yet.")}</em>`}</div>`;
       }
       root.innerHTML = html;
-      fillArcs();
-    }
-    function fillArcs() {
-      const box = $("#pbArcList"); if (!box) return;
-      const e = es.find((x) => x.slug === cur), qq = q.trim().toLowerCase();
-      const list = arcs.filter((a) => (showAll || a.type === e.arcType) && !working.arcs.includes(a.slug) && (!qq || a.name.toLowerCase().includes(qq))).slice(0, 60);
-      box.innerHTML = list.map((a) => `<button type="button" class="adm-arc q${a.rarity}" data-add-arc="${esc(a.slug)}"><img src="${img(a.icon)}" alt=""><span>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>`).join("") || `<em>${S("Tidak ada", "None")}</em>`;
     }
     async function loadMine() { try { mineList = user ? await fb.mine(user) : []; } catch (e) { mineList = []; } }
 
     fb.onUser(async (u) => {
-      user = u ? { uid: u.uid, displayName: u.displayName, email: u.email, email_verified: u.emailVerified } : null;
-      msg = ""; await loadMine(); render();
+      user = u ? { uid: u.uid, displayName: u.displayName } : null;
+      msg = ""; errs = []; await loadMine(); render();
     });
     root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
       try {
         if (t.id === "pbIn") { await fb.login(); return; }
         if (t.id === "pbOut") { await fb.logout(); return; }
-        if (t.dataset.addArc) { if (working.arcs.length < P.MAX.arcs) working.arcs.push(t.dataset.addArc); render(); return; }
-        if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
-        if (t.id === "pbAddSet") { if (working.sets.length < P.MAX.sets) working.sets.push({ id: $("#pbSet").value, pieces: +$("#pbPcs").value }); render(); return; }
-        if (t.dataset.rmSet) { working.sets.splice(+t.dataset.rmSet, 1); render(); return; }
-        if (t.dataset.awk) { const n = +t.dataset.awk, i = working.awks.indexOf(n); if (i >= 0) working.awks.splice(i, 1); else working.awks.push(n); render(); return; }
-        if (t.dataset.skill) { const i = working.skills.indexOf(t.dataset.skill); if (i >= 0) working.skills.splice(i, 1); else working.skills.push(t.dataset.skill); render(); return; }
-        if (t.dataset.stat) { const i = working.stats.indexOf(t.dataset.stat); if (i >= 0) working.stats.splice(i, 1); else working.stats.push(t.dataset.stat); render(); return; }
+        if (t.dataset.mem) {
+          keep(); const sl = t.dataset.mem, i = members.indexOf(sl);
+          if (i >= 0) members.splice(i, 1); else if (members.length < P.MAX.members) members.push(sl); else toast(S("Maksimal 4 anggota.", "Maximum 4 members."));
+          render(); return;
+        }
         if (t.dataset.del) { if (await ask(S("Hapus usulan ini?", "Delete this suggestion?"), S("Hapus", "Delete"), S("Batal", "Cancel"))) { await fb.remove(t.dataset.del); await loadMine(); render(); toast(S("Usulan dihapus.", "Suggestion deleted.")); } return; }
         if (t.id === "pbSend") {
-          const { build } = P.sanitizeBuild(working, ctx);
-          if (P.isEmpty(build)) { toast(S("Isi minimal satu bagian build dulu.", "Fill in at least one part of the build first.")); return; }
-          if (!P.diff(builds[cur], build).length) { toast(S("Build-nya sama dengan yang sudah tayang.", "This is identical to the published build.")); return; }
+          keep();
+          const r = P.sanitizeTeam({ name: form.name, members, roles: members.map((sl) => roles[sl] || ""), why: form.why, credit: { name: form.cname || (user.displayName || ""), url: form.url } }, { espers: known }, cur);
+          errs = r.errors; if (!r.team) { render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
           t.disabled = true;
-          await fb.submit(user, cur, build, id);
-          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!"));
+          await fb.submit(user, cur, { name: r.team.name, members: r.team.members, roles: r.team.roles, why: r.team.why }, r.team.credit, id);
+          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); form = { name: "", why: "", cname: form.cname, url: form.url }; render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!"));
         }
       } catch (e) { toast(fbErr(e)); render(); }
     });
-    root.addEventListener("input", (ev) => { if (ev.target.id === "pbQ") { q = ev.target.value; fillArcs(); } });
     root.addEventListener("change", (ev) => {
-      if (ev.target.id === "pbEsper") { cur = ev.target.value; pick(); render(); }
-      if (ev.target.id === "pbAll") { showAll = ev.target.checked; render(); }
+      if (ev.target.id === "pbEsper") { keep(); cur = ev.target.value; members = [cur].concat(members.filter((s) => s !== cur)).slice(0, 4); errs = []; render(); }
     });
   }
 

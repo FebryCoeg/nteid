@@ -10,23 +10,30 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn() && request.auth.token.email == 'febririansyah1999@gmail.com';
     }
-    function validBuild(b) {
-      return b is map
-        && b.keys().hasOnly(['arcs', 'sets', 'stats', 'awks', 'skills'])
-        && b.arcs is list && b.arcs.size() <= 12
-        && b.sets is list && b.sets.size() <= 8
-        && b.stats is list && b.stats.size() <= 12
-        && b.awks is list && b.awks.size() <= 6
-        && b.skills is list && b.skills.size() <= 4;
+    function validTeam(t) {
+      return t is map
+        && t.keys().hasOnly(['name', 'members', 'roles', 'why'])
+        && t.name is string && t.name.size() >= 1 && t.name.size() <= 40
+        && t.members is list && t.members.size() >= 2 && t.members.size() <= 4
+        && t.roles is list && t.roles.size() <= 4
+        && t.why is string && t.why.size() <= 300;
+    }
+    function validCredit(c) {
+      return c is map
+        && c.keys().hasOnly(['name', 'url'])
+        && c.name is string && c.name.size() >= 1 && c.name.size() <= 40
+        && c.url is string && c.url.size() <= 200
+        && (c.url == '' || c.url.matches('^https://((www|m|web|mbasic)[.])?facebook[.]com/[^ ]+$') || c.url.matches('^https://(www[.])?fb[.]com/[^ ]+$'));
     }
     function validProposal(d) {
-      return d.keys().hasOnly(['uid', 'name', 'esper', 'build', 'status', 'createdAt'])
+      return d.keys().hasOnly(['uid', 'name', 'esper', 'team', 'credit', 'status', 'createdAt'])
         && d.uid == request.auth.uid
         && d.name is string && d.name.size() <= 80
         && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
         && d.status == 'pending'
         && d.createdAt == request.time
-        && validBuild(d.build);
+        && validTeam(d.team)
+        && validCredit(d.credit);
     }
 
     match /proposals/{id} {
