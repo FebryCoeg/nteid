@@ -2028,27 +2028,48 @@
     const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
     const keep = () => { const g = (id) => { const el = $(id); return el ? el.value : null; }; const v = { name: g("#pbName"), why: g("#pbWhy"), cname: g("#pbCname"), url: g("#pbUrl") }; Object.keys(v).forEach((k) => { if (v[k] !== null) form[k] = v[k]; }); members.forEach((sl) => { const el = $(`[data-role="${sl}"]`); if (el) roles[sl] = el.value; }); };
 
+    const baseCount = {};
+    es.forEach((x) => { const b = x.name.split(" (")[0]; baseCount[b] = (baseCount[b] || 0) + 1; });
+    const chipName = (sl) => { const x = es.find((e) => e.slug === sl); if (!x) return sl; const b = x.name.split(" (")[0]; return baseCount[b] > 1 ? x.name : b; };
+    const openHelp = new Set();
+    const HELP = {
+      char: S("Tim ini akan tampil di halaman karakter yang kamu pilih, di tab Build, bagian \"Tim dari komunitas\".", "This team will appear on the chosen character's page, in the Build tab, under \"Community teams\"."),
+      mem: S("Pilih 2 sampai 4 karakter. Karakter halaman otomatis ikut dan tidak bisa dilepas. Klik lagi untuk melepas karakter lain. Angka di chip = urutan anggota.", "Pick 2 to 4 characters. The page's character is always included. Click again to remove another one. The number on a chip is the member order."),
+      role: S("Tulis peran singkat tiap anggota, misalnya DPS Utama, Sub-DPS, atau Support. Boleh dikosongkan.", "Write a short role for each member, e.g. Main DPS, Sub-DPS or Support. You can leave it empty."),
+      name: S("Nama singkat untuk susunan timmu, misalnya \"Tim Nova\". Maksimal 40 huruf.", "A short name for your team, e.g. \"Nova Team\". Max 40 characters."),
+      why: S("Jelaskan singkat kenapa susunan ini bagus: sinergi, reaksi yang terbentuk, atau cara memainkannya. Maksimal 300 huruf. Boleh kosong.", "Briefly explain why this team works: synergy, reactions it forms, or how to play it. Max 300 characters. Optional."),
+      cname: S("Nama ini yang tampil di bawah timmu sebagai \"Susunan tim oleh\". Bisa nama asli atau nama panggung, tidak harus sama dengan nama Google.", "This name appears under your team as \"Team by\". It can be a real name or a nickname and does not have to match your Google name."),
+      url: S("Kalau diisi, nama kreditmu bisa diklik dan membuka alamat Facebook ini. Hanya alamat facebook.com yang diterima. Kosongkan kalau tidak mau menampilkan link.", "If filled in, your credit name becomes a link to this Facebook address. Only facebook.com addresses are accepted. Leave empty for no link."),
+      mine: S("Menunggu = belum ditinjau admin. Disetujui = sudah tayang di situs. Ditolak = tidak ditayangkan. Kamu bisa menghapus atau mengirim ulang usulan.", "Pending = not reviewed yet. Approved = live on the site. Rejected = not published. You can delete or resend a suggestion."),
+      priv: S("Usulan menyimpan ID akun dan nama tampilan Google-mu (hanya dilihat admin). Emailmu tidak ditampilkan. Yang tampil di situs hanya nama kredit dan link Facebook yang kamu isi sendiri.", "A suggestion stores your account ID and Google display name (only the admin sees them). Your email is not shown. The site only shows the credit name and Facebook link you type yourself."),
+    };
+    const help = (k) => `<button type="button" class="pb-help" data-help="${k}" aria-expanded="${openHelp.has(k)}" aria-label="${S("Penjelasan", "Explanation")}">!</button>`;
+    const hint = (k) => `<p class="pb-hint" ${openHelp.has(k) ? "" : "hidden"} data-hint="${k}">${esc(HELP[k])}</p>`;
+    const field = (k, label, ctrl, forId) => `<div class="pb-field"><div class="pb-lab"><label${forId ? ` for="${forId}"` : ""}>${label}</label>${help(k)}</div>${hint(k)}${ctrl}</div>`;
+
     function render() {
       const auth = user
-        ? `<p class="txt">${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || "")}</b></p><div class="adm-row"><button class="btn ghost" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
-        : `<div class="adm-row"><button class="btn" id="pbIn" type="button">${S("Login dengan Google", "Sign in with Google")}</button></div>`;
-      let html = `<div class="adm-box">${auth}
-        <p class="mono adm-note">${S("PRIVASI: USULAN MENYIMPAN ID AKUN DAN NAMA TAMPILAN GOOGLE-MU (DILIHAT ADMIN). EMAILMU TIDAK DITAMPILKAN. YANG TAMPIL DI SITUS HANYA NAMA KREDIT DAN LINK FACEBOOK YANG KAMU ISI SENDIRI.", "PRIVACY: A SUGGESTION STORES YOUR ACCOUNT ID AND GOOGLE DISPLAY NAME (SEEN BY THE ADMIN). YOUR EMAIL IS NOT SHOWN. THE SITE ONLY SHOWS THE CREDIT NAME AND FACEBOOK LINK YOU TYPE YOURSELF.")}</p>${msg ? `<p class="mono adm-note">${esc(msg)}</p>` : ""}</div>`;
+        ? `<div class="pb-user"><span>${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || "")}</b></span><button class="btn ghost sm" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
+        : `<div class="adm-row"><button class="btn" id="pbIn" type="button">${S("Login dengan Google", "Sign in with Google")}</button></div><p class="txt pb-lead">${S("Login dulu supaya usulanmu tercatat atas namamu. Cukup satu klik dengan akun Google.", "Sign in first so your suggestion is recorded under your name. One click with your Google account.")}</p>`;
+      let html = `<div class="pb-card">${auth}<div class="pb-lab pb-privacy"><span class="mono">${S("PRIVASI", "PRIVACY")}</span>${help("priv")}</div>${hint("priv")}${msg ? `<p class="pb-ok">${esc(msg)}</p>` : ""}</div>`;
       if (user) {
-        html += `<div class="adm-box"><label>${S("Tim ini untuk halaman karakter", "This team is for the character page of")}</label>
-          <select id="pbEsper">${es.filter((e) => e.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
-          <label>${S("Anggota tim (2 sampai 4, karakter halaman wajib ikut)", "Team members (2 to 4; the page's character must be included)")}</label>
-          <div class="adm-chips">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(nm(sl))}</button>`; }).join("")}</div>
-          <label>${S("Peran tiap anggota (opsional, contoh: DPS, Support)", "Each member's role (optional, e.g. DPS, Support)")}</label>
-          <div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(nm(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}"></label>`).join("")}</div>
-          <label for="pbName">${S("Nama tim", "Team name")}</label><input type="text" id="pbName" maxlength="40" value="${esc(form.name)}" autocomplete="off">
-          <label for="pbWhy">${S("Kenapa tim ini bagus? (opsional, maks 300 huruf)", "Why is this team good? (optional, max 300 chars)")}</label><textarea id="pbWhy" maxlength="300" rows="3">${esc(form.why)}</textarea>
-          <label for="pbCname">${S("Nama untuk kredit (tampil di situs)", "Credit name (shown on the site)")}</label><input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">
-          <label for="pbUrl">${S("Link Facebook (opsional, harus alamat facebook.com)", "Facebook link (optional, must be a facebook.com address)")}</label><input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">
+        html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Pilih karakter dan anggota tim", "Choose the character and team members")}</h3>
+          ${field("char", S("Tim ini untuk halaman karakter", "This team is for the page of"), `<select id="pbEsper">${es.filter((e) => e.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}
+          ${field("mem", `${S("Anggota tim", "Team members")} <small>(${members.length}/4)</small>`, `<div class="adm-chips pb-mem">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(chipName(sl))}</button>`; }).join("")}</div>`)}
+          ${field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(chipName(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}" placeholder="${S("mis. DPS", "e.g. DPS")}"></label>`).join("")}</div>`)}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Tentang tim", "About the team")}</h3>
+          ${field("name", S("Nama tim", "Team name"), `<input type="text" id="pbName" maxlength="40" value="${esc(form.name)}" autocomplete="off" placeholder="${S("mis. Tim Nova", "e.g. Nova Team")}">`, "pbName")}
+          ${field("why", S("Kenapa tim ini bagus? (opsional)", "Why is this team good? (optional)"), `<textarea id="pbWhy" maxlength="300" rows="3">${esc(form.why)}</textarea>`, "pbWhy")}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Kredit untukmu", "Your credit")}</h3>
+          ${field("cname", S("Nama untuk kredit", "Credit name"), `<input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">`, "pbCname")}
+          ${field("url", S("Link Facebook (opsional)", "Facebook link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
           ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          <div class="adm-row" style="margin-top:16px"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>
-          <p class="mono adm-note">${S("SATU USULAN AKTIF PER KARAKTER. MENGIRIM LAGI AKAN MENGGANTI USULANMU SEBELUMNYA. ADMIN BISA MENOLAK USULAN APA PUN.", "ONE ACTIVE SUGGESTION PER CHARACTER. SENDING AGAIN REPLACES YOUR PREVIOUS ONE. THE ADMIN CAN REJECT ANY SUGGESTION.")}</p></div>`;
-        html += `<div class="adm-box"><label>${S("Usulanku", "My suggestions")}</label>${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><b>${esc((m.team && m.team.name) || "?")}</b> · ${esc(nm(m.esper))} · ${esc(STATUS()[m.status] || m.status)} <button class="btn ghost" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<em>${S("Belum ada usulan.", "No suggestions yet.")}</em>`}</div>`;
+          <div class="adm-row pb-send"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>
+          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Satu usulan aktif per karakter; mengirim lagi menggantikan yang lama.", "The admin reviews it before it goes live. One active suggestion per character; sending again replaces the old one.")}</p>
+        </div>
+        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span><button class="btn ghost sm" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
       }
       root.innerHTML = html;
     }
@@ -2060,6 +2081,7 @@
     });
     root.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
+      if (t.dataset.help) { const k = t.dataset.help; if (openHelp.has(k)) openHelp.delete(k); else openHelp.add(k); keep(); render(); return; }
       try {
         if (t.id === "pbIn") { await fb.login(); return; }
         if (t.id === "pbOut") { await fb.logout(); return; }
