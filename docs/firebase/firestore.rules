@@ -1,0 +1,53 @@
+rules_version = '2';
+// Tempel di Firebase Console > Firestore Database > Rules, lalu Publish.
+// Hanya koleksi "proposals" yang boleh diakses; semua yang lain tertutup.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function isAdmin() {
+      return signedIn() && request.auth.token.email == 'febririansyah1999@gmail.com';
+    }
+    function validBuild(b) {
+      return b is map
+        && b.keys().hasOnly(['arcs', 'sets', 'stats', 'awks', 'skills'])
+        && b.arcs is list && b.arcs.size() <= 12
+        && b.sets is list && b.sets.size() <= 8
+        && b.stats is list && b.stats.size() <= 12
+        && b.awks is list && b.awks.size() <= 6
+        && b.skills is list && b.skills.size() <= 4;
+    }
+    function validProposal(d) {
+      return d.keys().hasOnly(['uid', 'name', 'esper', 'build', 'status', 'createdAt'])
+        && d.uid == request.auth.uid
+        && d.name is string && d.name.size() <= 80
+        && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
+        && d.status == 'pending'
+        && d.createdAt == request.time
+        && validBuild(d.build);
+    }
+
+    match /proposals/{id} {
+      // id dokumen wajib "<uid>_<esper>": satu usulan per pengguna per Esper (menekan spam).
+      allow create: if signedIn()
+        && id == request.auth.uid + '_' + request.resource.data.esper
+        && validProposal(request.resource.data);
+
+      // Pemilik boleh mengganti usulannya sendiri (tetap berstatus pending).
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && id == request.auth.uid + '_' + request.resource.data.esper
+        && validProposal(request.resource.data);
+
+      // Admin hanya boleh mengubah status dan menambahkan reviewedAt.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedAt'])
+        && request.resource.data.status in ['approved', 'rejected', 'pending'];
+
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+  }
+}

@@ -62,6 +62,7 @@ PAGES = [
     ("musuh", "Status Anomali", "Status musuh Neverness to Everness di setiap level: HP, ATK, DEF, Resist per elemen, dan Break, termasuk Beyond the Rails."),
     ("kalkulator", "Kalkulator Damage", "Hitung damage satu serangan karakter Neverness to Everness ke musuh, plus total Break tim, dari data base game."),
     ("gacha", "Simulator Gacha", "Simulasi gacha papan dadu Neverness to Everness: lempar dadu di papan, pity, dan angka peluang resmi dari layar aturan game."),
+    ("usulan", "Usulkan Build", "Usulkan build karakter Neverness to Everness: login Google, susun build, dan kirim untuk ditinjau admin."),
     ("tracker", "Tracker Gacha", "Catat gacha Neverness to Everness: total pull dan S-Class, hitung pity, statistik, dan diagram batang pity. Data hanya tersimpan di browser."),
     ("istilah", "Istilah", "Arti istilah dunia Neverness to Everness dari buku panduan dalam game."),
     ("pencapaian", "Pencapaian", "Lebih dari 450 pencapaian Neverness to Everness lengkap dengan syarat dan hadiah."),

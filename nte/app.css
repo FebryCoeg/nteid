@@ -1660,3 +1660,8 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .tk-warn li { font-size: 0.74rem; line-height: 1.5; padding: 8px 10px; border-radius: 10px; background: #f8717122; border: 1px solid #f8717166; color: #ffb4b4; }
 .tk-chart canvas { max-width: 100%; }
 @media (max-width: 560px) { .tk-row { grid-template-columns: 22px 30px minmax(0, 1fr) 56px; } .tk-act { grid-column: 1 / -1; justify-content: flex-end; } }
+
+/* ---- usulan build komunitas ---- */
+.pb-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.pb-list li { padding: 10px 12px; border-radius: 10px; background: var(--panel-2); font-size: 0.82rem; line-height: 1.6; }
+.pb-list small { color: var(--text-2); }

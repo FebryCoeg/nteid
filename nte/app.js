@@ -127,6 +127,7 @@
     [/^\/kalkulator\/?$/, viewCalc],
     [/^\/gacha\/?$/, viewGacha],
     [/^\/tracker\/?$/, viewTracker],
+    [/^\/usulan\/?$/, viewProposal],
     [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/pencapaian\/?$/, viewAchievements],
@@ -896,8 +897,37 @@
     const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
     const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
     const SKG = ["basic", "redirect", "ultimate", "support"];
-    main.innerHTML = `<div id="admRoot"></div>`;
+    main.innerHTML = `<div id="admQueue"></div><div id="admRoot"></div>`;
     const root = $("#admRoot");
+    // antrean usulan komunitas (Firebase dimuat hanya saat tombol ditekan)
+    const qbox = $("#admQueue");
+    let applying = null, fbm = null, qList = null, qMsg = "";
+    const PX = window.NteProposals;
+    const pctx = () => ({ arcs: arcs.map((a) => a.slug), sets: mods.sets.map((m) => m.id), stats: STATS });
+    function renderQueue() {
+      const L = FIELD_LABEL();
+      qbox.innerHTML = `<div class="adm-box"><label>Usulan komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
+        ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => { const ch = PX.diff(builds[p.esper], p.build); return `<li><b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> dari ${esc(p.name || "?")}<br>${ch.length ? ch.map((c) => `<small>${esc(L[c.field])}: ${esc(buildFieldText(c.field, c.before, { arcs, sets: mods.sets }))} → <b>${esc(buildFieldText(c.field, c.after, { arcs, sets: mods.sets }))}</b></small>`).join("<br>") : "<small>Sama dengan build yang tayang.</small>"}<br><button class="btn" type="button" data-q-apply="${esc(p.id)}">Terapkan ke form</button> <button class="btn ghost" type="button" data-q-reject="${esc(p.id)}">Tolak</button></li>`; }).join("")}</ul>` : "<em>Tidak ada usulan menunggu.</em>") : ""}</div>`;
+    }
+    renderQueue();
+    qbox.addEventListener("click", async (ev) => {
+      const t = ev.target.closest("button"); if (!t) return;
+      try {
+        if (t.id === "qLoad") {
+          if (!PX) { qMsg = "Modul usulan gagal dimuat."; renderQueue(); return; }
+          fbm = fbm || await fbLoad();
+          const u = await fbm.login();
+          if (!fbm.isAdmin(u.user)) { await fbm.logout(); qMsg = "Akun ini bukan admin."; qList = null; renderQueue(); return; }
+          qList = await fbm.pending(); qMsg = ""; renderQueue(); return;
+        }
+        const id = t.dataset.qApply || t.dataset.qReject; if (!id) return;
+        const p = (qList || []).find((x) => x.id === id); if (!p) return;
+        if (t.dataset.qReject) { if (await ask("Tolak usulan ini?", "Tolak", "Batal")) { await fbm.setStatus(id, "rejected"); qList = await fbm.pending(); renderQueue(); toast("Usulan ditolak."); } return; }
+        if (!es.some((x) => x.slug === p.esper)) { toast("Esper pada usulan tidak dikenal."); return; }
+        cur = p.esper; working = Object.assign(fresh(), PX.sanitizeBuild(p.build, pctx()).build); applying = { id, esper: p.esper };
+        render("USULAN DIMUAT. PERIKSA, LALU KLIK SIMPAN KE GITHUB (USULAN DITANDAI DISETUJUI SETELAH TERSIMPAN)"); root.scrollIntoView({ behavior: "smooth" });
+      } catch (e) { qMsg = fbErr(e); renderQueue(); }
+    });
     function render(msg) {
       const e = es.find((x) => x.slug === cur);
       root.innerHTML = `
@@ -979,6 +1009,7 @@
         return;
       }
       const j = await r.json(); sha = j.content.sha; builds = copy; pick(); render("TERSIMPAN"); toast("Tersimpan. Situs diperbarui sekitar 1 menit.");
+      if (applying && applying.esper === cur && fbm) { const id = applying.id; applying = null; fbm.setStatus(id, "approved").then(async () => { qList = await fbm.pending(); renderQueue(); }).catch(() => toast("Build tersimpan, tapi gagal menandai usulan disetujui.")); }
     }
     const st = await pull();
     pick(); render(st === "ok" || st === "view" ? "" : "GAGAL MEMUAT (" + st + ")");
@@ -1926,6 +1957,125 @@
       data[tab] = { total: 0, a: 0, entries: [] }; save(); refresh();
     };
     buildAdd(); refresh();
+  }
+
+  // ---------------- USULAN BUILD KOMUNITAS ----------------
+  const BUILD_STATS = ["ATK %", "HP %", "DEF %", "CRIT Rate", "CRIT DMG", "DMG Bonus", "ATK", "HP", "DEF", "Energy Regen", "Healing Bonus", "Break"];
+  let fbPromise = null;
+  const fbLoad = () => (fbPromise ||= import(`${BASE}fb.js${ver}`).catch((e) => { fbPromise = null; throw e; }));
+  const fbErr = (e) => {
+    const c = e && e.code ? String(e.code) : "";
+    if (c.includes("popup-blocked")) return S("Popup login diblokir browser. Izinkan popup untuk situs ini lalu coba lagi.", "The login popup was blocked. Allow popups for this site and try again.");
+    if (c.includes("popup-closed") || c.includes("cancelled")) return S("Login dibatalkan.", "Login cancelled.");
+    if (c.includes("unauthorized-domain")) return S("Domain situs belum didaftarkan di Firebase (Authorized domains).", "This domain is not in Firebase Authorized domains.");
+    if (c.includes("permission-denied")) return S("Ditolak oleh aturan keamanan. Pastikan sudah login dengan email terverifikasi.", "Denied by security rules. Make sure you are signed in with a verified email.");
+    return S("Terjadi kesalahan. Coba lagi nanti.", "Something went wrong. Try again later.");
+  };
+  const buildFieldText = (f, v, ctx) => {
+    if (!v || !v.length) return "—";
+    if (f === "arcs") return v.map((s) => (ctx.arcs.find((a) => a.slug === s) || { name: s }).name).join(", ");
+    if (f === "sets") return v.map((x) => ((ctx.sets.find((m) => m.id === x.id) || { name: x.id }).name) + " " + x.pieces).join(", ");
+    return v.join(", ");
+  };
+  const FIELD_LABEL = () => ({ arcs: "Arc", sets: S("Set modul", "Module sets"), stats: S("Stat prioritas", "Stat priority"), awks: "Awakening", skills: S("Urutan skill", "Skill order") });
+
+  async function viewProposal() {
+    setTitle(S("Usulkan Build", "Suggest a Build"));
+    let meta = document.querySelector('meta[name="robots"]');
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.content = "noindex";
+    const [es, arcs, mods, SD, builds] = await Promise.all([load("espers"), load("arcs"), load("modules"), load("stats"), load("builds").catch(() => ({}))]);
+    const P = window.NteProposals;
+    const intro = head("USULAN", S("Usulkan Build", "Suggest a Build"), S("Punya build karakter yang lebih baik? Login dengan Google, susun build-nya, lalu kirim. Admin akan meninjau sebelum tayang.", "Got a better character build? Sign in with Google, put it together and send it. An admin reviews it before it goes live."), null);
+    if (!P) { main.innerHTML = intro + `<p class="txt">${S("Modul usulan gagal dimuat. Muat ulang halaman.", "The suggestion module failed to load. Reload the page.")}</p>`; return; }
+    main.innerHTML = intro + `<div id="pbRoot"><p class="txt">${S("Memuat…", "Loading…")}</p></div>`;
+    const root = $("#pbRoot");
+    let fb;
+    try { fb = await fbLoad(); } catch (e) { root.innerHTML = `<p class="txt">${S("Layanan login gagal dimuat (mungkin diblokir ekstensi atau offline). Coba lagi nanti.", "The login service failed to load (blocked by an extension or offline). Try again later.")}</p>`; return; }
+
+    const ctx = { arcs: arcs.map((a) => a.slug), sets: mods.sets.map((m) => m.id), stats: BUILD_STATS };
+    const SKG = ["basic", "redirect", "ultimate", "support"];
+    let user = null, cur = es[0].slug, working = null, showAll = false, q = "", mineList = [], msg = "";
+    const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
+    const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
+    pick();
+
+    const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
+    function render() {
+      const e = es.find((x) => x.slug === cur);
+      const auth = user
+        ? `<p class="txt">${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || user.email || "")}</b>${user.email_verified === false ? "" : ""}</p><div class="adm-row"><button class="btn ghost" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
+        : `<div class="adm-row"><button class="btn" id="pbIn" type="button">${S("Login dengan Google", "Sign in with Google")}</button></div>`;
+      let html = `<div class="adm-box">${auth}
+        <p class="mono adm-note">${S("PRIVASI: USULAN MENYIMPAN ID AKUN DAN NAMA TAMPILAN GOOGLE-MU (DILIHAT ADMIN). EMAILMU TIDAK DITAMPILKAN KE PENGUNJUNG LAIN. FIREBASE TETAP MENCATAT AKUN YANG LOGIN.", "PRIVACY: A SUGGESTION STORES YOUR ACCOUNT ID AND GOOGLE DISPLAY NAME (SEEN BY THE ADMIN). YOUR EMAIL IS NOT SHOWN TO OTHER VISITORS. FIREBASE STILL RECORDS THE ACCOUNT THAT SIGNED IN.")}</p>${msg ? `<p class="mono adm-note">${esc(msg)}</p>` : ""}</div>`;
+      if (user) {
+        const fit = arcs.filter((a) => a.type === e.arcType).length;
+        html += `<div class="adm-box"><label>Esper</label>
+          <select id="pbEsper">${es.map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}${builds[x.slug] ? " ✓" : ""}</option>`).join("")}</select>
+          <p class="mono adm-note">${builds[cur] ? S("FORM DIISI DENGAN BUILD YANG SEKARANG TAYANG. UBAH SESUAI USULANMU.", "THE FORM STARTS FROM THE CURRENTLY PUBLISHED BUILD. EDIT IT TO MATCH YOUR SUGGESTION.") : S("KARAKTER INI BELUM PUNYA BUILD. ISI USULANMU.", "THIS CHARACTER HAS NO BUILD YET. FILL IN YOUR SUGGESTION.")}</p>
+          <label>${S("Arc (klik untuk menambah, urutan = prioritas)", "Arc (click to add, order = priority)")}</label>
+          <div class="adm-fit"><span>${esc(e.name)} ${S("memakai Arc", "uses Arc")} <b>${esc(e.arcType)}</b>: <b>${fit}</b></span><label class="adm-chk"><input type="checkbox" id="pbAll"${showAll ? " checked" : ""}> ${S("Tampilkan semua tipe", "Show all types")}</label></div>
+          <div class="adm-chips">${working.arcs.map((sl, i) => { const a = arcs.find((x) => x.slug === sl); return a ? `<button type="button" class="adm-arc on q${a.rarity}" data-rm-arc="${i}"><img src="${img(a.icon)}" alt=""><span><i>${i + 1}</i>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>` : ""; }).join("") || `<em>${S("Belum ada", "None yet")}</em>`}</div>
+          <input type="search" id="pbQ" placeholder="${S("Cari Arc…", "Search Arc…")}" value="${esc(q)}" autocomplete="off">
+          <div class="adm-chips" id="pbArcList"></div>
+          <label>${S("Set modul", "Module sets")}</label>
+          <div class="adm-chips">${working.sets.map((x, i) => { const st = mods.sets.find((m) => m.id === x.id); return st ? `<button type="button" class="on" data-rm-set="${i}">${esc(st.name)} · ${x.pieces} ✕</button>` : ""; }).join("") || `<em>${S("Belum ada", "None yet")}</em>`}</div>
+          <div class="adm-row"><select id="pbSet">${mods.sets.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select><select id="pbPcs"><option value="4">4 ${S("keping", "pcs")}</option><option value="2">2 ${S("keping", "pcs")}</option></select><button class="btn" id="pbAddSet" type="button">${S("Tambah set", "Add set")}</button></div>
+          <label>${S("Awakening yang disarankan (klik berurutan sesuai prioritas)", "Suggested awakenings (click in priority order)")}</label>
+          <div class="adm-chips adm-awks">${e.awakening.slice(0, 6).map((a, i) => { const k = working.awks.indexOf(i + 1); return `<button type="button" class="adm-sk ${k >= 0 ? "on" : ""}" data-awk="${i + 1}"><span class="skill-ico">${a.icon ? `<img src="${img(a.icon)}" alt="">` : ""}</span><span>${k >= 0 ? `<i>${k + 1}</i>` : ""}${esc(a.name)}<small>Awakening ${i + 1}</small></span></button>`; }).join("")}</div>
+          <label>${S("Urutan naik level skill", "Skill level-up order")}</label>
+          <div class="adm-chips adm-skills">${SKG.filter((g) => e.skills.some((x) => x.group === g)).map((g) => { const i = working.skills.indexOf(g); const sk = e.skills.find((x) => x.group === g); const ic = ((SD.espers[e.id] || {}).icons || {})[g]; return `<button type="button" class="adm-sk ${i >= 0 ? "on" : ""}" data-skill="${g}"><span class="skill-ico">${ic ? `<img src="${img(ic)}" alt="">` : ""}</span><span>${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(sk.name)}<small>${esc(LABEL.group[g] || g)}</small></span></button>`; }).join("")}</div>
+          <label>${S("Stat prioritas (klik berurutan)", "Stat priority (click in order)")}</label>
+          <div class="adm-chips">${BUILD_STATS.map((t) => { const i = working.stats.indexOf(t); return `<button type="button" class="${i >= 0 ? "on" : ""}" data-stat="${esc(t)}">${i >= 0 ? `<i>${i + 1}</i>` : ""}${esc(t)}</button>`; }).join("")}</div>
+          <div class="adm-row" style="margin-top:16px"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>
+          <p class="mono adm-note">${S("SATU USULAN AKTIF PER ESPER. MENGIRIM LAGI AKAN MENGGANTI USULANMU SEBELUMNYA.", "ONE ACTIVE SUGGESTION PER ESPER. SENDING AGAIN REPLACES YOUR PREVIOUS ONE.")}</p></div>`;
+        html += `<div class="adm-box"><label>${S("Usulanku", "My suggestions")}</label>${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><b>${esc((es.find((x) => x.slug === m.esper) || { name: m.esper }).name)}</b> · ${esc(STATUS()[m.status] || m.status)} <button class="btn ghost" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<em>${S("Belum ada usulan.", "No suggestions yet.")}</em>`}</div>`;
+      }
+      root.innerHTML = html;
+      fillArcs();
+    }
+    function fillArcs() {
+      const box = $("#pbArcList"); if (!box) return;
+      const e = es.find((x) => x.slug === cur), qq = q.trim().toLowerCase();
+      const list = arcs.filter((a) => (showAll || a.type === e.arcType) && !working.arcs.includes(a.slug) && (!qq || a.name.toLowerCase().includes(qq))).slice(0, 60);
+      box.innerHTML = list.map((a) => `<button type="button" class="adm-arc q${a.rarity}" data-add-arc="${esc(a.slug)}"><img src="${img(a.icon)}" alt=""><span>${esc(a.name)}<small>${esc(a.type)} · ★${a.rarity}</small></span></button>`).join("") || `<em>${S("Tidak ada", "None")}</em>`;
+    }
+    async function loadMine() { try { mineList = user ? await fb.mine(user) : []; } catch (e) { mineList = []; } }
+
+    fb.onUser(async (u) => {
+      user = u ? { uid: u.uid, displayName: u.displayName, email: u.email, email_verified: u.emailVerified } : null;
+      msg = ""; await loadMine(); render();
+    });
+    root.addEventListener("click", async (ev) => {
+      const t = ev.target.closest("button"); if (!t) return;
+      try {
+        if (t.id === "pbIn") { await fb.login(); return; }
+        if (t.id === "pbOut") { await fb.logout(); return; }
+        if (t.dataset.addArc) { if (working.arcs.length < P.MAX.arcs) working.arcs.push(t.dataset.addArc); render(); return; }
+        if (t.dataset.rmArc) { working.arcs.splice(+t.dataset.rmArc, 1); render(); return; }
+        if (t.id === "pbAddSet") { if (working.sets.length < P.MAX.sets) working.sets.push({ id: $("#pbSet").value, pieces: +$("#pbPcs").value }); render(); return; }
+        if (t.dataset.rmSet) { working.sets.splice(+t.dataset.rmSet, 1); render(); return; }
+        if (t.dataset.awk) { const n = +t.dataset.awk, i = working.awks.indexOf(n); if (i >= 0) working.awks.splice(i, 1); else working.awks.push(n); render(); return; }
+        if (t.dataset.skill) { const i = working.skills.indexOf(t.dataset.skill); if (i >= 0) working.skills.splice(i, 1); else working.skills.push(t.dataset.skill); render(); return; }
+        if (t.dataset.stat) { const i = working.stats.indexOf(t.dataset.stat); if (i >= 0) working.stats.splice(i, 1); else working.stats.push(t.dataset.stat); render(); return; }
+        if (t.dataset.del) { if (await ask(S("Hapus usulan ini?", "Delete this suggestion?"), S("Hapus", "Delete"), S("Batal", "Cancel"))) { await fb.remove(t.dataset.del); await loadMine(); render(); toast(S("Usulan dihapus.", "Suggestion deleted.")); } return; }
+        if (t.id === "pbSend") {
+          const { build } = P.sanitizeBuild(working, ctx);
+          if (P.isEmpty(build)) { toast(S("Isi minimal satu bagian build dulu.", "Fill in at least one part of the build first.")); return; }
+          if (!P.diff(builds[cur], build).length) { toast(S("Build-nya sama dengan yang sudah tayang.", "This is identical to the published build.")); return; }
+          const id = P.docId(user.uid, cur);
+          if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
+          t.disabled = true;
+          await fb.submit(user, cur, build, id);
+          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!"));
+        }
+      } catch (e) { toast(fbErr(e)); render(); }
+    });
+    root.addEventListener("input", (ev) => { if (ev.target.id === "pbQ") { q = ev.target.value; fillArcs(); } });
+    root.addEventListener("change", (ev) => {
+      if (ev.target.id === "pbEsper") { cur = ev.target.value; pick(); render(); }
+      if (ev.target.id === "pbAll") { showAll = ev.target.checked; render(); }
+    });
   }
 
   // ---------------- TENTANG ----------------
