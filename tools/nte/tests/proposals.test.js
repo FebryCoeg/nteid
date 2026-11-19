@@ -72,3 +72,22 @@ test("docId: gabungan uid dan slug, karakter aneh ditolak", () => {
   assert.equal(P.docId("abc", "x/../y"), null);
   assert.equal(P.docId("", "x"), null);
 });
+
+test("teamKey: urutan anggota tidak berpengaruh, hasil terurut", () => {
+  assert.equal(P.teamKey(["zankou", "akane-rin", "blackbird"]), "akane-rin.blackbird.zankou");
+  assert.equal(P.teamKey(["blackbird", "zankou", "akane-rin"]), P.teamKey(["akane-rin", "blackbird", "zankou"]));
+  assert.equal(P.teamKey([]), "");
+});
+
+test("sameTeam: anggota yang sama dianggap tim kembar, apa pun urutan dan perannya", () => {
+  assert.equal(P.sameTeam(["a", "b", "c"], ["c", "a", "b"]), true);
+  assert.equal(P.sameTeam(["a", "b"], ["a", "b", "c"]), false);
+  assert.equal(P.sameTeam(["a", "b", "c"], ["a", "b", "d"]), false);
+});
+
+test("duplicateOf: menemukan tim yang sudah tayang dengan anggota sama", () => {
+  const list = [{ name: "X", members: ["b", "a"] }, { name: "Y", members: ["a", "c"] }, null, { name: "Z" }];
+  assert.equal(P.duplicateOf(["a", "b"], list).name, "X");
+  assert.equal(P.duplicateOf(["a", "d"], list), null);
+  assert.equal(P.duplicateOf(["a", "b"], undefined), null);
+});

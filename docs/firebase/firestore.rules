@@ -1,6 +1,6 @@
 rules_version = '2';
 // Tempel di Firebase Console > Firestore Database > Rules, lalu Publish.
-// Hanya koleksi "proposals" yang boleh diakses; semua yang lain tertutup.
+// Hanya koleksi "proposals" dan "locks" yang boleh diakses; semua yang lain tertutup.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -25,28 +25,37 @@ service cloud.firestore {
         && c.url is string && c.url.size() <= 200
         && (c.url == '' || c.url.matches('^https://((www|m|web|mbasic)[.])?facebook[.]com/[^ ]+$') || c.url.matches('^https://(www[.])?fb[.]com/[^ ]+$'));
     }
+    // "key" = anggota tim diurutkan dan digabung dengan titik; harus cocok dengan daftar anggota.
+    function validKey(d) {
+      return d.key is string && d.key.size() <= 200
+        && d.key.matches('^[A-Za-z0-9_.-]+$')
+        && d.key.split('[.]').size() == d.team.members.size()
+        && d.key.split('[.]').toSet() == d.team.members.toSet();
+    }
+    function lockPath(d) {
+      return /databases/$(database)/documents/locks/$(d.esper + '__' + d.key);
+    }
     function validProposal(d) {
-      return d.keys().hasOnly(['uid', 'name', 'esper', 'team', 'credit', 'status', 'createdAt'])
+      return d.keys().hasOnly(['uid', 'name', 'esper', 'key', 'team', 'credit', 'status', 'createdAt'])
         && d.uid == request.auth.uid
         && d.name is string && d.name.size() <= 80
         && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
         && d.status == 'pending'
         && d.createdAt == request.time
         && validTeam(d.team)
-        && validCredit(d.credit);
+        && validCredit(d.credit)
+        && validKey(d);
     }
 
     match /proposals/{id} {
-      // id dokumen wajib "<uid>_<esper>": satu usulan per pengguna per Esper (menekan spam).
+      // id dokumen wajib "<uid>_<esper>": satu usulan per pengguna per karakter, SEKALI SAJA.
+      // Tidak ada aturan update/delete untuk pemilik, jadi usulan tidak bisa diganti atau dihapus lalu dikirim ulang.
+      // Dikirim bersama dokumen kunci (locks) dalam satu batch: tim dengan anggota sama hanya bisa diusulkan sekali.
       allow create: if signedIn()
         && id == request.auth.uid + '_' + request.resource.data.esper
-        && validProposal(request.resource.data);
-
-      // Pemilik boleh mengganti usulannya sendiri (tetap berstatus pending).
-      allow update: if signedIn()
-        && resource.data.uid == request.auth.uid
-        && id == request.auth.uid + '_' + request.resource.data.esper
-        && validProposal(request.resource.data);
+        && validProposal(request.resource.data)
+        && existsAfter(lockPath(request.resource.data))
+        && getAfter(lockPath(request.resource.data)).data.uid == request.auth.uid;
 
       // Admin hanya boleh mengubah status dan menambahkan reviewedAt.
       allow update: if isAdmin()
@@ -54,7 +63,17 @@ service cloud.firestore {
         && request.resource.data.status in ['approved', 'rejected', 'pending'];
 
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Kunci tim kembar: dokumen "<esper>__<anggota diurutkan>" hanya bisa dibuat sekali (siapa cepat dia dapat).
+    match /locks/{lid} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow delete: if isAdmin();
     }
   }
 }

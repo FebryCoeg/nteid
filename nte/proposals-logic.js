@@ -56,8 +56,13 @@
     return { team: { name, members, roles, why, credit: { name: cname, url } }, errors };
   }
 
+  // Kunci tim: anggota diurutkan lalu digabung, jadi susunan yang sama selalu punya kunci yang sama.
+  const teamKey = (members) => (Array.isArray(members) ? members.slice().sort().join(".") : "");
+  const sameTeam = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && teamKey(a) === teamKey(b);
+  const duplicateOf = (members, list) => (Array.isArray(list) ? list.find((t) => t && Array.isArray(t.members) && sameTeam(members, t.members)) || null : null);
+
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { MAX, clean, facebookUrl, sanitizeTeam, docId };
+  return { MAX, clean, facebookUrl, sanitizeTeam, docId, teamKey, sameTeam, duplicateOf };
 });

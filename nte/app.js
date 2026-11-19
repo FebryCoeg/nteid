@@ -2013,7 +2013,7 @@
     let meta = document.querySelector('meta[name="robots"]');
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.content = "noindex";
-    const es = await load("espers");
+    const [es, curated, comm] = await Promise.all([load("espers"), load("builds_curated").catch(() => ({})), load("teams_community").catch(() => ({}))]);
     const P = window.NteProposals;
     const intro = head("USULAN", S("Usulkan Tim", "Suggest a Team"), S("Punya susunan tim yang bagus? Login dengan Google, susun timnya, lalu kirim. Kalau disetujui admin, timmu tampil di halaman karakter lengkap dengan kreditmu.", "Got a great team? Sign in with Google, put it together and send it. If the admin approves it, your team appears on the character page with your credit."), null);
     if (!P) { main.innerHTML = intro + `<p class="txt">${S("Modul usulan gagal dimuat. Muat ulang halaman.", "The suggestion module failed to load. Reload the page.")}</p>`; return; }
@@ -2023,6 +2023,8 @@
     try { fb = await fbLoad(); } catch (e) { root.innerHTML = `<p class="txt">${S("Layanan login gagal dimuat (mungkin diblokir ekstensi atau offline). Coba lagi nanti.", "The login service failed to load (blocked by an extension or offline). Try again later.")}</p>`; return; }
 
     const known = es.filter((e) => e.slug !== "exe").map((e) => e.slug);
+    const publishedTeams = (sl) => [].concat(((curated[sl] || {}).teams) || [], (comm && comm[sl]) || []);
+    const sentFor = (sl) => mineList.find((m) => m.esper === sl) || null;
     const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], msg = "", errs = [];
     const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
@@ -2040,7 +2042,7 @@
       why: S("Jelaskan singkat kenapa susunan ini bagus: sinergi, reaksi yang terbentuk, atau cara memainkannya. Maksimal 300 huruf. Boleh kosong.", "Briefly explain why this team works: synergy, reactions it forms, or how to play it. Max 300 characters. Optional."),
       cname: S("Nama ini yang tampil di bawah timmu sebagai \"Susunan tim oleh\". Bisa nama asli atau nama panggung, tidak harus sama dengan nama Google.", "This name appears under your team as \"Team by\". It can be a real name or a nickname and does not have to match your Google name."),
       url: S("Kalau diisi, nama kreditmu bisa diklik dan membuka alamat Facebook ini. Hanya alamat facebook.com yang diterima. Kosongkan kalau tidak mau menampilkan link.", "If filled in, your credit name becomes a link to this Facebook address. Only facebook.com addresses are accepted. Leave empty for no link."),
-      mine: S("Menunggu = belum ditinjau admin. Disetujui = sudah tayang di situs. Ditolak = tidak ditayangkan. Kamu bisa menghapus atau mengirim ulang usulan.", "Pending = not reviewed yet. Approved = live on the site. Rejected = not published. You can delete or resend a suggestion."),
+      mine: S("Menunggu = belum ditinjau admin. Disetujui = sudah tayang di situs. Ditolak = tidak ditayangkan. Tiap karakter hanya bisa kamu usulkan satu kali, dan usulan tidak bisa diubah atau dihapus.", "Pending = not reviewed yet. Approved = live on the site. Rejected = not published. You can suggest one team per character, once, and a suggestion cannot be edited or deleted."),
       priv: S("Usulan menyimpan ID akun dan nama tampilan Google-mu (hanya dilihat admin). Emailmu tidak ditampilkan. Yang tampil di situs hanya nama kredit dan link Facebook yang kamu isi sendiri.", "A suggestion stores your account ID and Google display name (only the admin sees them). Your email is not shown. The site only shows the credit name and Facebook link you type yourself."),
     };
     const help = (k) => `<button type="button" class="pb-help" data-help="${k}" aria-expanded="${openHelp.has(k)}" aria-label="${S("Penjelasan", "Explanation")}">!</button>`;
@@ -2066,10 +2068,10 @@
           ${field("cname", S("Nama untuk kredit", "Credit name"), `<input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">`, "pbCname")}
           ${field("url", S("Link Facebook (opsional)", "Facebook link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
           ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          <div class="adm-row pb-send"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>
-          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Satu usulan aktif per karakter; mengirim lagi menggantikan yang lama.", "The admin reviews it before it goes live. One active suggestion per character; sending again replaces the old one.")}</p>
+          ${sentFor(cur) ? `<p class="pb-ok">${S("Kamu sudah mengirim usulan untuk karakter ini. Pilih karakter lain untuk mengusulkan tim lagi.", "You already sent a suggestion for this character. Pick another character to suggest another team.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>`}
+          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU kali (karakter lain tetap boleh) dan usulan tidak bisa diubah, jadi periksa dulu sebelum mengirim. Susunan tim yang anggotanya sama dengan tim yang sudah ada akan ditolak.", "The admin reviews it before it goes live. You can suggest ONE team per character, once (other characters are still fine) and it cannot be edited, so double-check before sending. A team with the same members as an existing one is rejected.")}</p>
         </div>
-        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span><button class="btn ghost sm" type="button" data-del="${esc(m.id)}">${S("Hapus", "Delete")}</button></li>`).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
+        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
       }
       root.innerHTML = html;
     }
@@ -2090,15 +2092,21 @@
           if (i >= 0) members.splice(i, 1); else if (members.length < P.MAX.members) members.push(sl); else toast(S("Maksimal 4 anggota.", "Maximum 4 members."));
           render(); return;
         }
-        if (t.dataset.del) { if (await ask(S("Hapus usulan ini?", "Delete this suggestion?"), S("Hapus", "Delete"), S("Batal", "Cancel"))) { await fb.remove(t.dataset.del); await loadMine(); render(); toast(S("Usulan dihapus.", "Suggestion deleted.")); } return; }
         if (t.id === "pbSend") {
           keep();
           const r = P.sanitizeTeam({ name: form.name, members, roles: members.map((sl) => roles[sl] || ""), why: form.why, credit: { name: form.cname || (user.displayName || ""), url: form.url } }, { espers: known }, cur);
           errs = r.errors; if (!r.team) { render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
+          await loadMine();
+          if (sentFor(cur)) { errs = [S("Kamu sudah mengirim usulan untuk karakter ini (hanya boleh satu kali).", "You already sent a suggestion for this character (only once allowed).")]; render(); return; }
+          const dupMsg = S("Susunan tim dengan anggota yang sama sudah ada atau sudah pernah diusulkan, jadi ditolak. Coba susunan yang berbeda.", "A team with the same members already exists or was already suggested, so it is rejected. Try a different team.");
+          const key = P.teamKey(r.team.members);
+          if (P.duplicateOf(r.team.members, publishedTeams(cur)) || await fb.lockTaken(cur, key)) { errs = [dupMsg]; render(); return; }
+          if (!(await ask(S("Kirim usulan ini? Setelah dikirim tidak bisa diubah atau dihapus, dan karakter ini tidak bisa kamu usulkan lagi.", "Send this suggestion? It cannot be edited or deleted afterwards, and you cannot suggest for this character again."), S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
           t.disabled = true;
-          await fb.submit(user, cur, { name: r.team.name, members: r.team.members, roles: r.team.roles, why: r.team.why }, r.team.credit, id);
+          try { await fb.submit(user, cur, key, { name: r.team.name, members: r.team.members, roles: r.team.roles, why: r.team.why }, r.team.credit, id); }
+          catch (e2) { if (e2 && String(e2.code).includes("permission-denied") && await fb.lockTaken(cur, key)) { errs = [dupMsg]; render(); return; } throw e2; }
           await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); form = { name: "", why: "", cname: form.cname, url: form.url }; render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!"));
         }
       } catch (e) { toast(fbErr(e)); render(); }
