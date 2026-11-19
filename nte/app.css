@@ -1789,3 +1789,9 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-tm-head .cb-feat { background: #4ade8022; color: #4ade80; }
 .bd-feat { border: 1px solid #4ade8055; border-radius: 14px; padding: 10px 14px; background: #4ade8010; }
 .bd-feat p { margin: 0 0 4px; }
+
+/* ---- penanda repeat: hanya ikon ---- */
+.rt-loop { padding: 0; min-width: 28px; height: 28px; border-radius: 999px; justify-content: center; gap: 2px; font-size: 1rem; line-height: 1; letter-spacing: 0; }
+.rt-loop b { font-size: 0.72rem; font-weight: 800; }
+.rt-loop.end { padding: 0 8px; }
+.rt-rp { margin-top: 3px; width: 22px; height: 18px; padding: 0; font-size: 0.8rem; line-height: 1; text-align: center; }
