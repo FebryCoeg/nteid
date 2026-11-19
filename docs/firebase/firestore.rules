@@ -1,6 +1,6 @@
 rules_version = '2';
 // Tempel di Firebase Console > Firestore Database > Rules, lalu Publish.
-// Hanya koleksi "proposals", "locks", dan "buildProposals" yang boleh diakses; semua yang lain tertutup.
+// Hanya koleksi "proposals", "locks", "buildProposals", "stars", dan "buildStars" yang boleh diakses; semua yang lain tertutup.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -136,6 +136,61 @@ service cloud.firestore {
 
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow delete: if isAdmin();
+    }
+
+    // ---- Bintang untuk build komunitas ----
+    // stars/<pid>__<uid>: satu bintang per pengguna per build (tidak bisa diubah, hanya dibuat atau dicabut).
+    // buildStars/<pid>: penghitung publik; hanya boleh berubah +1 saat bintang dibuat dan -1 saat dicabut, dalam batch yang sama.
+    function starPath(pid, uid) { return /databases/$(database)/documents/stars/$(pid + '__' + uid); }
+    function counterPath(pid) { return /databases/$(database)/documents/buildStars/$(pid); }
+    function proposalPath(pid) { return /databases/$(database)/documents/buildProposals/$(pid); }
+
+    match /stars/{sid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'pid', 'esper', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.pid is string && request.resource.data.pid.size() <= 200
+        && request.resource.data.esper is string && request.resource.data.esper.size() <= 64
+        && sid == request.resource.data.pid + '__' + request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && exists(proposalPath(request.resource.data.pid))
+        && get(proposalPath(request.resource.data.pid)).data.esper == request.resource.data.esper
+        && existsAfter(counterPath(request.resource.data.pid))
+        && getAfter(counterPath(request.resource.data.pid)).data.esper == request.resource.data.esper
+        && getAfter(counterPath(request.resource.data.pid)).data.count
+          == (exists(counterPath(request.resource.data.pid)) ? get(counterPath(request.resource.data.pid)).data.count : 0) + 1;
+
+      allow delete: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && exists(counterPath(resource.data.pid))
+        && getAfter(counterPath(resource.data.pid)).data.count == get(counterPath(resource.data.pid)).data.count - 1;
+
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /buildStars/{pid} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['esper', 'count'])
+        && request.resource.data.count == 1
+        && request.resource.data.esper is string && request.resource.data.esper.size() <= 64
+        && !exists(starPath(pid, request.auth.uid))
+        && existsAfter(starPath(pid, request.auth.uid))
+        && getAfter(starPath(pid, request.auth.uid)).data.esper == request.resource.data.esper;
+
+      allow update: if signedIn()
+        && request.resource.data.keys().hasOnly(['esper', 'count'])
+        && request.resource.data.esper == resource.data.esper
+        && ((request.resource.data.count == resource.data.count + 1
+              && !exists(starPath(pid, request.auth.uid))
+              && existsAfter(starPath(pid, request.auth.uid)))
+            || (request.resource.data.count == resource.data.count - 1
+              && request.resource.data.count >= 0
+              && exists(starPath(pid, request.auth.uid))
+              && !existsAfter(starPath(pid, request.auth.uid))));
+
+      allow delete: if false;
     }
   }
 }

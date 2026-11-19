@@ -145,6 +145,31 @@
     return { build, errors };
   }
 
+  // ---- bintang dan build utama ----
+  const SAFE_PID = /^[A-Za-z0-9_-]{1,200}$/;
+  // id dokumen bintang: "<pid>__<uid>" (satu bintang per pengguna per build)
+  const starId = (pid, uid) => (typeof pid === "string" && typeof uid === "string" && SAFE_PID.test(pid) && SAFE_PID.test(uid) ? pid + "__" + uid : null);
+  // urut bintang terbanyak dulu; seri mengikuti urutan awal; tidak mengubah larik asli
+  const rankByStars = (list, counts) => {
+    const c = counts && typeof counts === "object" ? counts : {};
+    return (Array.isArray(list) ? list : []).map((x, i) => ({ x, i, n: Number(c[x && x.pid]) || 0 })).sort((a, b) => b.n - a.n || a.i - b.i).map((o) => o.x);
+  };
+  // Mengubah build komunitas terpilih menjadi data tab Build (hanya isi komunitas, tanpa catatan bawaan build resmi).
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  function featuredBuild(f) {
+    if (!f || typeof f !== "object" || Array.isArray(f)) return null;
+    const c = f.credit && typeof f.credit === "object" ? f.credit : {};
+    const t = f.team && typeof f.team === "object" && Array.isArray(f.team.members) && f.team.members.length > 1 ? f.team : null;
+    const both = (v) => ({ id: String(v || ""), en: String(v || "") });
+    return {
+      name: clean(f.name, MAX.name),
+      arcs: arr(f.arcs), sets: arr(f.sets), stats: arr(f.stats), sub: arr(f.sub), awks: arr(f.awks), skills: arr(f.skills),
+      teams: t ? [{ name: both(clean(f.name, MAX.name)), members: t.members.slice(), roles: t.members.map((_, i) => both(arr(t.roles)[i])), tag: { id: "DIPILIH DARI KOMUNITAS", en: "PICKED FROM THE COMMUNITY" }, why: f.why ? [both(clean(f.why, MAX.why))] : [] }] : [],
+      rot: arr(f.rot), repeat: Number.isInteger(f.repeat) ? f.repeat : null, rotation: clean(f.rotation, MAX.rotation), why: clean(f.why, MAX.why),
+      credit: { name: clean(c.name, MAX.credit), url: mediaUrl(c.url || "") || "" },
+    };
+  }
+
   // Kunci tim: anggota diurutkan lalu digabung, jadi susunan yang sama selalu punya kunci yang sama.
   const teamKey = (members) => (Array.isArray(members) ? members.slice().sort().join(".") : "");
   const sameTeam = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && teamKey(a) === teamKey(b);
@@ -153,5 +178,5 @@
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
+  return { starId, rankByStars, featuredBuild, MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
 });

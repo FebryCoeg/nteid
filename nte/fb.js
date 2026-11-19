@@ -34,3 +34,25 @@ export async function pendingBuilds() { return rows(await F.getDocs(F.query(F.co
 export const setBuildStatus = (id, status) => F.updateDoc(F.doc(db, BCOL, id), { status, reviewedAt: F.serverTimestamp() });
 // Pemilik mengedit usulannya sendiri; status otomatis kembali ke "pending" supaya admin menyetujui ulang.
 export const updateBuild = (id, build, credit) => F.updateDoc(F.doc(db, BCOL, id), { build, credit, status: "pending", updatedAt: F.serverTimestamp() });
+
+// ---- bintang untuk build komunitas ----
+export const current = () => auth.currentUser;
+export const whenUser = () => new Promise((res) => { const un = A.onAuthStateChanged(auth, (u) => { un(); res(u); }); });
+export async function myStars(uid, esper) {
+  const snap = await F.getDocs(F.query(F.collection(db, "stars"), F.where("uid", "==", uid), F.where("esper", "==", esper)));
+  return new Set(snap.docs.map((d) => d.data().pid));
+}
+// Bintang dan penghitung diubah bersama dalam satu transaksi (aturan Firestore menjaga +1 / -1).
+export async function setStar(user, pid, esper, on) {
+  const sref = F.doc(db, "stars", pid + "__" + user.uid), cref = F.doc(db, "buildStars", pid);
+  await F.runTransaction(db, async (tx) => {
+    const c = await tx.get(cref), s = await tx.get(sref);
+    if (on && !s.exists()) {
+      tx.set(sref, { uid: user.uid, pid, esper, createdAt: F.serverTimestamp() });
+      if (c.exists()) tx.update(cref, { count: c.data().count + 1 }); else tx.set(cref, { esper, count: 1 });
+    } else if (!on && s.exists() && c.exists()) {
+      tx.delete(sref);
+      tx.update(cref, { count: Math.max(0, c.data().count - 1) });
+    }
+  });
+}

@@ -467,7 +467,12 @@
     const DRAFTS = await load("builds_draft").catch(() => ({}));
     const COMM = await load("teams_community").catch(() => ({}));
     const COMMB = await load("builds_community").catch(() => ({}));
+    const FEAT = await load("builds_featured").catch(() => ({}));
     const VOC = await buildVocab().catch(() => null);
+    starState.esper = e.slug; starState.mine = new Set(); starState.hydrated = false; starState.counts = {};
+    if ((COMMB[e.slug] || []).length) starState.counts = await starCountsRest(e.slug).catch(() => ({}));
+    let ssHint = false; try { ssHint = localStorage.getItem("nte_fb") === "1"; } catch (er) {}
+    if (ssHint && (COMMB[e.slug] || []).length) fbLoad().then(async (fbm) => { const u = await fbm.whenUser(); if (u && starState.esper === e.slug) { starState.mine = await fbm.myStars(u.uid, e.slug); starState.hydrated = true; paintStars(); } }).catch(() => {});
     const ARCS = await load("arcs");
     const MODS = await load("modules");
     const tabs = [
@@ -563,10 +568,12 @@
         if (e.slug === "exe") return `<div class="af-sec"><div class="empty">${S("Coming soon. Exe belum rilis, jadi build-nya belum ditampilkan.", "Coming soon. Exe has not been released yet, so the build is not shown.")}</div></div>`;
         const manual = BUILDS[e.slug];
         const hasManual = manual && ((manual.arcs || []).length || (manual.sets || []).length || (manual.stats || []).length || (manual.awks || []).length || (manual.skills || []).length);
-        const bd = hasManual ? manual : (DRAFTS[e.slug] || null);
-        const isDraft = !hasManual;
+        const feat = FEAT[e.slug] && window.NteProposals ? window.NteProposals.featuredBuild(FEAT[e.slug]) : null;
+        const bd = feat || (hasManual ? manual : (DRAFTS[e.slug] || null));
+        const isDraft = !feat && !hasManual;
         let html = "";
         const SRC = (x) => (x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.by)} · ${esc(x.title)} ↗</a>` : esc(x.by + " · " + x.title));
+        if (feat) html += `<div class="af-sec bd-feat"><p class="mono">${S("BUILD UTAMA DARI KOMUNITAS", "MAIN BUILD FROM THE COMMUNITY")}</p><p class="txt">${S(`Build ini dipilih dari usulan komunitas dan menggantikan build bawaan: <b>${esc(feat.name)}</b>.`, `This build was picked from community suggestions and replaces the default build: <b>${esc(feat.name)}</b>.`)}</p>${creditHtml(feat.credit, S("DIBUAT OLEH", "MADE BY"))}</div>`;
         if (bd) {
           if (bd.role) html += `<p class="bd-roleline"><b>${esc(bd.role.rank)}-${S("RANK", "RANK")}</b><span>${esc(bd.role.role)}</span>${bd.role.tier ? `<em>${esc(bd.role.tier)}</em>` : ""}</p>`;
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
@@ -622,13 +629,14 @@
 </div></div>`;
           if ((bd.skills || []).length) html += `<div class="af-sec"><h4>${S("Prioritas naik level skill", "Skill priority")}</h4>${bd.skillNote ? `<p class="txt bd-skillnote">${esc(tx(bd.skillNote))}</p>` : ""}<div class="bd-skills">${bd.skills.map((g, i) => { const sk = e.skills.find((x) => x.group === g); return sk ? `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icons[g] ? `<img src="${img(icons[g])}" alt="">` : ""}</span><span><b>${esc(sk.name)}</b><small>${esc(LABEL.group[g] || g)}</small></span></div>` : ""; }).join("")}</div></div>`;
         }
+        if (feat && ((feat.rot || []).length || feat.rotation)) html += `<div class="af-sec"><h4>${S("Rotasi tim", "Team rotation")}</h4>${rotHtml(feat.rot, list, { repeat: feat.repeat })}${feat.rotation ? `<p class="bd-tm-metric cb-rot">${esc(feat.rotation)}</p>` : ""}</div>`;
         {
           const ct = ((COMM && COMM[e.slug]) || []).filter((t) => t && Array.isArray(t.members) && t.name);
           if (ct.length) html += `<div class="af-sec"><h4>${S("Tim dari komunitas", "Community teams")}</h4><div class="bd-teams">${ct.map((t) => teamHtml(t, e.slug, list, creditHtml(t.credit))).join("")}</div></div>`;
         }
         if (VOC) {
           const cb = ((COMMB && COMMB[e.slug]) || []).filter((b) => b && b.name && Array.isArray(b.arcs));
-          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${cb.map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY")), { list, esper: e.slug })).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
+          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${window.NteProposals.rankByStars(cb, starState.counts).map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY")), { list, esper: e.slug, star: { count: starState.counts[b.pid] || 0, mine: starState.mine.has(b.pid) }, featured: !!(FEAT[e.slug] && FEAT[e.slug].pid === b.pid) })).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
         }
         html += `<p class="mono" style="margin-top:6px"><button type="button" class="chip" data-report>${S("Data build salah? Laporkan", "Wrong build data? Report")}</button></p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a, i) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="mono">${S("BONUS", "BONUS:")} ${[3, 6][i] || ""} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</p><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
@@ -908,7 +916,7 @@
     const fresh = () => ({ arcs: [], sets: [], stats: [], awks: [], skills: [] });
     const pick = () => { working = Object.assign(fresh(), JSON.parse(JSON.stringify(builds[cur] || {}))); };
     const SKG = ["basic", "redirect", "ultimate", "support"];
-    main.innerHTML = `<div id="admQueue"></div><div id="admRoot"></div>`;
+    main.innerHTML = `<div id="admQueue"></div><div id="admFeat"></div><div id="admRoot"></div>`;
     const root = $("#admRoot");
     // antrean usulan tim komunitas (Firebase dimuat hanya saat tombol ditekan)
     const qbox = $("#admQueue");
@@ -946,6 +954,58 @@
       const w = await apiT("PUT", body);
       if (!w.ok) throw new Error("GitHub " + w.status);
     }
+    // Build komunitas yang sudah tayang, jumlah bintang, dan tombol "Jadikan build utama" (menulis builds_featured.json)
+    const fbox = $("#admFeat");
+    let fData = null, fMsg = "";
+    const FEATPATH = "nte/data/builds_featured.json", COMMPATH = "nte/data/builds_community.json";
+    async function ghRead(path) {
+      const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=main&t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" } });
+      if (r.status === 404) return { data: {}, sha: null };
+      if (!r.ok) throw new Error("GitHub " + r.status);
+      const j = await r.json(); return { data: JSON.parse(unb64(j.content) || "{}"), sha: j.sha };
+    }
+    async function ghWrite(path, data, sha, message) {
+      const body = { message, content: b64(JSON.stringify(data, null, 1) + "\n"), branch: "main" }; if (sha) body.sha = sha;
+      const w = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { method: "PUT", headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }, body: JSON.stringify(body) });
+      if (!w.ok) throw new Error("GitHub " + w.status);
+    }
+    function renderFeat() {
+      if (!fData) { fbox.innerHTML = `<div class="adm-box"><label>Build komunitas dan bintang</label><div class="adm-row"><button class="btn" id="fLoad" type="button">Muat build komunitas</button></div>${fMsg ? `<p class="mono adm-note">${esc(fMsg)}</p>` : ""}</div>`; return; }
+      const slugs = Object.keys(fData.comm).filter((k) => (fData.comm[k] || []).length);
+      fbox.innerHTML = `<div class="adm-box"><label>Build komunitas dan bintang</label><div class="adm-row"><button class="btn ghost" id="fLoad" type="button">Muat ulang</button></div>${fMsg ? `<p class="mono adm-note">${esc(fMsg)}</p>` : ""}
+        ${slugs.length ? slugs.map((sl) => { const en = es.find((x) => x.slug === sl) || { name: sl }, cur2 = fData.feat[sl];
+          return `<h4 style="margin:14px 0 6px">${esc(en.name)}${cur2 ? ` · <span class="pb-st approved">build utama: ${esc(cur2.name)}</span>` : ""}</h4>${cur2 ? `<div class="adm-row"><button class="btn ghost sm" type="button" data-unfeat="${esc(sl)}">Kembalikan ke build bawaan</button></div>` : ""}
+            <ul class="pb-list">${PX.rankByStars(fData.comm[sl], fData.counts).map((b) => `<li>${buildCardHtml(b, VB, creditHtml(b.credit, "USULAN OLEH"), { list: es, esper: sl, star: { count: fData.counts[b.pid] || 0, ro: true }, featured: !!(cur2 && cur2.pid === b.pid) })}${cur2 && cur2.pid === b.pid ? "" : `<button class="btn" type="button" data-feat="${esc(sl)}|${esc(b.pid || "")}">Jadikan build utama</button>`}</li>`).join("")}</ul>`; }).join("") : "<em>Belum ada build komunitas yang tayang.</em>"}</div>`;
+    }
+    renderFeat();
+    fbox.addEventListener("click", async (ev) => {
+      const t = ev.target.closest("button"); if (!t) return;
+      try {
+        if (t.id === "fLoad") {
+          if (!token) { fMsg = "Isi token GitHub dulu di atas, lalu coba lagi."; renderFeat(); return; }
+          VB = VB || await buildVocab().catch(() => null);
+          const [c, f, counts] = await Promise.all([ghRead(COMMPATH), ghRead(FEATPATH), starCountsRest().catch(() => ({}))]);
+          fData = { comm: c.data, feat: f.data, counts }; fMsg = ""; renderFeat(); return;
+        }
+        if (t.dataset.feat) {
+          const [sl, pid] = t.dataset.feat.split("|"); const b = ((fData.comm[sl]) || []).find((x) => x.pid === pid); if (!b) return;
+          if (!token) { toast("Isi token GitHub dulu di atas."); return; }
+          if (!(await ask(`Jadikan "${b.name}" sebagai build utama ${sl}? Build ini menggantikan isi tab Build di halaman karakter, dengan kredit pembuatnya.`, "Jadikan utama", "Batal"))) return;
+          t.disabled = true;
+          const f = await ghRead(FEATPATH); f.data[sl] = b;
+          await ghWrite(FEATPATH, f.data, f.sha, `build utama komunitas: ${sl} · ${b.name}`);
+          fData.feat = f.data; fMsg = "Tersimpan ke GitHub. Situs diperbarui sekitar 1 menit."; renderFeat(); toast("Build utama diganti."); return;
+        }
+        if (t.dataset.unfeat) {
+          const sl = t.dataset.unfeat; if (!token) { toast("Isi token GitHub dulu di atas."); return; }
+          if (!(await ask(`Kembalikan ${sl} ke build bawaan?`, "Kembalikan", "Batal"))) return;
+          t.disabled = true;
+          const f = await ghRead(FEATPATH); delete f.data[sl];
+          await ghWrite(FEATPATH, f.data, f.sha, `build utama dikembalikan ke bawaan: ${sl}`);
+          fData.feat = f.data; fMsg = "Dikembalikan ke build bawaan. Situs diperbarui sekitar 1 menit."; renderFeat(); toast("Dikembalikan."); return;
+        }
+      } catch (e) { fMsg = /GitHub/.test(String(e && e.message)) ? "Gagal menyimpan ke GitHub: " + e.message + ". Periksa token (izin Contents: Read and write)." : "Terjadi kesalahan: " + String(e && e.message || e); renderFeat(); }
+    });
     function renderQueue() {
       const bsec = qbList ? `<label style="margin-top:14px;display:block">Usulan build komunitas</label>${qbList.length ? `<ul class="pb-list">${qbList.map((p) => {
         const r = VB ? PX.sanitizeBuild({ ...(p.build || {}), credit: p.credit }, { ...VB.ctx, espers: knownE() }, p.esper) : { build: null, errors: ["Daftar pilihan belum dimuat."] };
@@ -2083,6 +2143,47 @@
     const end = rp === null ? "" : `<span class="rt-loop end">↩ ${rp === 0 ? S("ULANG DARI AWAL", "REPEAT FROM THE START") : S(`ULANG DARI LANGKAH ${rp + 1}`, `REPEAT FROM STEP ${rp + 1}`)}</span>`;
     return `<div class="rt-seq">${body}${end}</div>`;
   };
+  // Bintang: jumlah dibaca publik lewat REST Firestore (tanpa memuat SDK); memberi bintang butuh login (SDK dimuat saat diklik).
+  let cfgP = null;
+  const fbCfg = () => (cfgP ||= import(`${BASE}fb-config.js${ver}`));
+  async function starCountsRest(esper) {
+    const { firebaseConfig: c } = await fbCfg();
+    const q = { from: [{ collectionId: "buildStars" }] };
+    if (esper) q.where = { fieldFilter: { field: { fieldPath: "esper" }, op: "EQUAL", value: { stringValue: esper } } };
+    const r = await fetch(`https://firestore.googleapis.com/v1/projects/${c.projectId}/databases/(default)/documents:runQuery?key=${encodeURIComponent(c.apiKey)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ structuredQuery: q }) });
+    if (!r.ok) throw new Error("stars " + r.status);
+    const out = {};
+    (await r.json()).forEach((x) => { if (x.document) { const f = x.document.fields || {}, n = Number(f.count && f.count.integerValue); if (Number.isFinite(n)) out[x.document.name.split("/").pop()] = n; } });
+    return out;
+  }
+  const starState = { counts: {}, mine: new Set(), esper: "", hydrated: false };
+  const starBtn = (pid, esper, st) => st.ro
+    ? `<span class="cb-star ro" title="${S("Jumlah bintang", "Star count")}">★ <b>${st.count}</b></span>`
+    : `<button type="button" class="cb-star${st.mine ? " on" : ""}" data-star="${esc(pid)}" data-star-esper="${esc(esper)}" aria-pressed="${st.mine ? "true" : "false"}" title="${S("Beri bintang (perlu login Google)", "Star this build (Google login required)")}">★ <b>${st.count}</b></button>`;
+  function paintStars() {
+    document.querySelectorAll("[data-star]").forEach((b) => {
+      const on = starState.mine.has(b.dataset.star);
+      b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+      const n = b.querySelector("b"); if (n) n.textContent = String(starState.counts[b.dataset.star] || 0);
+    });
+  }
+  document.addEventListener("click", async (ev) => {
+    const b = ev.target.closest("[data-star]"); if (!b || b.disabled) return;
+    ev.preventDefault(); b.disabled = true;
+    try {
+      const fbm = await fbLoad(); let u = fbm.current();
+      if (!u) { await fbm.login(); u = fbm.current(); }
+      if (!u) return;
+      try { localStorage.setItem("nte_fb", "1"); } catch (e) {}
+      const pid = b.dataset.star, es = b.dataset.starEsper;
+      if (!starState.hydrated) { starState.mine = await fbm.myStars(u.uid, es); starState.hydrated = true; }
+      const on = !starState.mine.has(pid);
+      await fbm.setStar({ uid: u.uid }, pid, es, on);
+      if (on) starState.mine.add(pid); else starState.mine.delete(pid);
+      starState.counts[pid] = Math.max(0, (starState.counts[pid] || 0) + (on ? 1 : -1));
+      paintStars();
+    } catch (e) { toast(fbErr(e)); } finally { b.disabled = false; }
+  });
   // Urutan kartu sama seperti tab Build: tim, Arc, set modul, stat, Awakening, skill, catatan, kredit.
   const buildCardHtml = (b, V, extra, o) => {
     o = o || {};
@@ -2096,7 +2197,7 @@
     const awks = (b.awks || []).map((n, i) => { const a = (ce.awakening || [])[n - 1]; return chip(`${i + 1}. A${n}${a ? " · " + esc(a.name) : ""}`); }).join("");
     const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. <b>${esc(LABEL.group[g] || g)}</b>: ${esc(k ? k.name : g)}`); }).join("");
     const row = (label, html) => (html ? `<p class="mono cb-lab">${label}</p><div class="cb-chips">${html}</div>` : "");
-    return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b><em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
+    return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b>${o.star && b.pid ? starBtn(b.pid, o.esper, o.star) : ""}${o.featured ? `<em class="cb-feat">${S("BUILD UTAMA", "MAIN BUILD")}</em>` : ""}<em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
       ${team}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}${(b.rot && b.rot.length && o.list) || b.rotation ? `<p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p>${o.list ? rotHtml(b.rot, o.list, { repeat: b.repeat }) : ""}${b.rotation ? `<p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}` : ""}
       ${b.why ? `<p class="bd-tm-metric">${esc(b.why)}</p>` : ""}${extra || ""}</div>`;
   };

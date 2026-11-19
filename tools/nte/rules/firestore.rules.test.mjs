@@ -142,5 +142,51 @@ await t("repeat: bilangan bulat 0 sampai 49 atau null diterima; di luar itu atau
   for (const rp of [0, 3, 49, null]) { i++; await assertSucceeds(setDoc(B(ctxOf("p" + i, "p@x.com"), "p" + i + "_akane-rin"), mb("p" + i, { build: { ...build, rot: [step, step, step, step], repeat: rp } }))); }
   for (const rp of [-1, 50, 1.5, "2", true]) { i++; await assertFails(setDoc(B(ctxOf("p" + i, "p@x.com"), "p" + i + "_akane-rin"), mb("p" + i, { build: { ...build, rot: [step, step], repeat: rp } }))); }
 });
+// bintang untuk build komunitas
+const S1 = (db, id) => doc(db, "stars", id), C1 = (db, id) => doc(db, "buildStars", id);
+const starData = (uid, pid, over = {}) => ({ uid, pid, esper: "akane-rin", createdAt: serverTimestamp(), ...over });
+const giveStar = (db, uid, pid, o = {}) => { const b = writeBatch(db); b.set(S1(db, o.sid ?? pid + "__" + uid), starData(uid, pid, o.star || {})); if (o.first) b.set(C1(db, pid), { esper: "akane-rin", count: o.count ?? 1 }); else b.update(C1(db, pid), { count: o.count }); return b.commit(); };
+const takeStar = (db, uid, pid, count, o = {}) => { const b = writeBatch(db); if (!o.keep) b.delete(S1(db, o.sid ?? pid + "__" + uid)); if (!o.keepCount) b.update(C1(db, pid), { count }); return b.commit(); };
+const s1 = ctxOf("s1", "s1@x.com"), s2 = ctxOf("s2", "s2@x.com"), s3 = ctxOf("s3", "s3@x.com"), s4 = ctxOf("s4", "s4@x.com");
+await t("bintang: siapkan usulan yang akan diberi bintang", () => assertSucceeds(setDoc(B(s1, "s1_akane-rin"), mb("s1"))));
+await t("bintang: pengguna login boleh memberi bintang pertama (bintang dan penghitung satu batch)", () => assertSucceeds(giveStar(s2, "s2", "s1_akane-rin", { first: true, count: 1 })));
+await t("bintang: penghitung bisa dibaca tanpa login, juga lewat query per karakter", async () => {
+  await assertSucceeds(getDoc(C1(anon, "s1_akane-rin")));
+  await assertSucceeds(getDocs(query(collection(anon, "buildStars"), where("esper", "==", "akane-rin"))));
+});
+await t("bintang: pengguna kedua menambah jumlah menjadi 2", () => assertSucceeds(giveStar(s3, "s3", "s1_akane-rin", { count: 2 })));
+await t("bintang: bintang kedua dari pengguna yang sama ditolak", () => assertFails(giveStar(s2, "s2", "s1_akane-rin", { count: 3 })));
+await t("bintang: melompat 2 angka ditolak", () => assertFails(giveStar(s4, "s4", "s1_akane-rin", { count: 4 })));
+await t("bintang: menambah penghitung tanpa dokumen bintang ditolak", () => assertFails(updateDoc(C1(s4, "s1_akane-rin"), { count: 3 })));
+await t("bintang: tanpa login ditolak", () => assertFails(giveStar(anon, "x", "s1_akane-rin", { count: 3 })));
+await t("bintang: atas nama orang lain atau id dokumen palsu ditolak", async () => {
+  await assertFails(giveStar(s4, "s4", "s1_akane-rin", { count: 3, star: { uid: "s2" } }));
+  await assertFails(giveStar(s4, "s4", "s1_akane-rin", { count: 3, sid: "s1_akane-rin__s2" }));
+  await assertFails(giveStar(s4, "s4", "s1_akane-rin", { count: 3, star: { createdAt: new Date("2000-01-01") } }));
+});
+await t("bintang: usulan tidak ada atau karakter tidak cocok ditolak", async () => {
+  await assertFails(giveStar(s4, "s4", "tidak-ada_akane-rin", { first: true, count: 1 }));
+  await assertFails(giveStar(s4, "s4", "s1_akane-rin", { count: 3, star: { esper: "blackbird" } }));
+});
+await t("bintang: penghitung tidak bisa dibuat langsung dengan angka besar", () => assertFails(setDoc(C1(s4, "s1_akane-rin__x"), { esper: "akane-rin", count: 99 })));
+await t("bintang: bintang tidak bisa dibaca orang lain, pemilik boleh membaca dan memakai query uid", async () => {
+  await assertSucceeds(getDoc(S1(s2, "s1_akane-rin__s2")));
+  await assertFails(getDoc(S1(s3, "s1_akane-rin__s2")));
+  await assertFails(getDoc(S1(anon, "s1_akane-rin__s2")));
+  await assertSucceeds(getDocs(query(collection(s2, "stars"), where("uid", "==", "s2"))));
+  await assertFails(getDocs(collection(s2, "stars")));
+});
+await t("bintang: mencabut bintang sendiri menurunkan jumlah satu", () => assertSucceeds(takeStar(s2, "s2", "s1_akane-rin", 1)));
+await t("bintang: mencabut tanpa menurunkan penghitung, atau menurunkan tanpa mencabut, ditolak", async () => {
+  await assertFails(takeStar(s3, "s3", "s1_akane-rin", 1, { keepCount: true }));
+  await assertFails(takeStar(s3, "s3", "s1_akane-rin", 0, { keep: true }));
+});
+await t("bintang: mencabut bintang orang lain ditolak", () => assertFails(takeStar(s4, "s4", "s1_akane-rin", 0, { sid: "s1_akane-rin__s3" })));
+await t("bintang: penghitung tidak bisa dihapus dan jumlah tidak bisa menjadi negatif", async () => {
+  await assertFails(deleteDoc(C1(s3, "s1_akane-rin")));
+  await assertSucceeds(takeStar(s3, "s3", "s1_akane-rin", 0));
+  await assertFails(updateDoc(C1(s3, "s1_akane-rin"), { count: -1 }));
+});
+await t("bintang: setelah dicabut, pengguna boleh memberi bintang lagi", () => assertSucceeds(giveStar(s2, "s2", "s1_akane-rin", { count: 1 })));
 console.log(n + " uji aturan lulus");
 await env.cleanup();

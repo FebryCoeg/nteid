@@ -1778,3 +1778,14 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .rt-rp { margin-top: 3px; padding: 2px 6px; font-size: 0.6rem; border-radius: 6px; border: 1px solid #ffffff22; background: transparent; color: var(--text-2); cursor: pointer; white-space: nowrap; }
 .rt-rp.on { border-color: #4ade80; color: #4ade80; }
 .rt-rp-info { margin: 2px 0; }
+
+/* ---- bintang dan build utama ---- */
+.cb-star { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; border: 1px solid #ffffff33; background: transparent; color: var(--text-2); font: inherit; font-size: 0.8rem; cursor: pointer; }
+.cb-star b { font-weight: 800; }
+.cb-star:hover:not(.ro) { border-color: #ffc24d; color: #ffc24d; }
+.cb-star.on { background: #ffc24d22; border-color: #ffc24d; color: #ffc24d; }
+.cb-star.ro { cursor: default; }
+.cb-star[disabled] { opacity: 0.6; cursor: progress; }
+.bd-tm-head .cb-feat { background: #4ade8022; color: #4ade80; }
+.bd-feat { border: 1px solid #4ade8055; border-radius: 14px; padding: 10px 14px; background: #4ade8010; }
+.bd-feat p { margin: 0 0 4px; }

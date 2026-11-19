@@ -241,3 +241,53 @@ test("sanitizeBuild: rotasi 50 langkah dengan repeat di langkah terakhir diterim
   assert.equal(r.build.rot.length, 50);
   assert.equal(r.build.repeat, 49);
 });
+
+// ---- bintang dan build utama ----
+test("starId: gabungan pid dan uid, karakter aneh ditolak", () => {
+  assert.equal(P.starId("abc_akane-rin", "u123"), "abc_akane-rin__u123");
+  assert.equal(P.starId("a/b", "u"), null);
+  assert.equal(P.starId("abc", ""), null);
+  assert.equal(P.starId("abc", "u/../x"), null);
+  assert.equal(P.starId(5, "u"), null);
+});
+
+test("rankByStars: bintang terbanyak di atas, seri tetap urutan awal, pid tanpa data dianggap 0", () => {
+  const list = [{ pid: "a" }, { pid: "b" }, { pid: "c" }, { pid: "d" }];
+  const out = P.rankByStars(list, { b: 5, c: 5, d: 1 });
+  assert.deepEqual(out.map((x) => x.pid), ["b", "c", "d", "a"]);
+  assert.deepEqual(P.rankByStars(list, {}).map((x) => x.pid), ["a", "b", "c", "d"]);
+  assert.deepEqual(P.rankByStars(list, null).map((x) => x.pid), ["a", "b", "c", "d"]);
+  assert.deepEqual(P.rankByStars(undefined, {}), []);
+  assert.equal(list[0].pid, "a");
+});
+
+const fb = { name: "Nova Burst", pid: "u1_akane-rin", team: { members: ["akane-rin", "blackbird"], roles: ["DPS", ""] }, arcs: ["real-music"], sets: [{ id: "Suit1", pieces: 4 }], stats: ["ATK"], sub: ["DMG %"], awks: [1, 6], skills: ["ultimate"], rot: [{ c: "akane-rin", a: "e" }], repeat: 0, rotation: "cat", why: "alasan", credit: { name: "Budi", url: "https://www.youtube.com/@budi" } };
+
+test("featuredBuild: membentuk data tab Build dari build komunitas, hanya isi komunitas, dengan kredit", () => {
+  const bd = P.featuredBuild(fb);
+  assert.deepEqual(bd.arcs, ["real-music"]);
+  assert.deepEqual(bd.sets, [{ id: "Suit1", pieces: 4 }]);
+  assert.deepEqual(bd.stats, ["ATK"]);
+  assert.deepEqual(bd.sub, ["DMG %"]);
+  assert.deepEqual(bd.awks, [1, 6]);
+  assert.deepEqual(bd.skills, ["ultimate"]);
+  assert.equal(bd.teams.length, 1);
+  assert.deepEqual(bd.teams[0].members, ["akane-rin", "blackbird"]);
+  assert.equal(bd.teams[0].name.id, "Nova Burst");
+  assert.equal(bd.teams[0].roles[0].id, "DPS");
+  assert.deepEqual(bd.credit, { name: "Budi", url: "https://www.youtube.com/@budi" });
+  assert.deepEqual(bd.rot, [{ c: "akane-rin", a: "e" }]);
+  assert.equal(bd.repeat, 0);
+  assert.equal(bd.rotation, "cat");
+  for (const k of ["role", "calc", "arcWhy", "setWhy", "setPct", "arcNote"]) assert.equal(k in bd, false, k);
+});
+
+test("featuredBuild: tanpa tim, link tidak sah dibuang, data rusak tidak crash", () => {
+  const bd = P.featuredBuild({ ...fb, team: undefined, credit: { name: "S", url: "https://evil.com/x" } });
+  assert.deepEqual(bd.teams, []);
+  assert.equal(bd.credit.url, "");
+  for (const bad of [null, undefined, 5, "x", []]) assert.equal(P.featuredBuild(bad), null);
+  const bd2 = P.featuredBuild({ name: "X", arcs: "bukan-list", stats: null });
+  assert.deepEqual(bd2.arcs, []);
+  assert.deepEqual(bd2.stats, []);
+});
