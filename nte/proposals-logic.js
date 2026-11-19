@@ -74,7 +74,8 @@
     else if (out.length < min || out.length > max) errors.push(label + ": pilih " + (min === max ? min : min + " sampai " + max) + ".");
     return out;
   }
-  function sanitizeBuild(raw, ctx) {
+  const SKILL_GROUPS = ["basic", "redirect", "ultimate", "support"];
+  function sanitizeBuild(raw, ctx, pageEsper) {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { build: null, errors: ["Data build tidak valid."] };
     const errors = [];
     const name = clean(raw.name, MAX.name);
@@ -93,10 +94,34 @@
     }
     const stats = pickList(raw.stats, ctx.stats, 1, BMAX.stats, "Stat utama", errors);
     const sub = pickList(raw.sub, ctx.sub, 0, BMAX.sub, "Sub-stat", errors);
+    const awks = [];
+    const ain = raw.awks === undefined ? [] : raw.awks;
+    if (!Array.isArray(ain) || ain.length > 6) errors.push("Awakening: pilih maksimal 6.");
+    else for (const n of ain) { if (Number.isInteger(n) && n >= 1 && n <= 6 && !awks.includes(n)) awks.push(n); else { errors.push("Awakening: pilihan tidak valid atau ganda."); break; } }
+    const skills = pickList(raw.skills === undefined ? [] : raw.skills, SKILL_GROUPS, 0, SKILL_GROUPS.length, "Skill", errors);
+    let team = null;
+    if (raw.team !== undefined && raw.team !== null) {
+      if (typeof raw.team !== "object" || Array.isArray(raw.team)) errors.push("Data tim tidak valid.");
+      else {
+        const min = Array.isArray(raw.team.members) ? raw.team.members : [];
+        if (min.length > 1 || (min.length === 1 && min[0] !== pageEsper)) {
+          const known = new Set(ctx.espers || []);
+          const members = []; let bad = false;
+          for (const m of min) { if (typeof m === "string" && known.has(m) && !members.includes(m)) members.push(m); else bad = true; }
+          if (bad) errors.push("Tim: ada anggota yang tidak dikenal atau ganda.");
+          if (members.length < MAX.minMembers || members.length > MAX.members) errors.push("Tim harus berisi " + MAX.minMembers + " sampai " + MAX.members + " karakter.");
+          if (!members.includes(pageEsper)) errors.push("Karakter halaman ini harus ada di dalam tim.");
+          const rin = Array.isArray(raw.team.roles) ? raw.team.roles : [];
+          team = { members, roles: members.map((_, i) => clean(rin[i], MAX.role)) };
+        }
+      }
+    }
     const why = clean(raw.why, MAX.why);
     const credit = sanitizeCredit(raw.credit, errors);
     if (errors.length) return { build: null, errors };
-    return { build: { name, arcs, sets, stats, sub, why, credit }, errors };
+    const build = { name, arcs, sets, stats, sub, awks, skills, why, credit };
+    if (team) build.team = team;
+    return { build, errors };
   }
 
   // Kunci tim: anggota diurutkan lalu digabung, jadi susunan yang sama selalu punya kunci yang sama.

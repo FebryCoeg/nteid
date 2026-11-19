@@ -47,14 +47,24 @@ service cloud.firestore {
         && validKey(d);
     }
 
+    // tim opsional di dalam build: 2 sampai 4 anggota, peran maksimal 4
+    function validBuildTeam(t) {
+      return t is map
+        && t.keys().hasOnly(['members', 'roles'])
+        && t.members is list && t.members.size() >= 2 && t.members.size() <= 4
+        && t.roles is list && t.roles.size() <= 4;
+    }
     function validBuild(b) {
       return b is map
-        && b.keys().hasOnly(['name', 'arcs', 'sets', 'stats', 'sub', 'why'])
+        && b.keys().hasOnly(['name', 'team', 'arcs', 'sets', 'stats', 'sub', 'awks', 'skills', 'why'])
         && b.name is string && b.name.size() >= 1 && b.name.size() <= 40
+        && (!('team' in b) || validBuildTeam(b.team))
         && b.arcs is list && b.arcs.size() >= 1 && b.arcs.size() <= 4
         && b.sets is list && b.sets.size() <= 3
         && b.stats is list && b.stats.size() >= 1 && b.stats.size() <= 3
         && b.sub is list && b.sub.size() <= 4
+        && b.awks is list && b.awks.size() <= 6
+        && b.skills is list && b.skills.size() <= 4
         && b.why is string && b.why.size() <= 300;
     }
     function validBuildProposal(d) {
@@ -97,7 +107,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Usulan build lengkap: satu per pengguna per karakter, sekali saja (id "<uid>_<esper>"), tanpa update/delete pemilik.
+    // Usulan lengkap (tim opsional, Arc, set, stat, Awakening, skill): satu per pengguna per karakter, sekali saja (id "<uid>_<esper>"), tanpa update/delete pemilik.
     match /buildProposals/{id} {
       allow create: if signedIn()
         && id == request.auth.uid + '_' + request.resource.data.esper

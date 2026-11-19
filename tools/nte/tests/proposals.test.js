@@ -93,8 +93,8 @@ test("duplicateOf: menemukan tim yang sudah tayang dengan anggota sama", () => {
 });
 
 // ---- usulan build ----
-const bctx = { arcs: ["crime-and-punishment", "ravenous-blade", "watch-your-heads", "echoes-on-hold", "x5"], sets: ["Suit1", "Suit3", "Suit11"], stats: ["CRIT DMG", "Psyche DMG", "ATK %", "HP %"], sub: ["DMG %", "ATK %", "Cycle Intensity", "CRIT Rate", "DEF"] };
-const bok = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }, { id: "Suit11", pieces: 2 }], stats: ["CRIT DMG", "Psyche DMG"], sub: ["DMG %", "ATK %"], why: "Cocok untuk boss.", credit: { name: "Budi", url: "https://www.facebook.com/budi" } };
+const bctx = { espers: ["akane-rin", "blackbird", "lacrimosa", "zankou", "sakiri"], arcs: ["crime-and-punishment", "ravenous-blade", "watch-your-heads", "echoes-on-hold", "x5"], sets: ["Suit1", "Suit3", "Suit11"], stats: ["CRIT DMG", "Psyche DMG", "ATK %", "HP %"], sub: ["DMG %", "ATK %", "Cycle Intensity", "CRIT Rate", "DEF"] };
+const bok = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }, { id: "Suit11", pieces: 2 }], stats: ["CRIT DMG", "Psyche DMG"], sub: ["DMG %", "ATK %"], awks: [], skills: [], why: "Cocok untuk boss.", credit: { name: "Budi", url: "https://www.facebook.com/budi" } };
 
 test("sanitizeBuild: build valid dipertahankan", () => {
   const r = P.sanitizeBuild(bok, bctx);
@@ -134,10 +134,36 @@ test("sanitizeBuild: stat utama 1 sampai 3, sub-stat maksimal 4, harus dari daft
 
 test("sanitizeBuild: catatan dirapikan dan dipotong; bukan objek tidak crash", () => {
   assert.equal(P.sanitizeBuild({ ...bok, why: "a\nb\u0000" + "y".repeat(400) }, bctx).build.why.length, 300);
-  for (const bad of [null, undefined, 5, "x", []]) assert.ok(P.sanitizeBuild(bad, bctx).errors.length);
+  for (const bad of [null, undefined, 5, "x", []]) assert.ok(P.sanitizeBuild(bad, bctx, "akane-rin").errors.length);
 });
 
 test("sanitizeBuild: bidang asing dibuang, tidak ikut tersimpan", () => {
   const b = P.sanitizeBuild({ ...bok, evil: "<script>", isAdmin: true }, bctx).build;
-  assert.deepEqual(Object.keys(b).sort(), ["arcs", "credit", "name", "sets", "stats", "sub", "why"]);
+  assert.deepEqual(Object.keys(b).sort(), ["arcs", "awks", "credit", "name", "sets", "skills", "stats", "sub", "why"]);
+});
+
+test("sanitizeBuild gabungan: tim opsional, bila ada harus valid dan memuat karakter halaman", () => {
+  const ok = P.sanitizeBuild({ ...bok, team: { members: ["akane-rin", "blackbird", "zankou"], roles: ["DPS", "", "x".repeat(50)] } }, bctx, "akane-rin");
+  assert.deepEqual(ok.errors, []);
+  assert.deepEqual(ok.build.team.members, ["akane-rin", "blackbird", "zankou"]);
+  assert.equal(ok.build.team.roles.length, 3);
+  assert.equal(ok.build.team.roles[2].length, 24);
+  assert.equal("team" in P.sanitizeBuild(bok, bctx, "akane-rin").build, false);
+  assert.equal("team" in P.sanitizeBuild({ ...bok, team: { members: ["akane-rin"], roles: [""] } }, bctx, "akane-rin").build, false);
+  for (const members of [["blackbird", "zankou"], ["akane-rin", "akane-rin"], ["akane-rin", "bukan"], ["akane-rin", "blackbird", "lacrimosa", "zankou", "sakiri"]])
+    assert.ok(P.sanitizeBuild({ ...bok, team: { members, roles: [] } }, bctx, "akane-rin").errors.length, JSON.stringify(members));
+  assert.ok(P.sanitizeBuild({ ...bok, team: "x" }, bctx, "akane-rin").errors.length);
+});
+
+test("sanitizeBuild gabungan: urutan Awakening berupa angka 1 sampai 6 tanpa ganda", () => {
+  assert.deepEqual(P.sanitizeBuild({ ...bok, awks: [1, 6, 3] }, bctx, "akane-rin").build.awks, [1, 6, 3]);
+  for (const awks of [[7], [0], ["1"], [1, 1], [1, 2, 3, 4, 5, 6, 1], "x", [1.5]])
+    assert.ok(P.sanitizeBuild({ ...bok, awks }, bctx, "akane-rin").errors.length, JSON.stringify(awks));
+  assert.deepEqual(P.sanitizeBuild(bok, bctx, "akane-rin").build.awks, []);
+});
+
+test("sanitizeBuild gabungan: prioritas skill hanya empat grup dikenal tanpa ganda", () => {
+  assert.deepEqual(P.sanitizeBuild({ ...bok, skills: ["ultimate", "basic"] }, bctx, "akane-rin").build.skills, ["ultimate", "basic"]);
+  for (const skills of [["ulti"], ["basic", "basic"], ["basic", "redirect", "ultimate", "support", "basic"], "basic"])
+    assert.ok(P.sanitizeBuild({ ...bok, skills }, bctx, "akane-rin").errors.length, JSON.stringify(skills));
 });

@@ -71,7 +71,7 @@ await t("koleksi lain tertutup", () => assertFails(setDoc(doc(alice, "lain", "x"
 await t("admin boleh menghapus usulan (supaya pengusul bisa mengulang) dan kuncinya", async () => { await assertSucceeds(deleteDoc(P(admin, "alice_akane-rin"))); await assertSucceeds(deleteDoc(doc(admin, "locks", "akane-rin__akane-rin.blackbird"))); });
 await t("setelah admin menghapus, pengusul boleh mengirim lagi", () => assertSucceeds(send(alice, "alice_akane-rin", mk("alice", { name: "Alice C" }))));
 // usulan build lengkap
-const build = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }], stats: ["CRIT DMG"], sub: ["DMG %"], why: "Cocok." };
+const build = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }], stats: ["CRIT DMG"], sub: ["DMG %"], awks: [1, 6], skills: ["ultimate"], why: "Cocok." };
 const mb = (uid, over = {}) => ({ uid, name: "Alice", esper: "akane-rin", build, credit, status: "pending", createdAt: serverTimestamp(), ...over });
 const B = (db, id) => doc(db, "buildProposals", id);
 await t("build: pengguna login boleh mengirim build sendiri", () => assertSucceeds(setDoc(B(alice, "alice_akane-rin"), mb("alice"))));
@@ -89,5 +89,15 @@ await t("build: pemilik dan admin boleh membaca, orang lain tidak", async () => 
 await t("build: pemilik tidak boleh menyetujui sendiri, admin boleh ubah status saja", async () => { await assertFails(updateDoc(B(alice, "alice_akane-rin"), { status: "approved" })); await assertFails(updateDoc(B(admin, "alice_akane-rin"), { build: { ...build, name: "Lain" } })); await assertSucceeds(updateDoc(B(admin, "alice_akane-rin"), { status: "approved", reviewedAt: serverTimestamp() })); });
 await t("build: admin palsu ditolak, daftar milik sendiri boleh, daftar semua ditolak", async () => { await assertFails(updateDoc(B(fakeAdmin, "alice_akane-rin"), { status: "rejected" })); await assertSucceeds(getDocs(query(collection(alice, "buildProposals"), where("uid", "==", "alice")))); await assertFails(getDocs(collection(alice, "buildProposals"))); await assertSucceeds(getDocs(query(collection(admin, "buildProposals"), where("status", "==", "approved")))); });
 await t("build: admin boleh menghapus, lalu pengusul boleh mengirim lagi", async () => { await assertSucceeds(deleteDoc(B(admin, "alice_akane-rin"))); await assertSucceeds(setDoc(B(alice, "alice_akane-rin"), mb("alice"))); });
+await t("gabungan: tim opsional valid diterima, tim tidak valid ditolak", async () => {
+  await assertSucceeds(setDoc(B(ctxOf("t1", "t1@x.com"), "t1_akane-rin"), mb("t1", { build: { ...build, team: { members: ["akane-rin", "blackbird"], roles: ["DPS", ""] } } })));
+  for (const [i, tm] of [{ members: ["akane-rin"], roles: [] }, { members: ["a", "b", "c", "d", "e"], roles: [] }, { members: ["a", "b"], roles: ["1", "2", "3", "4", "5"] }, { members: ["a", "b"], roles: [], evil: 1 }, "x"].entries())
+    await assertFails(setDoc(B(ctxOf("t" + (i + 2), "t@x.com"), "t" + (i + 2) + "_akane-rin"), mb("t" + (i + 2), { build: { ...build, team: tm } })));
+});
+await t("gabungan: awakening lebih dari 6 atau skill lebih dari 4 ditolak", async () => {
+  await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: { ...build, awks: [1, 2, 3, 4, 5, 6, 1] } })));
+  await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: { ...build, skills: ["a", "b", "c", "d", "e"] } })));
+  await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: { name: "X", arcs: ["a"], sets: [], stats: ["s"], sub: [], why: "" } })));
+});
 console.log(n + " uji aturan lulus");
 await env.cleanup();

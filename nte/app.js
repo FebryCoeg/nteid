@@ -624,11 +624,11 @@
         }
         {
           const ct = ((COMM && COMM[e.slug]) || []).filter((t) => t && Array.isArray(t.members) && t.name);
-          html += `<div class="af-sec"><h4>${S("Tim dari komunitas", "Community teams")}</h4>${ct.length ? `<div class="bd-teams">${ct.map((t) => teamHtml(t, e.slug, list, creditHtml(t.credit))).join("")}</div>` : `<p class="txt">${S("Belum ada tim dari komunitas.", "No community teams yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan susunan tim", "Suggest a team")}</a></p></div>`;
+          if (ct.length) html += `<div class="af-sec"><h4>${S("Tim dari komunitas", "Community teams")}</h4><div class="bd-teams">${ct.map((t) => teamHtml(t, e.slug, list, creditHtml(t.credit))).join("")}</div></div>`;
         }
         if (VOC) {
           const cb = ((COMMB && COMMB[e.slug]) || []).filter((b) => b && b.name && Array.isArray(b.arcs));
-          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${cb.map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("BUILD OLEH", "BUILD BY")))).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build", "Suggest a build")}</a></p></div>`;
+          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${cb.map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY")), { list, esper: e.slug })).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
         }
         html += `<p class="mono" style="margin-top:6px"><button type="button" class="chip" data-report>${S("Data build salah? Laporkan", "Wrong build data? Report")}</button></p>`;
         return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a, i) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="mono">${S("BONUS", "BONUS:")} ${[3, 6][i] || ""} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</p><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
@@ -948,9 +948,9 @@
     }
     function renderQueue() {
       const bsec = qbList ? `<label style="margin-top:14px;display:block">Usulan build komunitas</label>${qbList.length ? `<ul class="pb-list">${qbList.map((p) => {
-        const r = VB ? PX.sanitizeBuild({ ...(p.build || {}), credit: p.credit }, VB.ctx) : { build: null, errors: ["Daftar pilihan belum dimuat."] };
+        const r = VB ? PX.sanitizeBuild({ ...(p.build || {}), credit: p.credit }, { ...VB.ctx, espers: knownE() }, p.esper) : { build: null, errors: ["Daftar pilihan belum dimuat."] };
         if (!r.build) return `<li><b>Usulan build tidak valid</b> dari ${esc(p.name || "?")}: ${esc(r.errors.join(" "))}<br><button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
-        return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${buildCardHtml(r.build, VB, creditHtml(r.build.credit, "BUILD OLEH"))}<button class="btn" type="button" data-qb-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
+        return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${buildCardHtml(r.build, VB, creditHtml(r.build.credit, "USULAN OLEH"), { list: es, esper: p.esper })}<button class="btn" type="button" data-qb-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
       }).join("")}</ul>` : "<em>Tidak ada usulan build menunggu.</em>"}` : "";
       qbox.innerHTML = `<div class="adm-box"><label>Usulan tim komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
         ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => {
@@ -975,7 +975,7 @@
           const bid = t.dataset.qbOk || t.dataset.qbReject; const bp = (qbList || []).find((x) => x.id === bid); if (!bp) return;
           if (t.dataset.qbReject) { if (await ask("Tolak build ini?", "Tolak", "Batal")) { await fbm.setBuildStatus(bid, "rejected"); qbList = await fbm.pendingBuilds(); renderQueue(); toast("Build ditolak."); } return; }
           if (!token) { toast("Isi token GitHub dulu di atas, lalu coba lagi."); return; }
-          const rb = VB ? PX.sanitizeBuild({ ...(bp.build || {}), credit: bp.credit }, VB.ctx) : { build: null };
+          const rb = VB ? PX.sanitizeBuild({ ...(bp.build || {}), credit: bp.credit }, { ...VB.ctx, espers: knownE() }, bp.esper) : { build: null };
           if (!rb.build) { toast("Build tidak valid."); return; }
           if (!(await ask(`Tayangkan build "${rb.build.name}" untuk ${bp.esper}?`, "Tayangkan", "Batal"))) return;
           t.disabled = true;
@@ -2056,26 +2056,32 @@
     const sets = mods.sets || [];
     return { arcList: arcs, setList: sets, statList: [...st].sort(), subList: [...sb].sort(), ctx: { arcs: arcs.map((a) => a.slug), sets: sets.map((x) => x.id), stats: [...st], sub: [...sb] } };
   })().catch((e) => { vocabP = null; throw e; }));
-  const buildCardHtml = (b, V, extra) => {
+  // Urutan kartu sama seperti tab Build: tim, Arc, set modul, stat, Awakening, skill, catatan, kredit.
+  const buildCardHtml = (b, V, extra, o) => {
+    o = o || {};
     const chip = (t, href) => (href ? `<a class="chip" href="${href}" data-link>${t}</a>` : `<span class="chip">${t}</span>`);
+    const ce = (o.list || []).find((x) => x.slug === o.esper) || {};
+    const team = b.team && Array.isArray(b.team.members) && o.list ? `<p class="mono cb-lab">${S("SUSUNAN TIM", "TEAM LINEUP")}</p><div class="bd-tm-mem">${b.team.members.map((sl, mi) => { const m = o.list.find((x) => x.slug === sl); const rl = (b.team.roles || [])[mi]; return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === o.esper ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small>${rl ? `<small class="bd-tm-role">${esc(rl)}</small>` : ""}</a>` : ""; }).join("")}</div>` : "";
     const arcs = (b.arcs || []).map((sl, i) => { const a = V.arcList.find((x) => x.slug === sl); return a ? chip(`${i + 1}. ${esc(a.name)}`, `/arc/${a.slug}`) : ""; }).join("");
     const sets = (b.sets || []).map((x) => { const st = V.setList.find((m) => m.id === x.id); return st ? chip(`${esc(st.name)} ${x.pieces}${S(" keping", "-pc")}`) : ""; }).join("");
     const stats = (b.stats || []).map((t, i) => chip(`${i + 1}. ${esc(t)}`)).join("");
     const sub = (b.sub || []).map((t, i) => chip(`${i + 1}. ${esc(t)}`)).join("");
+    const awks = (b.awks || []).map((n, i) => { const a = (ce.awakening || [])[n - 1]; return chip(`${i + 1}. A${n}${a ? " · " + esc(a.name) : ""}`); }).join("");
+    const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. ${esc(k ? k.name : g)}`); }).join("");
     const row = (label, html) => (html ? `<p class="mono cb-lab">${label}</p><div class="cb-chips">${html}</div>` : "");
     return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b><em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
-      ${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}
+      ${team}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}
       ${b.why ? `<p class="bd-tm-metric">${esc(b.why)}</p>` : ""}${extra || ""}</div>`;
   };
 
   async function viewProposal() {
-    setTitle(S("Usulkan Tim", "Suggest a Team"));
+    setTitle(S("Usulkan Build dan Tim", "Suggest a Build and Team"));
     let meta = document.querySelector('meta[name="robots"]');
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.content = "noindex";
-    const [es, curated, comm] = await Promise.all([load("espers"), load("builds_curated").catch(() => ({})), load("teams_community").catch(() => ({}))]);
+    const [es, curated, comm, commB] = await Promise.all([load("espers"), load("builds_curated").catch(() => ({})), load("teams_community").catch(() => ({})), load("builds_community").catch(() => ({}))]);
     const P = window.NteProposals;
-    const intro = head("USULAN", S("Usulkan Tim", "Suggest a Team"), S("Punya susunan tim yang bagus? Login dengan Google, susun timnya, lalu kirim. Kalau disetujui admin, timmu tampil di halaman karakter lengkap dengan kreditmu.", "Got a great team? Sign in with Google, put it together and send it. If the admin approves it, your team appears on the character page with your credit."), null);
+    const intro = head("USULAN", S("Usulkan Build dan Tim", "Suggest a Build and Team"), S("Punya build atau susunan tim yang bagus? Login dengan Google, isi formulirnya (tim, Arc, set modul, stat, Awakening, skill), lalu kirim. Kalau disetujui admin, usulanmu tampil di halaman karakter lengkap dengan kreditmu.", "Got a great build or team? Sign in with Google, fill in the form (team, Arcs, module sets, stats, Awakenings, skills) and send it. If the admin approves it, your suggestion appears on the character page with your credit."), null);
     if (!P) { main.innerHTML = intro + `<p class="txt">${S("Modul usulan gagal dimuat. Muat ulang halaman.", "The suggestion module failed to load. Reload the page.")}</p>`; return; }
     main.innerHTML = intro + `<div id="pbRoot"><p class="txt">${S("Memuat…", "Loading…")}</p></div>`;
     const root = $("#pbRoot");
@@ -2083,19 +2089,18 @@
     try { fb = await fbLoad(); } catch (e) { root.innerHTML = `<p class="txt">${S("Layanan login gagal dimuat (mungkin diblokir ekstensi atau offline). Coba lagi nanti.", "The login service failed to load (blocked by an extension or offline). Try again later.")}</p>`; return; }
 
     const known = es.filter((e) => e.slug !== "exe").map((e) => e.slug);
-    const publishedTeams = (sl) => [].concat(((curated[sl] || {}).teams) || [], (comm && comm[sl]) || []);
-    const sentFor = (sl) => mineList.find((m) => m.esper === sl) || null;
+    const publishedTeams = (sl) => [].concat(((curated[sl] || {}).teams) || [], (comm && comm[sl]) || [], ((commB && commB[sl]) || []).map((b) => b && b.team).filter(Boolean));
     const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
     const V = await buildVocab().catch(() => null);
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], mineB = [], msg = "", errs = [];
-    let kind = "team", bf = { name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""] };
+    let bf = { name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""] };
     const sentB = (sl) => mineB.find((m) => m.esper === sl) || null;
     function keepB() {
       const g = (id) => { const el = $(id); return el ? el.value : null; };
       const n = g("#pbBName"), w = g("#pbBWhy"); if (n !== null) bf.name = n; if (w !== null) bf.why = w;
       document.querySelectorAll("[data-b]").forEach((el) => {
-        const m = /^(arc|setid|setp|stat|sub)(\d)$/.exec(el.dataset.b); if (!m) return; const i = +m[2];
-        if (m[1] === "arc") bf.arcs[i] = el.value; else if (m[1] === "setid") bf.sets[i].id = el.value; else if (m[1] === "setp") bf.sets[i].pieces = +el.value; else if (m[1] === "stat") bf.stats[i] = el.value; else bf.sub[i] = el.value;
+        const m = /^(arc|setid|setp|stat|sub|awk|skl)(\d)$/.exec(el.dataset.b); if (!m) return; const i = +m[2];
+        if (m[1] === "arc") bf.arcs[i] = el.value; else if (m[1] === "setid") bf.sets[i].id = el.value; else if (m[1] === "setp") bf.sets[i].pieces = +el.value; else if (m[1] === "stat") bf.stats[i] = el.value; else if (m[1] === "awk") bf.awks[i] = el.value; else if (m[1] === "skl") bf.skills[i] = el.value; else bf.sub[i] = el.value;
       });
     }
     const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
@@ -2106,7 +2111,9 @@
     const chipName = (sl) => { const x = es.find((e) => e.slug === sl); if (!x) return sl; const b = x.name.split(" (")[0]; return baseCount[b] > 1 ? x.name : b; };
     const openHelp = new Set();
     const HELP = {
-      char: S("Tim ini akan tampil di halaman karakter yang kamu pilih, di tab Build, bagian \"Tim dari komunitas\".", "This team will appear on the chosen character's page, in the Build tab, under \"Community teams\"."),
+      char: S("Usulanmu akan tampil di halaman karakter yang kamu pilih, di tab Build, bagian \"Build dari komunitas\". Urutan isiannya sama seperti tab Build: tim, Arc, set modul, stat, Awakening, lalu skill.", "Your suggestion will appear on the chosen character's page, in the Build tab, under \"Community builds\". The fields follow the Build tab order: team, Arcs, module sets, stats, Awakenings, then skills."),
+      bawk: S("Urutkan Awakening dari yang paling diprioritaskan (slot 1) sampai slot 6. Boleh dikosongkan atau diisi sebagian. Tidak boleh memilih Awakening yang sama dua kali.", "Order the Awakenings from highest priority (slot 1) to slot 6. You can leave it empty or fill part of it. The same Awakening cannot be picked twice."),
+      bskl: S("Urutkan skill dari yang paling dulu dinaikkan levelnya (slot 1). Boleh dikosongkan. Tidak boleh memilih skill yang sama dua kali.", "Order the skills from the first one to level up (slot 1). You can leave it empty. The same skill cannot be picked twice."),
       mem: S("Pilih 2 sampai 4 karakter. Karakter halaman otomatis ikut dan tidak bisa dilepas. Klik lagi untuk melepas karakter lain. Angka di chip = urutan anggota.", "Pick 2 to 4 characters. The page's character is always included. Click again to remove another one. The number on a chip is the member order."),
       role: S("Tulis peran singkat tiap anggota, misalnya DPS Utama, Sub-DPS, atau Support. Boleh dikosongkan.", "Write a short role for each member, e.g. Main DPS, Sub-DPS or Support. You can leave it empty."),
       name: S("Nama singkat untuk susunan timmu, misalnya \"Tim Nova\". Maksimal 40 huruf.", "A short name for your team, e.g. \"Nova Team\". Max 40 characters."),
@@ -2131,48 +2138,48 @@
         ? `<div class="pb-user"><span>${S("Masuk sebagai", "Signed in as")} <b>${esc(user.displayName || "")}</b></span><button class="btn ghost sm" id="pbOut" type="button">${S("Keluar", "Sign out")}</button></div>`
         : `<div class="adm-row"><button class="btn" id="pbIn" type="button">${S("Login dengan Google", "Sign in with Google")}</button></div><p class="txt pb-lead">${S("Login dulu supaya usulanmu tercatat atas namamu. Cukup satu klik dengan akun Google.", "Sign in first so your suggestion is recorded under your name. One click with your Google account.")}</p>`;
       let html = `<div class="pb-card">${auth}<div class="pb-lab pb-privacy"><span class="mono">${S("PRIVASI", "PRIVACY")}</span>${help("priv")}</div>${hint("priv")}${msg ? `<p class="pb-ok">${esc(msg)}</p>` : ""}</div>`;
-      if (user && V) html += `<div class="pb-card pb-kind"><div class="adm-row"><button type="button" class="btn${kind === "team" ? "" : " ghost"}" data-kind="team">${S("Usulkan tim", "Suggest a team")}</button><button type="button" class="btn${kind === "build" ? "" : " ghost"}" data-kind="build">${S("Usulkan build", "Suggest a build")}</button></div></div>`;
-      if (user && kind === "build" && V) {
+      if (user && V) {
         const sel = (key, val, opts, blank) => `<select data-b="${key}"><option value="">${blank}</option>${opts.map(([v, l]) => `<option value="${esc(v)}"${v === val ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
-        const arcOpts = V.arcList.slice().sort((a, b) => a.name.localeCompare(b.name)).map((a) => [a.slug, a.name]);
+        const empty = S("— kosong —", "— empty —");
+        const arcOpts = V.arcList.slice().sort((x, y) => x.name.localeCompare(y.name)).map((x) => [x.slug, x.name]);
         const setOpts = V.setList.map((x) => [x.id, x.name]);
         const slot = (n, fn) => Array.from({ length: n }, (_, i) => `<div class="pb-slot"><i>${i + 1}</i>${fn(i)}</div>`).join("");
-        html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Pilih karakter", "Choose the character")}</h3>
-          ${field("char", S("Build ini untuk halaman karakter", "This build is for the page of"), `<select id="pbEsper">${es.filter((e) => e.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}</div>
-        <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Isi build", "Fill in the build")}</h3>
-          ${field("bname", S("Nama build", "Build name"), `<input type="text" id="pbBName" maxlength="40" value="${esc(bf.name)}" autocomplete="off" placeholder="${S("mis. Nova Burst untuk boss", "e.g. Nova Burst for bosses")}">`, "pbBName")}
-          ${field("barc", S("Arc prioritas (maks 4)", "Priority Arcs (max 4)"), slot(4, (i) => sel("arc" + i, bf.arcs[i], arcOpts, S("— kosong —", "— empty —"))))}
-          ${field("bset", S("Set modul (maks 3, opsional)", "Module sets (max 3, optional)"), slot(3, (i) => `${sel("setid" + i, bf.sets[i].id, setOpts, S("— kosong —", "— empty —"))}<select data-b="setp${i}" class="pb-pc"><option value="4"${bf.sets[i].pieces === 4 ? " selected" : ""}>4 ${S("keping", "pc")}</option><option value="2"${bf.sets[i].pieces === 2 ? " selected" : ""}>2 ${S("keping", "pc")}</option></select>`))}
-          ${field("bstat", S("Stat utama (maks 3)", "Main stats (max 3)"), slot(3, (i) => sel("stat" + i, bf.stats[i], V.statList.map((x) => [x, x]), S("— kosong —", "— empty —"))))}
-          ${field("bsub", S("Sub-stat (maks 4, opsional)", "Sub stats (max 4, optional)"), slot(4, (i) => sel("sub" + i, bf.sub[i], V.subList.map((x) => [x, x]), S("— kosong —", "— empty —"))))}
-          ${field("bwhy", S("Catatan (opsional)", "Notes (optional)"), `<textarea id="pbBWhy" maxlength="300" rows="3">${esc(bf.why)}</textarea>`, "pbBWhy")}
+        const ce = es.find((x) => x.slug === cur) || {};
+        const awkOpts = (ce.awakening || []).slice(0, 6).map((x, k) => [String(k + 1), `A${k + 1} · ${x.name}`]);
+        const sklOpts = ["basic", "redirect", "ultimate", "support"].map((g) => { const k = (ce.skills || []).find((x) => x.group === g); return [g, k ? k.name : g]; });
+        html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Karakter dan nama usulan", "Character and suggestion name")}</h3>
+          ${field("char", S("Usulan ini untuk halaman karakter", "This suggestion is for the page of"), `<select id="pbEsper">${es.filter((x) => x.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}
+          ${field("bname", S("Nama usulan", "Suggestion name"), `<input type="text" id="pbBName" maxlength="40" value="${esc(bf.name)}" autocomplete="off" placeholder="${S("mis. Nova Burst untuk boss", "e.g. Nova Burst for bosses")}">`, "pbBName")}
         </div>
-        <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Kredit untukmu", "Your credit")}</h3>
-          ${field("cname", S("Nama untuk kredit", "Credit name"), `<input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">`, "pbCname")}
-          ${field("url", S("Link Facebook (opsional)", "Facebook link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
-          ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          ${sentB(cur) ? `<p class="pb-ok">${S("Kamu sudah mengirim build untuk karakter ini. Pilih karakter lain untuk mengusulkan build lagi.", "You already sent a build for this character. Pick another character to suggest another build.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSendB" type="button">${S("Kirim usulan build", "Send build suggestion")}</button></div>`}
-          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU build, sekali saja dan tidak bisa diubah, jadi periksa dulu sebelum mengirim. Build tampil sebagai Build dari komunitas, terpisah dari rekomendasi resmi.", "The admin reviews it before it goes live. You can suggest ONE build per character, once and it cannot be edited, so double-check before sending. It appears as a community build, separate from the official recommendation.")}</p>
-        </div>
-        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Build usulanku", "My build suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineB.length ? `<ul class="pb-list">${mineB.map((m) => `<li><span><b>${esc((m.build && m.build.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan build.", "No build suggestions yet.")}</p>`}</div>`;
-      } else if (user) {
-        html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Pilih karakter dan anggota tim", "Choose the character and team members")}</h3>
-          ${field("char", S("Tim ini untuk halaman karakter", "This team is for the page of"), `<select id="pbEsper">${es.filter((e) => e.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}
+        <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Susunan tim (opsional)", "Team lineup (optional)")}</h3>
           ${field("mem", `${S("Anggota tim", "Team members")} <small>(${members.length}/4)</small>`, `<div class="adm-chips pb-mem">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(chipName(sl))}</button>`; }).join("")}</div>`)}
-          ${field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(chipName(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}" placeholder="${S("mis. DPS", "e.g. DPS")}"></label>`).join("")}</div>`)}
+          ${members.length > 1 ? field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(chipName(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}" placeholder="${S("mis. DPS", "e.g. DPS")}"></label>`).join("")}</div>`) : `<p class="pb-lead">${S("Pilih 1 sampai 3 karakter lagi kalau mau menyertakan susunan tim. Boleh dilewati.", "Pick 1 to 3 more characters to include a team lineup. You can skip this.")}</p>`}
         </div>
-        <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Tentang tim", "About the team")}</h3>
-          ${field("name", S("Nama tim", "Team name"), `<input type="text" id="pbName" maxlength="40" value="${esc(form.name)}" autocomplete="off" placeholder="${S("mis. Tim Nova", "e.g. Nova Team")}">`, "pbName")}
-          ${field("why", S("Kenapa tim ini bagus? (opsional)", "Why is this team good? (optional)"), `<textarea id="pbWhy" maxlength="300" rows="3">${esc(form.why)}</textarea>`, "pbWhy")}
+        <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Arc terbaik", "Best Arcs")}</h3>
+          ${field("barc", S("Arc prioritas (maks 4)", "Priority Arcs (max 4)"), slot(4, (i) => sel("arc" + i, bf.arcs[i], arcOpts, empty)))}
         </div>
-        <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Kredit untukmu", "Your credit")}</h3>
+        <div class="pb-card"><h3 class="pb-h"><i>4</i>${S("Cartridge terbaik (set modul)", "Best Cartridges (module sets)")}</h3>
+          ${field("bset", S("Set modul (maks 3, opsional)", "Module sets (max 3, optional)"), slot(3, (i) => `${sel("setid" + i, bf.sets[i].id, setOpts, empty)}<select data-b="setp${i}" class="pb-pc"><option value="4"${bf.sets[i].pieces === 4 ? " selected" : ""}>4 ${S("keping", "pc")}</option><option value="2"${bf.sets[i].pieces === 2 ? " selected" : ""}>2 ${S("keping", "pc")}</option></select>`))}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>5</i>${S("Stat terbaik", "Best Stats")}</h3>
+          ${field("bstat", S("Stat utama (maks 3)", "Main stats (max 3)"), slot(3, (i) => sel("stat" + i, bf.stats[i], V.statList.map((x) => [x, x]), empty)))}
+          ${field("bsub", S("Sub-stat (maks 4, opsional)", "Sub stats (max 4, optional)"), slot(4, (i) => sel("sub" + i, bf.sub[i], V.subList.map((x) => [x, x]), empty)))}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>6</i>${S("Awakening yang disarankan", "Recommended Awakenings")}</h3>
+          ${field("bawk", S("Urutan prioritas Awakening (opsional)", "Awakening priority order (optional)"), slot(6, (i) => sel("awk" + i, bf.awks[i], awkOpts, empty)))}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>7</i>${S("Prioritas naik level skill", "Skill priority")}</h3>
+          ${field("bskl", S("Urutan skill yang dinaikkan (opsional)", "Skill level-up order (optional)"), slot(4, (i) => sel("skl" + i, bf.skills[i], sklOpts, empty)))}
+        </div>
+        <div class="pb-card"><h3 class="pb-h"><i>8</i>${S("Catatan dan kredit", "Notes and credit")}</h3>
+          ${field("bwhy", S("Catatan (opsional)", "Notes (optional)"), `<textarea id="pbBWhy" maxlength="300" rows="3">${esc(bf.why)}</textarea>`, "pbBWhy")}
           ${field("cname", S("Nama untuk kredit", "Credit name"), `<input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">`, "pbCname")}
           ${field("url", S("Link Facebook (opsional)", "Facebook link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
           ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          ${sentFor(cur) ? `<p class="pb-ok">${S("Kamu sudah mengirim usulan untuk karakter ini. Pilih karakter lain untuk mengusulkan tim lagi.", "You already sent a suggestion for this character. Pick another character to suggest another team.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSend" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>`}
-          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU kali (karakter lain tetap boleh) dan usulan tidak bisa diubah, jadi periksa dulu sebelum mengirim. Susunan tim yang anggotanya sama dengan tim yang sudah ada akan ditolak.", "The admin reviews it before it goes live. You can suggest ONE team per character, once (other characters are still fine) and it cannot be edited, so double-check before sending. A team with the same members as an existing one is rejected.")}</p>
+          ${sentB(cur) ? `<p class="pb-ok">${S("Kamu sudah mengirim usulan untuk karakter ini. Pilih karakter lain untuk mengusulkan lagi.", "You already sent a suggestion for this character. Pick another character to suggest again.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSendB" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>`}
+          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU kali (karakter lain tetap boleh) dan usulan tidak bisa diubah, jadi periksa dulu sebelum mengirim. Susunan tim yang anggotanya sama dengan tim yang sudah ada akan ditolak. Usulan tampil sebagai Build dari komunitas, terpisah dari rekomendasi resmi.", "The admin reviews it before it goes live. You can suggest ONE per character, once (other characters are still fine) and it cannot be edited, so double-check before sending. A team with the same members as an existing one is rejected. It appears as a community build, separate from the official recommendation.")}</p>
         </div>
-        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineList.length ? `<ul class="pb-list">${mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
+        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineB.length + mineList.length ? `<ul class="pb-list">${mineB.map((m) => `<li><span><b>${esc((m.build && m.build.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`).concat(mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · ${S("tim", "team")} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`)).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
       }
       root.innerHTML = html;
     }
@@ -2189,21 +2196,23 @@
       const t = ev.target.closest("button"); if (!t) return;
       if (t.dataset.help) { const k = t.dataset.help; if (openHelp.has(k)) openHelp.delete(k); else openHelp.add(k); keep(); render(); return; }
       try {
-        if (t.dataset.kind) { keep(); kind = t.dataset.kind; errs = []; render(); return; }
         if (t.id === "pbSendB") {
           keep();
           const credit = { name: form.cname || (user.displayName || ""), url: form.url };
-          const r = P.sanitizeBuild({ name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), why: bf.why, credit }, V.ctx);
+          const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), why: bf.why, credit };
+          if (members.length > 1) raw.team = { members: members.slice(), roles: members.map((sl) => roles[sl] || "") };
+          const r = P.sanitizeBuild(raw, { ...V.ctx, espers: known }, cur);
           errs = r.errors; if (!r.build) { render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
           await loadMine();
-          if (sentB(cur)) { errs = [S("Kamu sudah mengirim build untuk karakter ini (hanya boleh satu kali).", "You already sent a build for this character (only once allowed).")]; render(); return; }
-          if (!(await ask(S("Kirim build ini? Setelah dikirim tidak bisa diubah atau dihapus, dan karakter ini tidak bisa kamu usulkan buildnya lagi.", "Send this build? It cannot be edited or deleted afterwards, and you cannot suggest another build for this character."), S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
+          if (sentB(cur)) { errs = [S("Kamu sudah mengirim usulan untuk karakter ini (hanya boleh satu kali).", "You already sent a suggestion for this character (only once allowed).")]; render(); return; }
+          if (r.build.team && P.duplicateOf(r.build.team.members, publishedTeams(cur))) { errs = [S("Susunan tim dengan anggota yang sama sudah ada, jadi ditolak. Ubah anggota timnya atau kosongkan bagian tim.", "A team with the same members already exists, so it is rejected. Change the members or leave the team empty.")]; render(); return; }
+          if (!(await ask(S("Kirim usulan ini? Setelah dikirim tidak bisa diubah atau dihapus, dan karakter ini tidak bisa kamu usulkan lagi.", "Send this suggestion? It cannot be edited or deleted afterwards, and you cannot suggest for this character again."), S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
           t.disabled = true;
           const { credit: cr, ...core } = r.build;
           await fb.submitBuild(user, cur, core, cr, id);
-          await loadMine(); msg = S("BUILD TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "BUILD SENT. WAITING FOR ADMIN REVIEW."); bf.name = ""; bf.why = ""; render(); toast(S("Build terkirim. Terima kasih!", "Build sent. Thank you!")); return;
+          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); bf.name = ""; bf.why = ""; render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!")); return;
         }
         if (t.id === "pbIn") { await fb.login(); return; }
         if (t.id === "pbOut") { await fb.logout(); return; }
@@ -2211,23 +2220,6 @@
           keep(); const sl = t.dataset.mem, i = members.indexOf(sl);
           if (i >= 0) members.splice(i, 1); else if (members.length < P.MAX.members) members.push(sl); else toast(S("Maksimal 4 anggota.", "Maximum 4 members."));
           render(); return;
-        }
-        if (t.id === "pbSend") {
-          keep();
-          const r = P.sanitizeTeam({ name: form.name, members, roles: members.map((sl) => roles[sl] || ""), why: form.why, credit: { name: form.cname || (user.displayName || ""), url: form.url } }, { espers: known }, cur);
-          errs = r.errors; if (!r.team) { render(); return; }
-          const id = P.docId(user.uid, cur);
-          if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
-          await loadMine();
-          if (sentFor(cur)) { errs = [S("Kamu sudah mengirim usulan untuk karakter ini (hanya boleh satu kali).", "You already sent a suggestion for this character (only once allowed).")]; render(); return; }
-          const dupMsg = S("Susunan tim dengan anggota yang sama sudah ada atau sudah pernah diusulkan, jadi ditolak. Coba susunan yang berbeda.", "A team with the same members already exists or was already suggested, so it is rejected. Try a different team.");
-          const key = P.teamKey(r.team.members);
-          if (P.duplicateOf(r.team.members, publishedTeams(cur)) || await fb.lockTaken(cur, key)) { errs = [dupMsg]; render(); return; }
-          if (!(await ask(S("Kirim usulan ini? Setelah dikirim tidak bisa diubah atau dihapus, dan karakter ini tidak bisa kamu usulkan lagi.", "Send this suggestion? It cannot be edited or deleted afterwards, and you cannot suggest for this character again."), S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
-          t.disabled = true;
-          try { await fb.submit(user, cur, key, { name: r.team.name, members: r.team.members, roles: r.team.roles, why: r.team.why }, r.team.credit, id); }
-          catch (e2) { if (e2 && String(e2.code).includes("permission-denied") && await fb.lockTaken(cur, key)) { errs = [dupMsg]; render(); return; } throw e2; }
-          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); form = { name: "", why: "", cname: form.cname, url: form.url }; render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!"));
         }
       } catch (e) { toast(fbErr(e)); render(); }
     });
