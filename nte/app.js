@@ -2069,14 +2069,19 @@
   const rotHtml = (steps, list, o) => {
     o = o || {};
     if (!Array.isArray(steps) || !steps.length) return "";
+    const rp = Number.isInteger(o.repeat) && o.repeat >= 0 && o.repeat < steps.length ? o.repeat : null;
     let prev = null;
-    return `<div class="rt-seq">${steps.map((x, i) => {
+    const body = steps.map((x, i) => {
       const m = list.find((e) => e.slug === x.c), act = rotAct(x.a); if (!m || !act) return "";
       const nm2 = m.name.split(" (")[0];
-      const sw = prev ? `<i class="rt-sep">›</i>` : "";
+      const mark = rp === i ? `<span class="rt-loop start" title="${S("Rotasi diulang mulai dari langkah ini", "The rotation repeats from this step")}">↻ ${rp === 0 ? S("MULAI", "START") : S("ULANG DARI SINI", "REPEAT FROM HERE")}</span>` : "";
+      const sep = prev && !mark ? `<i class="rt-sep">›</i>` : "";
       prev = x.c;
-      return `${sw}<span class="rt-step${o.edit ? " edit" : ""}" title="${esc(nm2)}: ${esc(act.text)}"><img src="${img(m.icon)}" alt="${esc(nm2)}"><small class="rt-name">${esc(nm2)}</small><span class="rt-act">${act.html}</span>${o.edit ? `<span class="rt-tools"><button type="button" data-rot-mv="${i}:-1" aria-label="${S("Geser ke kiri", "Move left")}"${i === 0 ? " disabled" : ""}>‹</button><button type="button" data-rot-mv="${i}:1" aria-label="${S("Geser ke kanan", "Move right")}"${i === steps.length - 1 ? " disabled" : ""}>›</button><button type="button" data-rot-del="${i}" aria-label="${S("Hapus langkah", "Remove step")}">×</button></span>` : ""}</span>`;
-    }).join("")}</div>`;
+      const tools = o.edit ? `<span class="rt-tools"><button type="button" data-rot-mv="${i}:-1" aria-label="${S("Geser ke kiri", "Move left")}"${i === 0 ? " disabled" : ""}>‹</button><button type="button" data-rot-mv="${i}:1" aria-label="${S("Geser ke kanan", "Move right")}"${i === steps.length - 1 ? " disabled" : ""}>›</button><button type="button" data-rot-del="${i}" aria-label="${S("Hapus langkah", "Remove step")}">×</button></span><button type="button" class="rt-rp${rp === i ? " on" : ""}" data-rot-repeat="${rp === i ? -1 : i}" title="${S("Ulangi rotasi dari langkah ini", "Repeat the rotation from this step")}">↻ ${rp === i ? S("titik ulang", "repeat point") : S("ulang dari sini", "repeat from here")}</button>` : "";
+      return `${mark}${sep}<span class="rt-step${o.edit ? " edit" : ""}${rp === i ? " rp" : ""}" title="${i + 1}. ${esc(nm2)}: ${esc(act.text)}"><b class="rt-n">${i + 1}</b><img src="${img(m.icon)}" alt="${esc(nm2)}"><small class="rt-name">${esc(nm2)}</small><span class="rt-act">${act.html}</span>${tools}</span>`;
+    }).join("");
+    const end = rp === null ? "" : `<span class="rt-loop end">↩ ${rp === 0 ? S("ULANG DARI AWAL", "REPEAT FROM THE START") : S(`ULANG DARI LANGKAH ${rp + 1}`, `REPEAT FROM STEP ${rp + 1}`)}</span>`;
+    return `<div class="rt-seq">${body}${end}</div>`;
   };
   // Urutan kartu sama seperti tab Build: tim, Arc, set modul, stat, Awakening, skill, catatan, kredit.
   const buildCardHtml = (b, V, extra, o) => {
@@ -2092,7 +2097,7 @@
     const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. <b>${esc(LABEL.group[g] || g)}</b>: ${esc(k ? k.name : g)}`); }).join("");
     const row = (label, html) => (html ? `<p class="mono cb-lab">${label}</p><div class="cb-chips">${html}</div>` : "");
     return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b><em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
-      ${team}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}${(b.rot && b.rot.length && o.list) || b.rotation ? `<p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p>${o.list ? rotHtml(b.rot, o.list) : ""}${b.rotation ? `<p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}` : ""}
+      ${team}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}${(b.rot && b.rot.length && o.list) || b.rotation ? `<p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p>${o.list ? rotHtml(b.rot, o.list, { repeat: b.repeat }) : ""}${b.rotation ? `<p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}` : ""}
       ${b.why ? `<p class="bd-tm-metric">${esc(b.why)}</p>` : ""}${extra || ""}</div>`;
   };
 
@@ -2133,7 +2138,7 @@
     const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
     const V = await buildVocab().catch(() => null);
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], mineB = [], msg = "", errs = [];
-    const newBf = () => ({ name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rot: [], rotation: "" });
+    const newBf = () => ({ name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rot: [], repeat: null, rotation: "" });
     let bf = newBf(), editId = null;
     const ROLE_PRESETS = ["DPS", "Sub DPS", "Support", "Healing", "Tank", "Costume"];
     const roleCustom = new Set();
@@ -2168,7 +2173,7 @@
       bname: S("Nama singkat untuk build-mu, misalnya \"Nova Burst untuk boss\". Maksimal 40 huruf.", "A short name for your build, e.g. \"Nova Burst for bosses\". Max 40 characters."),
       barc: S("Klik slot untuk membuka daftar bergambar. Hanya Arc dengan tipe yang cocok dengan karakter ini yang bisa dipilih. Pilih 1 sampai 4 Arc sesuai urutan prioritas: slot 1 yang paling kamu sarankan. Tidak boleh memilih Arc yang sama dua kali.", "Click a slot to open the picture list. Only Arcs of the type this character uses can be picked. Pick 1 to 4 Arcs in priority order: slot 1 is the one you recommend most. The same Arc cannot be picked twice."),
       bset: S("Klik slot untuk membuka daftar set bergambar lengkap dengan efek 2 dan 4 keping. Pilih sampai 3 set beserta jumlah kepingnya (2 atau 4). Boleh dikosongkan.", "Click a slot to open the picture list with the 2-piece and 4-piece effects. Pick up to 3 sets with the piece count (2 or 4). You can leave it empty."),
-      brot: S("Susun rotasi langkah demi langkah: pilih karakter aktif, lalu klik aksinya (E, Q, klik kiri, tahan klik kiri, atau Switch). Untuk ganti karakter, pilih karakter tujuan lalu klik Switch, kemudian tambah aksinya. Langkah bisa digeser atau dihapus. Maksimal 24 langkah. Boleh dikosongkan.", "Build the rotation step by step: pick the active character, then click the action (E, Q, left click, hold left click or Switch). To switch character, pick the target character and click Switch, then add its actions. Steps can be moved or removed. Max 24 steps. Optional."),
+      brot: S("Susun rotasi langkah demi langkah: pilih karakter aktif, lalu klik aksinya (E, Q, klik kiri, tahan klik kiri, atau Switch). Untuk ganti karakter, pilih karakter tujuan lalu klik Switch, kemudian tambah aksinya. Langkah bisa digeser atau dihapus. Kalau rotasinya berulang, klik \"↻ ulang dari sini\" pada langkah tempat rotasi kembali (dari awal atau dari tengah, misalnya setelah rotasi pembuka), lalu rotasi ditandai berulang terus dari titik itu. Maksimal 50 langkah. Boleh dikosongkan.", "Build the rotation step by step: pick the active character, then click the action (E, Q, left click, hold left click or Switch). To switch character, pick the target character and click Switch, then add its actions. Steps can be moved or removed. If the rotation loops, click \"↻ repeat from here\" on the step it returns to (the start or the middle, e.g. after an opening rotation) and the rotation is marked as repeating from that point. Max 50 steps. Optional."),
       brotn: S("Catatan tambahan untuk rotasi, misalnya syarat atau trik waktunya. Maksimal 500 huruf. Boleh dikosongkan.", "An extra note for the rotation, e.g. requirements or timing tricks. Max 500 characters. Optional."),
       bstat: S("Pilih 1 sampai 3 stat utama sesuai urutan prioritas. Pilihannya diambil dari daftar yang dipakai di situs ini.", "Pick 1 to 3 main stats in priority order. The choices come from the list used on this site."),
       bsub: S("Pilih sampai 4 sub-stat sesuai urutan prioritas. Boleh dikosongkan.", "Pick up to 4 sub stats in priority order. You can leave it empty."),
@@ -2232,8 +2237,8 @@
             <p class="mono cb-lab">${S("2. KLIK AKSINYA", "2. CLICK THE ACTION")}</p>
             <div class="rt-acts">${["e", "q", "atk", "hold", "switch"].map((a2) => `<button type="button" class="chip" data-rot-add="${a2}"${bf.rot.length >= P.MAX.rotSteps ? " disabled" : ""}>${rotAct(a2).html}<span>${esc(rotAct(a2).text)}</span></button>`).join("")}</div>
             <p class="mono cb-lab">${S("RANGKAIAN ROTASI", "ROTATION SEQUENCE")} (${bf.rot.length}/${P.MAX.rotSteps})</p>
-            ${bf.rot.length ? rotHtml(bf.rot, es, { edit: true }) : `<p class="pb-lead">${S("Belum ada langkah. Pilih karakter lalu klik aksi di atas.", "No steps yet. Pick a character, then click an action above.")}</p>`}
-            ${bf.rot.length ? `<button type="button" class="btn ghost sm" data-rot-clear>${S("Hapus semua langkah", "Clear all steps")}</button>` : ""}
+            ${bf.rot.length ? rotHtml(bf.rot, es, { edit: true, repeat: bf.repeat }) : `<p class="pb-lead">${S("Belum ada langkah. Pilih karakter lalu klik aksi di atas.", "No steps yet. Pick a character, then click an action above.")}</p>`}
+            ${bf.rot.length ? `<p class="pb-lead rt-rp-info">${Number.isInteger(bf.repeat) ? S(`Rotasi diulang terus mulai dari langkah ${bf.repeat + 1}${bf.repeat === 0 ? " (dari awal)" : ""}.`, `The rotation repeats from step ${bf.repeat + 1}${bf.repeat === 0 ? " (from the start)" : ""}.`) : S("Rotasi belum diberi titik ulang. Klik \"ulang dari sini\" pada langkah tempat rotasi kembali, atau tombol di bawah untuk mengulang dari awal.", "No repeat point yet. Click \"repeat from here\" on the step the rotation loops back to, or use the button below to repeat from the start.")}</p><div class="adm-row"><button type="button" class="btn ghost sm" data-rot-repeat="0">↻ ${S("Ulangi dari awal", "Repeat from the start")}</button>${Number.isInteger(bf.repeat) ? `<button type="button" class="btn ghost sm" data-rot-repeat="-1">${S("Tanpa ulang", "No repeat")}</button>` : ""}<button type="button" class="btn ghost sm" data-rot-clear>${S("Hapus semua langkah", "Clear all steps")}</button></div>` : ""}
           </div>`)}
           ${field("brotn", S("Catatan rotasi (opsional)", "Rotation note (optional)"), `<textarea id="pbRotNote" maxlength="500" rows="2">${esc(bf.rotation)}</textarea>`, "pbRotNote")}
         </div>
@@ -2251,7 +2256,7 @@
     }
     function collectBuild() {
       const credit = { name: form.cname || (user.displayName || ""), url: form.url };
-      const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), rot: bf.rot.map((x) => ({ c: x.c, a: x.a })), rotation: bf.rotation, why: bf.why, credit };
+      const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), rot: bf.rot.map((x) => ({ c: x.c, a: x.a })), repeat: bf.rot.length ? bf.repeat : null, rotation: bf.rotation, why: bf.why, credit };
       if (members.length > 1) raw.team = { members: members.slice(), roles: members.map((sl) => roles[sl] || "") };
       const ceT = (es.find((x) => x.slug === cur) || {}).arcType;
       return P.sanitizeBuild(raw, { ...V.ctx, arcs: V.arcList.filter((a) => a.type === ceT).map((a) => a.slug), espers: known }, cur);
@@ -2262,7 +2267,7 @@
       members = b.team && Array.isArray(b.team.members) && b.team.members.includes(cur) ? b.team.members.slice() : [cur];
       roles = {}; roleCustom.clear();
       if (b.team && Array.isArray(b.team.members)) b.team.members.forEach((sl, i) => { roles[sl] = (b.team.roles || [])[i] || ""; if (roles[sl] && !ROLE_PRESETS.includes(roles[sl])) roleCustom.add(sl); });
-      bf = { name: b.name || "", why: b.why || "", arcs: pad(b.arcs, 4, (x) => x || ""), sets: pad(b.sets, 3, (x) => (x ? { id: x.id, pieces: x.pieces } : { id: "", pieces: 4 })), stats: pad(b.stats, 3, (x) => x || ""), sub: pad(b.sub, 4, (x) => x || ""), awks: pad(b.awks, 6, (x) => (x ? String(x) : "")), skills: pad(b.skills, 4, (x) => x || ""), rot: (b.rot || []).map((x) => ({ c: x.c, a: x.a })), rotation: b.rotation || "" };
+      bf = { name: b.name || "", why: b.why || "", arcs: pad(b.arcs, 4, (x) => x || ""), sets: pad(b.sets, 3, (x) => (x ? { id: x.id, pieces: x.pieces } : { id: "", pieces: 4 })), stats: pad(b.stats, 3, (x) => x || ""), sub: pad(b.sub, 4, (x) => x || ""), awks: pad(b.awks, 6, (x) => (x ? String(x) : "")), skills: pad(b.skills, 4, (x) => x || ""), rot: (b.rot || []).map((x) => ({ c: x.c, a: x.a })), repeat: Number.isInteger(b.repeat) ? b.repeat : null, rotation: b.rotation || "" };
       form.cname = c.name || ""; form.url = c.url || ""; rotChar = cur;
     }
     async function loadMine() {
@@ -2279,10 +2284,15 @@
       if (t.dataset.help) { const k = t.dataset.help; if (openHelp.has(k)) openHelp.delete(k); else openHelp.add(k); keep(); render(); return; }
       try {
         if (t.dataset.rotChar) { keep(); rotChar = t.dataset.rotChar; render(); return; }
-        if (t.dataset.rotAdd) { keep(); if (bf.rot.length < P.MAX.rotSteps && members.includes(rotChar)) bf.rot.push({ c: rotChar, a: t.dataset.rotAdd }); else if (bf.rot.length >= P.MAX.rotSteps) toast(S("Maksimal 24 langkah.", "Maximum 24 steps.")); render(); return; }
-        if (t.dataset.rotDel !== undefined) { keep(); bf.rot.splice(+t.dataset.rotDel, 1); render(); return; }
-        if (t.dataset.rotMv) { keep(); const [ix, dx] = t.dataset.rotMv.split(":").map(Number), jx = ix + dx; if (jx >= 0 && jx < bf.rot.length) { const tmp = bf.rot[ix]; bf.rot[ix] = bf.rot[jx]; bf.rot[jx] = tmp; } render(); return; }
-        if (t.dataset.rotClear !== undefined) { keep(); bf.rot = []; render(); return; }
+        if (t.dataset.rotAdd) { keep(); if (bf.rot.length < P.MAX.rotSteps && members.includes(rotChar)) bf.rot.push({ c: rotChar, a: t.dataset.rotAdd }); else if (bf.rot.length >= P.MAX.rotSteps) toast(S("Maksimal 50 langkah.", "Maximum 50 steps.")); render(); return; }
+        if (t.dataset.rotRepeat !== undefined) { keep(); const v = +t.dataset.rotRepeat; bf.repeat = v >= 0 && v < bf.rot.length ? v : null; render(); return; }
+        if (t.dataset.rotDel !== undefined) {
+          keep(); const di = +t.dataset.rotDel; bf.rot.splice(di, 1);
+          if (Number.isInteger(bf.repeat)) { if (!bf.rot.length) bf.repeat = null; else if (di < bf.repeat) bf.repeat -= 1; else if (bf.repeat >= bf.rot.length) bf.repeat = bf.rot.length - 1; }
+          render(); return;
+        }
+        if (t.dataset.rotMv) { keep(); const [ix, dx] = t.dataset.rotMv.split(":").map(Number), jx = ix + dx; if (jx >= 0 && jx < bf.rot.length) { const tmp = bf.rot[ix]; bf.rot[ix] = bf.rot[jx]; bf.rot[jx] = tmp; if (bf.repeat === ix) bf.repeat = jx; else if (bf.repeat === jx) bf.repeat = ix; } render(); return; }
+        if (t.dataset.rotClear !== undefined) { keep(); bf.rot = []; bf.repeat = null; render(); return; }
         if (t.dataset.clear) { keep(); const [ty, ix] = t.dataset.clear.split(":"); if (ty === "arc") bf.arcs[+ix] = ""; else bf.sets[+ix].id = ""; render(); return; }
         if (t.dataset.pick) {
           keep(); const ty = t.dataset.pick, ix = +t.dataset.i, ce2 = es.find((x) => x.slug === cur) || {};

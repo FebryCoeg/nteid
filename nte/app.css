@@ -1767,3 +1767,14 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .pb-edit p { margin: 0; }
 .pb-role select { margin-bottom: 4px; }
 .bd-tm-link { color: var(--accent, #ff5a7a); }
+
+/* ---- repeat rotasi ---- */
+.rt-step { position: relative; }
+.rt-n { position: absolute; top: 3px; left: 5px; font-size: 0.58rem; color: var(--text-2); font-weight: 700; }
+.rt-step.rp { border-color: #4ade80; box-shadow: 0 0 0 1px #4ade8066; }
+.rt-loop { display: inline-flex; align-items: center; padding: 6px 8px; border-radius: 10px; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.04em; white-space: nowrap; }
+.rt-loop.start { background: #4ade8022; color: #4ade80; border: 1px solid #4ade8066; }
+.rt-loop.end { background: #4ade8014; color: #4ade80; border: 1px dashed #4ade8088; }
+.rt-rp { margin-top: 3px; padding: 2px 6px; font-size: 0.6rem; border-radius: 6px; border: 1px solid #ffffff22; background: transparent; color: var(--text-2); cursor: pointer; white-space: nowrap; }
+.rt-rp.on { border-color: #4ade80; color: #4ade80; }
+.rt-rp-info { margin: 2px 0; }

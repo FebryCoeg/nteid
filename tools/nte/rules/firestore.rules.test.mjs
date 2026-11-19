@@ -104,10 +104,10 @@ await t("rotasi tim: opsional, maksimal 500 huruf, harus teks", async () => {
   await assertFails(setDoc(B(ctxOf("r2", "r2@x.com"), "r2_akane-rin"), mb("r2", { build: { ...build, rotation: "x".repeat(501) } })));
   await assertFails(setDoc(B(ctxOf("r3", "r3@x.com"), "r3_akane-rin"), mb("r3", { build: { ...build, rotation: 5 } })));
 });
-await t("rotasi berurutan: opsional, maksimal 24 langkah, harus berupa daftar", async () => {
+await t("rotasi berurutan: opsional, maksimal 50 langkah, harus berupa daftar", async () => {
   const step = { c: "akane-rin", a: "e" };
-  await assertSucceeds(setDoc(B(ctxOf("o1", "o1@x.com"), "o1_akane-rin"), mb("o1", { build: { ...build, rot: [step, step] } })));
-  await assertFails(setDoc(B(ctxOf("o2", "o2@x.com"), "o2_akane-rin"), mb("o2", { build: { ...build, rot: Array(25).fill(step) } })));
+  await assertSucceeds(setDoc(B(ctxOf("o1", "o1@x.com"), "o1_akane-rin"), mb("o1", { build: { ...build, rot: [step, step, ...Array(48).fill(step)] } })));
+  await assertFails(setDoc(B(ctxOf("o2", "o2@x.com"), "o2_akane-rin"), mb("o2", { build: { ...build, rot: Array(51).fill(step) } })));
   await assertFails(setDoc(B(ctxOf("o3", "o3@x.com"), "o3_akane-rin"), mb("o3", { build: { ...build, rot: "e" } })));
 });
 // edit usulan oleh pemilik
@@ -135,6 +135,12 @@ await t("link media: YouTube, Instagram, TikTok, X diterima; situs lain dan tipu
   let i = 0;
   for (const u of ["https://www.youtube.com/@budi", "https://instagram.com/budi", "https://www.tiktok.com/@budi", "https://x.com/budi", "https://linktr.ee/budi", "https://youtu.be/abc"]) { i++; await assertSucceeds(setDoc(B(ctxOf("m" + i, "m@x.com"), "m" + i + "_akane-rin"), mb("m" + i, { credit: { name: "B", url: u } }))); }
   for (const u of ["https://evil.com/x", "https://youtube.com.evil.com/x", "https://instagram.com@evil.com/x", "https://instagram.com", "http://x.com/budi", "https://notx.com/a"]) { i++; await assertFails(setDoc(B(ctxOf("m" + i, "m@x.com"), "m" + i + "_akane-rin"), mb("m" + i, { credit: { name: "B", url: u } }))); }
+});
+await t("repeat: bilangan bulat 0 sampai 49 atau null diterima; di luar itu atau bukan angka ditolak", async () => {
+  const step = { c: "akane-rin", a: "e" };
+  let i = 0;
+  for (const rp of [0, 3, 49, null]) { i++; await assertSucceeds(setDoc(B(ctxOf("p" + i, "p@x.com"), "p" + i + "_akane-rin"), mb("p" + i, { build: { ...build, rot: [step, step, step, step], repeat: rp } }))); }
+  for (const rp of [-1, 50, 1.5, "2", true]) { i++; await assertFails(setDoc(B(ctxOf("p" + i, "p@x.com"), "p" + i + "_akane-rin"), mb("p" + i, { build: { ...build, rot: [step, step], repeat: rp } }))); }
 });
 console.log(n + " uji aturan lulus");
 await env.cleanup();

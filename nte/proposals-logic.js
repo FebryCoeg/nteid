@@ -4,7 +4,7 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.NteProposals = factory();
 })(typeof self !== "undefined" ? self : this, function () {
-  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500, rotSteps: 24 };
+  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500, rotSteps: 50 };
   // Link Media: alamat profil/halaman di media sosial populer (bukan situs sembarang). Subdomain resmi ikut diterima.
   const MEDIA_DOMAINS = ["facebook.com", "fb.com", "instagram.com", "youtube.com", "youtu.be", "tiktok.com", "x.com", "twitter.com", "threads.net", "discord.gg", "discord.com", "twitch.tv", "linktr.ee", "reddit.com", "github.com", "t.me", "saweria.co", "trakteer.id"];
   const mediaHost = (h) => MEDIA_DOMAINS.some((d) => h === d || h.endsWith("." + d));
@@ -130,11 +130,17 @@
         else { errors.push("Rotasi: ada langkah dengan karakter di luar tim atau aksi yang tidak dikenal."); break; }
       }
     }
+    // Titik repeat: nomor langkah (mulai 0) tempat rotasi kembali setelah langkah terakhir. null = tidak diulang.
+    let repeat = null;
+    if (rot.length && raw.repeat !== undefined && raw.repeat !== null) {
+      if (Number.isInteger(raw.repeat) && raw.repeat >= 0 && raw.repeat < rot.length) repeat = raw.repeat;
+      else errors.push("Rotasi: titik ulang berada di luar rangkaian langkah.");
+    }
     const why = clean(raw.why, MAX.why);
     const rotation = clean(raw.rotation, MAX.rotation);
     const credit = sanitizeCredit(raw.credit, errors);
     if (errors.length) return { build: null, errors };
-    const build = { name, arcs, sets, stats, sub, awks, skills, rot, rotation, why, credit };
+    const build = { name, arcs, sets, stats, sub, awks, skills, rot, repeat, rotation, why, credit };
     if (team) build.team = team;
     return { build, errors };
   }

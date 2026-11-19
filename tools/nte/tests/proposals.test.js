@@ -94,7 +94,7 @@ test("duplicateOf: menemukan tim yang sudah tayang dengan anggota sama", () => {
 
 // ---- usulan build ----
 const bctx = { espers: ["akane-rin", "blackbird", "lacrimosa", "zankou", "sakiri"], arcs: ["crime-and-punishment", "ravenous-blade", "watch-your-heads", "echoes-on-hold", "x5"], sets: ["Suit1", "Suit3", "Suit11"], stats: ["CRIT DMG", "Psyche DMG", "ATK %", "HP %"], sub: ["DMG %", "ATK %", "Cycle Intensity", "CRIT Rate", "DEF"] };
-const bok = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }, { id: "Suit11", pieces: 2 }], stats: ["CRIT DMG", "Psyche DMG"], sub: ["DMG %", "ATK %"], awks: [], skills: [], rot: [], rotation: "", why: "Cocok untuk boss.", credit: { name: "Budi", url: "https://www.facebook.com/budi" } };
+const bok = { name: "Nova Burst", arcs: ["ravenous-blade", "watch-your-heads"], sets: [{ id: "Suit3", pieces: 4 }, { id: "Suit11", pieces: 2 }], stats: ["CRIT DMG", "Psyche DMG"], sub: ["DMG %", "ATK %"], awks: [], skills: [], rot: [], repeat: null, rotation: "", why: "Cocok untuk boss.", credit: { name: "Budi", url: "https://www.facebook.com/budi" } };
 
 test("sanitizeBuild: build valid dipertahankan", () => {
   const r = P.sanitizeBuild(bok, bctx);
@@ -139,7 +139,7 @@ test("sanitizeBuild: catatan dirapikan dan dipotong; bukan objek tidak crash", (
 
 test("sanitizeBuild: bidang asing dibuang, tidak ikut tersimpan", () => {
   const b = P.sanitizeBuild({ ...bok, evil: "<script>", isAdmin: true }, bctx).build;
-  assert.deepEqual(Object.keys(b).sort(), ["arcs", "awks", "credit", "name", "rot", "rotation", "sets", "skills", "stats", "sub", "why"]);
+  assert.deepEqual(Object.keys(b).sort(), ["arcs", "awks", "credit", "name", "repeat", "rot", "rotation", "sets", "skills", "stats", "sub", "why"]);
 });
 
 test("sanitizeBuild gabungan: tim opsional, bila ada harus valid dan memuat karakter halaman", () => {
@@ -184,10 +184,10 @@ test("sanitizeBuild: rotasi berurutan (karakter + aksi) diterima bila karakter a
   assert.deepEqual(P.sanitizeBuild(bok, bctx, "akane-rin").build.rot, []);
 });
 
-test("sanitizeBuild: rotasi menolak aksi asing, karakter di luar tim, bentuk salah, dan lebih dari 24 langkah", () => {
-  const bad = [[{ c: "blackbird", a: "x" }], [{ c: "blackbird", a: "qte" }], [{ c: "lacrimosa", a: "e" }], [{ c: "blackbird" }], ["e"], [null], "e", [{ c: "blackbird", a: "e", evil: 1 }].concat(Array(24).fill({ c: "blackbird", a: "e" }))];
+test("sanitizeBuild: rotasi menolak aksi asing, karakter di luar tim, bentuk salah, dan lebih dari 50 langkah", () => {
+  const bad = [[{ c: "blackbird", a: "x" }], [{ c: "blackbird", a: "qte" }], [{ c: "lacrimosa", a: "e" }], [{ c: "blackbird" }], ["e"], [null], "e", [{ c: "blackbird", a: "e", evil: 1 }].concat(Array(50).fill({ c: "blackbird", a: "e" }))];
   for (const rot of bad) assert.ok(P.sanitizeBuild({ ...bok, team: rteam, rot }, bctx, "akane-rin").errors.length, JSON.stringify(rot).slice(0, 60));
-  assert.equal(P.sanitizeBuild({ ...bok, team: rteam, rot: Array(24).fill({ c: "akane-rin", a: "atk" }) }, bctx, "akane-rin").errors.length, 0);
+  assert.equal(P.sanitizeBuild({ ...bok, team: rteam, rot: Array(50).fill({ c: "akane-rin", a: "atk" }) }, bctx, "akane-rin").errors.length, 0);
 });
 
 test("sanitizeBuild: tanpa tim, rotasi hanya boleh memakai karakter halaman; bidang asing di langkah dibuang", () => {
@@ -218,4 +218,26 @@ test("sanitizeCredit lewat sanitizeTeam: link YouTube diterima", () => {
   const r = P.sanitizeTeam({ ...ok, credit: { name: "Budi", url: "https://www.youtube.com/@budi" } }, ctx, "akane-rin");
   assert.deepEqual(r.errors, []);
   assert.equal(r.team.credit.url, "https://www.youtube.com/@budi");
+});
+
+const steps = (n) => Array.from({ length: n }, (_, i) => ({ c: "akane-rin", a: i % 2 ? "atk" : "e" }));
+test("sanitizeBuild: titik repeat = nomor langkah (mulai 0) tempat rotasi diulang", () => {
+  assert.equal(P.sanitizeBuild({ ...bok, rot: steps(6), repeat: 0 }, bctx, "akane-rin").build.repeat, 0);
+  assert.equal(P.sanitizeBuild({ ...bok, rot: steps(6), repeat: 3 }, bctx, "akane-rin").build.repeat, 3);
+  assert.equal(P.sanitizeBuild({ ...bok, rot: steps(6), repeat: 5 }, bctx, "akane-rin").build.repeat, 5);
+  assert.equal(P.sanitizeBuild({ ...bok, rot: steps(6) }, bctx, "akane-rin").build.repeat, null);
+  assert.equal(P.sanitizeBuild({ ...bok, rot: steps(6), repeat: null }, bctx, "akane-rin").build.repeat, null);
+});
+
+test("sanitizeBuild: titik repeat di luar rangkaian atau bukan bilangan bulat ditolak; tanpa langkah jadi null", () => {
+  for (const repeat of [6, 99, -1, 1.5, "2", true, {}])
+    assert.ok(P.sanitizeBuild({ ...bok, rot: steps(6), repeat }, bctx, "akane-rin").errors.length, JSON.stringify(repeat));
+  assert.equal(P.sanitizeBuild({ ...bok, rot: [], repeat: 2 }, bctx, "akane-rin").build.repeat, null);
+});
+
+test("sanitizeBuild: rotasi 50 langkah dengan repeat di langkah terakhir diterima", () => {
+  const r = P.sanitizeBuild({ ...bok, rot: steps(50), repeat: 49 }, bctx, "akane-rin");
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.build.rot.length, 50);
+  assert.equal(r.build.repeat, 49);
 });

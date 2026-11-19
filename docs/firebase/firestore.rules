@@ -56,7 +56,7 @@ service cloud.firestore {
     }
     function validBuild(b) {
       return b is map
-        && b.keys().hasOnly(['name', 'team', 'arcs', 'sets', 'stats', 'sub', 'awks', 'skills', 'rot', 'rotation', 'why'])
+        && b.keys().hasOnly(['name', 'team', 'arcs', 'sets', 'stats', 'sub', 'awks', 'skills', 'rot', 'repeat', 'rotation', 'why'])
         && b.name is string && b.name.size() >= 1 && b.name.size() <= 40
         && (!('team' in b) || validBuildTeam(b.team))
         && b.arcs is list && b.arcs.size() >= 1 && b.arcs.size() <= 4
@@ -65,7 +65,8 @@ service cloud.firestore {
         && b.sub is list && b.sub.size() <= 4
         && b.awks is list && b.awks.size() <= 6
         && b.skills is list && b.skills.size() <= 4
-        && (!('rot' in b) || (b.rot is list && b.rot.size() <= 24))
+        && (!('rot' in b) || (b.rot is list && b.rot.size() <= 50))
+        && (!('repeat' in b) || b.repeat == null || (b.repeat is int && b.repeat >= 0 && b.repeat < 50))
         && (!('rotation' in b) || (b.rotation is string && b.rotation.size() <= 500))
         && b.why is string && b.why.size() <= 300;
     }
