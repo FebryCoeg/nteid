@@ -1701,3 +1701,5 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .pb-st { font-style: normal; font-weight: 700; }
 .pb-st.pending { color: #ffc24d; } .pb-st.approved { color: #4ade80; } .pb-st.rejected { color: #f87171; }
 .pb-card .btn.sm { padding: 6px 14px; font-size: 0.72rem; min-height: 0; line-height: 1.2; }
+.pb-roles { align-items: start; }
+.pb-card .pb-role { margin: 0; text-transform: none; font: 700 0.76rem var(--display); letter-spacing: 0; color: var(--text); }
