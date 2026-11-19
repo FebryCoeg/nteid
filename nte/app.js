@@ -638,8 +638,7 @@
           const cb = ((COMMB && COMMB[e.slug]) || []).filter((b) => b && b.name && Array.isArray(b.arcs));
           html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${window.NteProposals.rankByStars(cb, starState.counts).map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY")), { list, esper: e.slug, star: { count: starState.counts[b.pid] || 0, mine: starState.mine.has(b.pid) }, featured: !!(FEAT[e.slug] && FEAT[e.slug].pid === b.pid) })).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
         }
-        html += `<p class="mono" style="margin-top:6px"><button type="button" class="chip" data-report>${S("Data build salah? Laporkan", "Wrong build data? Report")}</button></p>`;
-        return html + `<div class="af-sec"><h4>${S("Efek Bonus Awakening", "Awakening bonus effects")}</h4><p class="mono" style="margin-bottom:10px">${S("Terbuka saat 3 dan 6 Awakening aktif", "Unlocked when 3 and 6 Awakenings are active")}</p>` + e.console.map((a, i) => `<div class="entry"><h4>${esc(a.name)}</h4><p class="mono">${S("BONUS", "BONUS:")} ${[3, 6][i] || ""} ${S("AWAKENING AKTIF", "AWAKENINGS ACTIVE")}</p><p class="txt">${rich(a.desc)}</p></div>`).join("") + `</div>`;
+        return html;
       },
       awakening: () => {
         const main6 = e.awakening.slice(0, 6), bonus = e.awakening.slice(6);
