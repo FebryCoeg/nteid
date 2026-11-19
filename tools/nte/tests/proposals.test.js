@@ -177,7 +177,7 @@ test("sanitizeBuild: rotasi tim opsional, dirapikan, dipotong 500 huruf, bukan s
 
 const rteam = { members: ["akane-rin", "blackbird", "zankou"], roles: [] };
 test("sanitizeBuild: rotasi berurutan (karakter + aksi) diterima bila karakter ada di tim", () => {
-  const rot = [{ c: "blackbird", a: "e" }, { c: "blackbird", a: "hold" }, { c: "blackbird", a: "q" }, { c: "blackbird", a: "atk" }, { c: "zankou", a: "qte" }];
+  const rot = [{ c: "blackbird", a: "e" }, { c: "blackbird", a: "hold" }, { c: "blackbird", a: "q" }, { c: "blackbird", a: "atk" }, { c: "zankou", a: "switch" }];
   const r = P.sanitizeBuild({ ...bok, team: rteam, rot }, bctx, "akane-rin");
   assert.deepEqual(r.errors, []);
   assert.deepEqual(r.build.rot, rot);
@@ -185,7 +185,7 @@ test("sanitizeBuild: rotasi berurutan (karakter + aksi) diterima bila karakter a
 });
 
 test("sanitizeBuild: rotasi menolak aksi asing, karakter di luar tim, bentuk salah, dan lebih dari 24 langkah", () => {
-  const bad = [[{ c: "blackbird", a: "x" }], [{ c: "lacrimosa", a: "e" }], [{ c: "blackbird" }], ["e"], [null], "e", [{ c: "blackbird", a: "e", evil: 1 }].concat(Array(24).fill({ c: "blackbird", a: "e" }))];
+  const bad = [[{ c: "blackbird", a: "x" }], [{ c: "blackbird", a: "qte" }], [{ c: "lacrimosa", a: "e" }], [{ c: "blackbird" }], ["e"], [null], "e", [{ c: "blackbird", a: "e", evil: 1 }].concat(Array(24).fill({ c: "blackbird", a: "e" }))];
   for (const rot of bad) assert.ok(P.sanitizeBuild({ ...bok, team: rteam, rot }, bctx, "akane-rin").errors.length, JSON.stringify(rot).slice(0, 60));
   assert.equal(P.sanitizeBuild({ ...bok, team: rteam, rot: Array(24).fill({ c: "akane-rin", a: "atk" }) }, bctx, "akane-rin").errors.length, 0);
 });

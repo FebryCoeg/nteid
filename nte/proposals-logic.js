@@ -75,8 +75,8 @@
     return out;
   }
   const SKILL_GROUPS = ["basic", "redirect", "ultimate", "support"];
-  // Aksi dalam rotasi: tombol E, tombol Q, klik kiri (serangan dasar), tahan klik kiri, dan QTE (support).
-  const ROT_ACTIONS = ["e", "q", "atk", "hold", "qte"];
+  // Aksi dalam rotasi: tombol E, tombol Q, klik kiri (serangan dasar), tahan klik kiri, dan Switch (ganti ke karakter itu).
+  const ROT_ACTIONS = ["e", "q", "atk", "hold", "switch"];
   function sanitizeBuild(raw, ctx, pageEsper) {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { build: null, errors: ["Data build tidak valid."] };
     const errors = [];

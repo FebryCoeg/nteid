@@ -2057,14 +2057,14 @@
     const sets = mods.sets || [];
     return { arcList: arcs, setList: sets, statList: [...st].sort(), subList: [...sb].sort(), ctx: { arcs: arcs.map((a) => a.slug), sets: sets.map((x) => x.id), stats: [...st], sub: [...sb] } };
   })().catch((e) => { vocabP = null; throw e; }));
-  // Rotasi tim: deret langkah (karakter + aksi). Aksi: E, Q, klik kiri, tahan klik kiri, QTE.
+  // Rotasi tim: deret langkah (karakter + aksi). Aksi: E, Q, klik kiri, tahan klik kiri, Switch.
   const MOUSE = `<svg class="rt-mouse" viewBox="0 0 16 22" width="13" height="18" aria-hidden="true"><path d="M8 1.5V9H1.5V8A6.5 6.5 0 0 1 8 1.5Z" fill="var(--accent,#ff5a7a)"/><rect x="1.5" y="1.5" width="13" height="19" rx="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5V9M1.5 9h13" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>`;
   const rotAct = (a) => ({
     e: { html: `<b class="rt-key">E</b>`, text: S("Tombol E", "E key") },
     q: { html: `<b class="rt-key">Q</b>`, text: S("Tombol Q (ultimate)", "Q key (ultimate)") },
     atk: { html: `${MOUSE}`, text: S("Klik kiri (serangan dasar)", "Left click (basic attack)") },
     hold: { html: `${MOUSE}<small>${S("tahan", "hold")}</small>`, text: S("Tahan klik kiri", "Hold left click") },
-    qte: { html: `<b class="rt-key">QTE</b>`, text: "QTE" },
+    switch: { html: `<b class="rt-key rt-sw">⇄ Switch</b>`, text: S("Switch (ganti ke karakter ini)", "Switch (change to this character)") },
   })[a];
   const rotHtml = (steps, list, o) => {
     o = o || {};
@@ -2073,7 +2073,7 @@
     return `<div class="rt-seq">${steps.map((x, i) => {
       const m = list.find((e) => e.slug === x.c), act = rotAct(x.a); if (!m || !act) return "";
       const nm2 = m.name.split(" (")[0];
-      const sw = prev && prev !== x.c ? `<i class="rt-sep sw" title="${S("Ganti karakter", "Switch character")}">⇄</i>` : prev ? `<i class="rt-sep">›</i>` : "";
+      const sw = prev ? `<i class="rt-sep">›</i>` : "";
       prev = x.c;
       return `${sw}<span class="rt-step${o.edit ? " edit" : ""}" title="${esc(nm2)}: ${esc(act.text)}"><img src="${img(m.icon)}" alt="${esc(nm2)}"><small class="rt-name">${esc(nm2)}</small><span class="rt-act">${act.html}</span>${o.edit ? `<span class="rt-tools"><button type="button" data-rot-mv="${i}:-1" aria-label="${S("Geser ke kiri", "Move left")}"${i === 0 ? " disabled" : ""}>‹</button><button type="button" data-rot-mv="${i}:1" aria-label="${S("Geser ke kanan", "Move right")}"${i === steps.length - 1 ? " disabled" : ""}>›</button><button type="button" data-rot-del="${i}" aria-label="${S("Hapus langkah", "Remove step")}">×</button></span>` : ""}</span>`;
     }).join("")}</div>`;
@@ -2165,7 +2165,7 @@
       bname: S("Nama singkat untuk build-mu, misalnya \"Nova Burst untuk boss\". Maksimal 40 huruf.", "A short name for your build, e.g. \"Nova Burst for bosses\". Max 40 characters."),
       barc: S("Klik slot untuk membuka daftar bergambar. Hanya Arc dengan tipe yang cocok dengan karakter ini yang bisa dipilih. Pilih 1 sampai 4 Arc sesuai urutan prioritas: slot 1 yang paling kamu sarankan. Tidak boleh memilih Arc yang sama dua kali.", "Click a slot to open the picture list. Only Arcs of the type this character uses can be picked. Pick 1 to 4 Arcs in priority order: slot 1 is the one you recommend most. The same Arc cannot be picked twice."),
       bset: S("Klik slot untuk membuka daftar set bergambar lengkap dengan efek 2 dan 4 keping. Pilih sampai 3 set beserta jumlah kepingnya (2 atau 4). Boleh dikosongkan.", "Click a slot to open the picture list with the 2-piece and 4-piece effects. Pick up to 3 sets with the piece count (2 or 4). You can leave it empty."),
-      brot: S("Susun rotasi langkah demi langkah: pilih karakter aktif, lalu klik aksinya (E, Q, klik kiri, tahan klik kiri, atau QTE). Untuk ganti karakter, pilih karakter lain lalu tambah aksinya. Langkah bisa digeser atau dihapus. Maksimal 24 langkah. Boleh dikosongkan.", "Build the rotation step by step: pick the active character, then click the action (E, Q, left click, hold left click or QTE). To switch character, pick another character and add its action. Steps can be moved or removed. Max 24 steps. Optional."),
+      brot: S("Susun rotasi langkah demi langkah: pilih karakter aktif, lalu klik aksinya (E, Q, klik kiri, tahan klik kiri, atau Switch). Untuk ganti karakter, pilih karakter tujuan lalu klik Switch, kemudian tambah aksinya. Langkah bisa digeser atau dihapus. Maksimal 24 langkah. Boleh dikosongkan.", "Build the rotation step by step: pick the active character, then click the action (E, Q, left click, hold left click or Switch). To switch character, pick the target character and click Switch, then add its actions. Steps can be moved or removed. Max 24 steps. Optional."),
       brotn: S("Catatan tambahan untuk rotasi, misalnya syarat atau trik waktunya. Maksimal 500 huruf. Boleh dikosongkan.", "An extra note for the rotation, e.g. requirements or timing tricks. Max 500 characters. Optional."),
       bstat: S("Pilih 1 sampai 3 stat utama sesuai urutan prioritas. Pilihannya diambil dari daftar yang dipakai di situs ini.", "Pick 1 to 3 main stats in priority order. The choices come from the list used on this site."),
       bsub: S("Pilih sampai 4 sub-stat sesuai urutan prioritas. Boleh dikosongkan.", "Pick up to 4 sub stats in priority order. You can leave it empty."),
@@ -2223,7 +2223,7 @@
             <p class="mono cb-lab">${S("1. PILIH KARAKTER AKTIF", "1. PICK THE ACTIVE CHARACTER")}</p>
             <div class="rt-chars">${members.map((sl) => { const m = es.find((x) => x.slug === sl); return m ? `<button type="button" class="${sl === rotChar ? "on" : ""}" data-rot-char="${sl}" title="${esc(m.name)}"><img src="${img(m.icon)}" alt=""><small>${esc(chipName(sl))}</small></button>` : ""; }).join("")}</div>
             <p class="mono cb-lab">${S("2. KLIK AKSINYA", "2. CLICK THE ACTION")}</p>
-            <div class="rt-acts">${["e", "q", "atk", "hold", "qte"].map((a2) => `<button type="button" class="chip" data-rot-add="${a2}"${bf.rot.length >= P.MAX.rotSteps ? " disabled" : ""}>${rotAct(a2).html}<span>${esc(rotAct(a2).text)}</span></button>`).join("")}</div>
+            <div class="rt-acts">${["e", "q", "atk", "hold", "switch"].map((a2) => `<button type="button" class="chip" data-rot-add="${a2}"${bf.rot.length >= P.MAX.rotSteps ? " disabled" : ""}>${rotAct(a2).html}<span>${esc(rotAct(a2).text)}</span></button>`).join("")}</div>
             <p class="mono cb-lab">${S("RANGKAIAN ROTASI", "ROTATION SEQUENCE")} (${bf.rot.length}/${P.MAX.rotSteps})</p>
             ${bf.rot.length ? rotHtml(bf.rot, es, { edit: true }) : `<p class="pb-lead">${S("Belum ada langkah. Pilih karakter lalu klik aksi di atas.", "No steps yet. Pick a character, then click an action above.")}</p>`}
             ${bf.rot.length ? `<button type="button" class="btn ghost sm" data-rot-clear>${S("Hapus semua langkah", "Clear all steps")}</button>` : ""}

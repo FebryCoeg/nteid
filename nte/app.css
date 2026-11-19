@@ -1760,3 +1760,4 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .rt-tools button[disabled] { opacity: 0.3; cursor: default; }
 
 .rt-build > .btn { justify-self: start; }
+.rt-key.rt-sw { color: #ffc24d; white-space: nowrap; }
