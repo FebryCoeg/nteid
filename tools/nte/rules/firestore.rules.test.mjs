@@ -99,5 +99,10 @@ await t("gabungan: awakening lebih dari 6 atau skill lebih dari 4 ditolak", asyn
   await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: { ...build, skills: ["a", "b", "c", "d", "e"] } })));
   await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: { name: "X", arcs: ["a"], sets: [], stats: ["s"], sub: [], why: "" } })));
 });
+await t("rotasi tim: opsional, maksimal 500 huruf, harus teks", async () => {
+  await assertSucceeds(setDoc(B(ctxOf("r1", "r1@x.com"), "r1_akane-rin"), mb("r1", { build: { ...build, rotation: "Skill A > Ult B" } })));
+  await assertFails(setDoc(B(ctxOf("r2", "r2@x.com"), "r2_akane-rin"), mb("r2", { build: { ...build, rotation: "x".repeat(501) } })));
+  await assertFails(setDoc(B(ctxOf("r3", "r3@x.com"), "r3_akane-rin"), mb("r3", { build: { ...build, rotation: 5 } })));
+});
 console.log(n + " uji aturan lulus");
 await env.cleanup();

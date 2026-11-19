@@ -1712,3 +1712,26 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .pb-slot select { flex: 1; min-width: 0; }
 .pb-slot select.pb-pc { flex: none; width: 96px; }
 .pb-kind { padding: 10px 16px; }
+
+/* ---- pemilih bergambar (Arc dan set modul) ---- */
+.pb-pick { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; padding: 6px 10px; min-height: 52px; border-radius: 10px; border: 1px solid #ffffff22; background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer; }
+.pb-pick:hover { border-color: #ffffff55; }
+.pb-pick img { flex: none; width: 40px; height: 40px; object-fit: contain; border-radius: 8px; }
+.pb-pick span { display: grid; min-width: 0; }
+.pb-pick small { color: var(--text-2); font-size: 0.72rem; }
+.pb-pick-empty { color: var(--text-2); font-size: 0.85rem; }
+.pb-modal { position: fixed; inset: 0; z-index: 200; background: #000000b3; display: grid; place-items: center; padding: 14px; }
+.pb-modal-box { background: var(--panel); border: 1px solid #ffffff22; border-radius: 16px; width: 100%; max-width: 640px; max-height: 84vh; overflow: auto; padding: 14px; }
+.pb-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.pb-modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pb-modal-grid.wide { grid-template-columns: 1fr; }
+.pb-opt { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 10px; border-radius: 12px; border: 1px solid #ffffff22; background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer; }
+.pb-opt:hover:not([disabled]) { border-color: var(--accent, #ff5a7a); }
+.pb-opt[disabled] { opacity: 0.45; cursor: not-allowed; }
+.pb-opt img { width: 72px; height: 72px; object-fit: contain; }
+.pb-opt > span { display: grid; gap: 3px; }
+.pb-opt small { color: var(--text-2); font-size: 0.72rem; line-height: 1.45; }
+.pb-opt-used { color: #ffc24d !important; }
+.pb-modal-grid.wide .pb-opt { flex-direction: row; text-align: left; align-items: flex-start; }
+.pb-modal-grid.wide .pb-opt img { width: 56px; height: 56px; flex: none; }
+.cb-rot { margin: 0 0 6px; }

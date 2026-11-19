@@ -4,7 +4,7 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.NteProposals = factory();
 })(typeof self !== "undefined" ? self : this, function () {
-  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2 };
+  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500 };
   const FB_HOSTS = new Set(["facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com", "mbasic.facebook.com", "fb.com", "www.fb.com"]);
 
   // Rapikan teks bebas: buang karakter kontrol, ratakan spasi/baris baru, potong.
@@ -117,9 +117,10 @@
       }
     }
     const why = clean(raw.why, MAX.why);
+    const rotation = clean(raw.rotation, MAX.rotation);
     const credit = sanitizeCredit(raw.credit, errors);
     if (errors.length) return { build: null, errors };
-    const build = { name, arcs, sets, stats, sub, awks, skills, why, credit };
+    const build = { name, arcs, sets, stats, sub, awks, skills, rotation, why, credit };
     if (team) build.team = team;
     return { build, errors };
   }

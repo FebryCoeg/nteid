@@ -2053,6 +2053,7 @@
     const [arcs, mods, cur] = await Promise.all([load("arcs"), load("modules"), load("builds_curated").catch(() => ({}))]);
     const st = new Set(), sb = new Set();
     Object.values(cur).forEach((v) => { ((v && v.stats) || []).forEach((x) => st.add(x)); ((v && v.sub) || []).forEach((x) => sb.add(x)); });
+    sb.delete("Universal DMG %");
     const sets = mods.sets || [];
     return { arcList: arcs, setList: sets, statList: [...st].sort(), subList: [...sb].sort(), ctx: { arcs: arcs.map((a) => a.slug), sets: sets.map((x) => x.id), stats: [...st], sub: [...sb] } };
   })().catch((e) => { vocabP = null; throw e; }));
@@ -2070,9 +2071,27 @@
     const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. ${esc(k ? k.name : g)}`); }).join("");
     const row = (label, html) => (html ? `<p class="mono cb-lab">${label}</p><div class="cb-chips">${html}</div>` : "");
     return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b><em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
-      ${team}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}
+      ${team}${b.rotation ? `<p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p><p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}
       ${b.why ? `<p class="bd-tm-metric">${esc(b.why)}</p>` : ""}${extra || ""}</div>`;
   };
+
+  // Pemilih bergambar (pop-up): items = [{key, img, name, sub, text, used}]. wide = tampilan daftar untuk teks panjang.
+  function pickModal(title, items, onPick, wide) {
+    const old = document.querySelector(".pb-modal"); if (old) old.remove();
+    const el = document.createElement("div");
+    el.className = "pb-modal"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", title);
+    el.innerHTML = `<div class="pb-modal-box"><div class="pb-modal-head"><b>${esc(title)}</b><button type="button" class="btn ghost sm" data-x aria-label="${S("Tutup", "Close")}">×</button></div>
+      <div class="pb-modal-grid${wide ? " wide" : ""}">${items.length ? items.map((it) => `<button type="button" class="pb-opt" data-k="${esc(it.key)}"${it.used ? " disabled" : ""}>${it.img ? `<img src="${img(it.img)}" alt="" loading="lazy">` : ""}<span><b>${esc(it.name)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}${it.text ? `<small class="pb-opt-tx">${esc(it.text)}</small>` : ""}${it.used ? `<small class="pb-opt-used">${S("Sudah dipilih di slot lain", "Already used in another slot")}</small>` : ""}</span></button>`).join("") : `<p class="txt">${S("Tidak ada pilihan.", "No options.")}</p>`}</div></div>`;
+    const close = () => { el.remove(); document.removeEventListener("keydown", onKey); };
+    const onKey = (e) => { if (e.key === "Escape") close(); };
+    el.addEventListener("click", (e) => {
+      if (e.target === el || e.target.closest("[data-x]")) { close(); return; }
+      const b = e.target.closest("[data-k]"); if (b && !b.disabled) { const k = b.dataset.k; close(); onPick(k); }
+    });
+    document.addEventListener("keydown", onKey);
+    document.body.appendChild(el);
+    const first = el.querySelector(".pb-opt:not([disabled])") || el.querySelector("[data-x]"); if (first) first.focus();
+  }
 
   async function viewProposal() {
     setTitle(S("Usulkan Build dan Tim", "Suggest a Build and Team"));
@@ -2093,14 +2112,14 @@
     const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
     const V = await buildVocab().catch(() => null);
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], mineB = [], msg = "", errs = [];
-    let bf = { name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""] };
+    let bf = { name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rotation: "" };
     const sentB = (sl) => mineB.find((m) => m.esper === sl) || null;
     function keepB() {
       const g = (id) => { const el = $(id); return el ? el.value : null; };
-      const n = g("#pbBName"), w = g("#pbBWhy"); if (n !== null) bf.name = n; if (w !== null) bf.why = w;
+      const n = g("#pbBName"), w = g("#pbBWhy"), ro = g("#pbRot"); if (n !== null) bf.name = n; if (w !== null) bf.why = w; if (ro !== null) bf.rotation = ro;
       document.querySelectorAll("[data-b]").forEach((el) => {
-        const m = /^(arc|setid|setp|stat|sub|awk|skl)(\d)$/.exec(el.dataset.b); if (!m) return; const i = +m[2];
-        if (m[1] === "arc") bf.arcs[i] = el.value; else if (m[1] === "setid") bf.sets[i].id = el.value; else if (m[1] === "setp") bf.sets[i].pieces = +el.value; else if (m[1] === "stat") bf.stats[i] = el.value; else if (m[1] === "awk") bf.awks[i] = el.value; else if (m[1] === "skl") bf.skills[i] = el.value; else bf.sub[i] = el.value;
+        const m = /^(setp|stat|sub|awk|skl)(\d)$/.exec(el.dataset.b); if (!m) return; const i = +m[2];
+        if (m[1] === "setp") bf.sets[i].pieces = +el.value; else if (m[1] === "stat") bf.stats[i] = el.value; else if (m[1] === "awk") bf.awks[i] = el.value; else if (m[1] === "skl") bf.skills[i] = el.value; else bf.sub[i] = el.value;
       });
     }
     const STATUS = () => ({ pending: S("Menunggu", "Pending"), approved: S("Disetujui", "Approved"), rejected: S("Ditolak", "Rejected") });
@@ -2121,8 +2140,9 @@
       cname: S("Nama ini yang tampil di bawah timmu sebagai \"Susunan tim oleh\". Bisa nama asli atau nama panggung, tidak harus sama dengan nama Google.", "This name appears under your team as \"Team by\". It can be a real name or a nickname and does not have to match your Google name."),
       url: S("Kalau diisi, nama kreditmu bisa diklik dan membuka alamat Facebook ini. Hanya alamat facebook.com yang diterima. Kosongkan kalau tidak mau menampilkan link.", "If filled in, your credit name becomes a link to this Facebook address. Only facebook.com addresses are accepted. Leave empty for no link."),
       bname: S("Nama singkat untuk build-mu, misalnya \"Nova Burst untuk boss\". Maksimal 40 huruf.", "A short name for your build, e.g. \"Nova Burst for bosses\". Max 40 characters."),
-      barc: S("Pilih 1 sampai 4 Arc sesuai urutan prioritas: slot 1 yang paling kamu sarankan. Tidak boleh memilih Arc yang sama dua kali.", "Pick 1 to 4 Arcs in priority order: slot 1 is the one you recommend most. The same Arc cannot be picked twice."),
-      bset: S("Pilih sampai 3 set modul beserta jumlah kepingnya (2 atau 4). Boleh dikosongkan.", "Pick up to 3 module sets with the piece count (2 or 4). You can leave it empty."),
+      barc: S("Klik slot untuk membuka daftar bergambar. Hanya Arc dengan tipe yang cocok dengan karakter ini yang bisa dipilih. Pilih 1 sampai 4 Arc sesuai urutan prioritas: slot 1 yang paling kamu sarankan. Tidak boleh memilih Arc yang sama dua kali.", "Click a slot to open the picture list. Only Arcs of the type this character uses can be picked. Pick 1 to 4 Arcs in priority order: slot 1 is the one you recommend most. The same Arc cannot be picked twice."),
+      bset: S("Klik slot untuk membuka daftar set bergambar lengkap dengan efek 2 dan 4 keping. Pilih sampai 3 set beserta jumlah kepingnya (2 atau 4). Boleh dikosongkan.", "Click a slot to open the picture list with the 2-piece and 4-piece effects. Pick up to 3 sets with the piece count (2 or 4). You can leave it empty."),
+      brot: S("Tulis urutan rotasi tim secara singkat, misalnya urutan pergantian karakter dan skill yang dipakai. Maksimal 500 huruf. Boleh dikosongkan.", "Briefly write the team rotation, e.g. the character switch order and skills used. Max 500 characters. Optional."),
       bstat: S("Pilih 1 sampai 3 stat utama sesuai urutan prioritas. Pilihannya diambil dari daftar yang dipakai di situs ini.", "Pick 1 to 3 main stats in priority order. The choices come from the list used on this site."),
       bsub: S("Pilih sampai 4 sub-stat sesuai urutan prioritas. Boleh dikosongkan.", "Pick up to 4 sub stats in priority order. You can leave it empty."),
       bwhy: S("Jelaskan singkat kenapa build ini bagus atau untuk konten apa. Maksimal 300 huruf. Boleh kosong.", "Briefly explain why this build works or what content it is for. Max 300 characters. Optional."),
@@ -2141,10 +2161,11 @@
       if (user && V) {
         const sel = (key, val, opts, blank) => `<select data-b="${key}"><option value="">${blank}</option>${opts.map(([v, l]) => `<option value="${esc(v)}"${v === val ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
         const empty = S("— kosong —", "— empty —");
-        const arcOpts = V.arcList.slice().sort((x, y) => x.name.localeCompare(y.name)).map((x) => [x.slug, x.name]);
-        const setOpts = V.setList.map((x) => [x.id, x.name]);
         const slot = (n, fn) => Array.from({ length: n }, (_, i) => `<div class="pb-slot"><i>${i + 1}</i>${fn(i)}</div>`).join("");
         const ce = es.find((x) => x.slug === cur) || {};
+        const pickBtn = (type, i, it, emptyLabel) => `<button type="button" class="pb-pick${it ? " has" : ""}" data-pick="${type}" data-i="${i}">${it ? `${it.img ? `<img src="${img(it.img)}" alt="">` : ""}<span><b>${esc(it.name)}</b><small>${esc(it.sub || "")}</small></span>` : `<span class="pb-pick-empty">${emptyLabel}</span>`}</button>${it ? `<button type="button" class="btn ghost sm" data-clear="${type}:${i}" aria-label="${S("Kosongkan slot", "Clear slot")}">×</button>` : ""}`;
+        const arcItem = (sl) => { const a = sl && V.arcList.find((x) => x.slug === sl); return a ? { img: a.icon, name: a.name, sub: `${a.type} · ★${a.rarity}` } : null; };
+        const setItem = (id) => { const st = id && V.setList.find((x) => x.id === id); return st ? { img: st.icon, name: st.name, sub: "" } : null; };
         const awkOpts = (ce.awakening || []).slice(0, 6).map((x, k) => [String(k + 1), `A${k + 1} · ${x.name}`]);
         const sklOpts = ["basic", "redirect", "ultimate", "support"].map((g) => { const k = (ce.skills || []).find((x) => x.group === g); return [g, k ? k.name : g]; });
         html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Karakter dan nama usulan", "Character and suggestion name")}</h3>
@@ -2154,12 +2175,14 @@
         <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Susunan tim (opsional)", "Team lineup (optional)")}</h3>
           ${field("mem", `${S("Anggota tim", "Team members")} <small>(${members.length}/4)</small>`, `<div class="adm-chips pb-mem">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(chipName(sl))}</button>`; }).join("")}</div>`)}
           ${members.length > 1 ? field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(chipName(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}" placeholder="${S("mis. DPS", "e.g. DPS")}"></label>`).join("")}</div>`) : `<p class="pb-lead">${S("Pilih 1 sampai 3 karakter lagi kalau mau menyertakan susunan tim. Boleh dilewati.", "Pick 1 to 3 more characters to include a team lineup. You can skip this.")}</p>`}
+          ${field("brot", S("Rotasi tim (opsional)", "Team rotation (optional)"), `<textarea id="pbRot" maxlength="500" rows="3" placeholder="${S("mis. Skill A, ganti ke B, Ultimate C, kembali ke A", "e.g. Skill A, switch to B, Ultimate C, back to A")}">${esc(bf.rotation)}</textarea>`, "pbRot")}
         </div>
         <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Arc terbaik", "Best Arcs")}</h3>
-          ${field("barc", S("Arc prioritas (maks 4)", "Priority Arcs (max 4)"), slot(4, (i) => sel("arc" + i, bf.arcs[i], arcOpts, empty)))}
+          <p class="pb-lead">${S(`Karakter ini memakai Arc tipe <b>${esc(ce.arcType || "?")}</b>, jadi hanya Arc tipe itu yang bisa dipilih.`, `This character uses <b>${esc(ce.arcType || "?")}</b> Arcs, so only that type can be picked.`)}</p>
+          ${field("barc", S("Arc prioritas (maks 4)", "Priority Arcs (max 4)"), slot(4, (i) => pickBtn("arc", i, arcItem(bf.arcs[i]), S("Pilih Arc", "Choose Arc"))))}
         </div>
         <div class="pb-card"><h3 class="pb-h"><i>4</i>${S("Cartridge terbaik (set modul)", "Best Cartridges (module sets)")}</h3>
-          ${field("bset", S("Set modul (maks 3, opsional)", "Module sets (max 3, optional)"), slot(3, (i) => `${sel("setid" + i, bf.sets[i].id, setOpts, empty)}<select data-b="setp${i}" class="pb-pc"><option value="4"${bf.sets[i].pieces === 4 ? " selected" : ""}>4 ${S("keping", "pc")}</option><option value="2"${bf.sets[i].pieces === 2 ? " selected" : ""}>2 ${S("keping", "pc")}</option></select>`))}
+          ${field("bset", S("Set modul (maks 3, opsional)", "Module sets (max 3, optional)"), slot(3, (i) => `${pickBtn("set", i, setItem(bf.sets[i].id), S("Pilih set modul", "Choose module set"))}<select data-b="setp${i}" class="pb-pc"><option value="4"${bf.sets[i].pieces === 4 ? " selected" : ""}>4 ${S("keping", "pc")}</option><option value="2"${bf.sets[i].pieces === 2 ? " selected" : ""}>2 ${S("keping", "pc")}</option></select>`))}
         </div>
         <div class="pb-card"><h3 class="pb-h"><i>5</i>${S("Stat terbaik", "Best Stats")}</h3>
           ${field("bstat", S("Stat utama (maks 3)", "Main stats (max 3)"), slot(3, (i) => sel("stat" + i, bf.stats[i], V.statList.map((x) => [x, x]), empty)))}
@@ -2196,12 +2219,25 @@
       const t = ev.target.closest("button"); if (!t) return;
       if (t.dataset.help) { const k = t.dataset.help; if (openHelp.has(k)) openHelp.delete(k); else openHelp.add(k); keep(); render(); return; }
       try {
+        if (t.dataset.clear) { keep(); const [ty, ix] = t.dataset.clear.split(":"); if (ty === "arc") bf.arcs[+ix] = ""; else bf.sets[+ix].id = ""; render(); return; }
+        if (t.dataset.pick) {
+          keep(); const ty = t.dataset.pick, ix = +t.dataset.i, ce2 = es.find((x) => x.slug === cur) || {};
+          if (ty === "arc") {
+            const items = V.arcList.filter((a) => a.type === ce2.arcType).sort((x, y) => y.rarity - x.rarity || x.name.localeCompare(y.name)).map((a) => ({ key: a.slug, img: a.icon, name: a.name, sub: `${a.type} · ★${a.rarity}`, text: (a.effect && a.effect.name) || "", used: bf.arcs.some((v, k) => v === a.slug && k !== ix) }));
+            pickModal(S(`Pilih Arc tipe ${ce2.arcType}`, `Choose a ${ce2.arcType} Arc`), items, (k) => { bf.arcs[ix] = k; render(); });
+          } else {
+            const items = V.setList.map((st) => ({ key: st.id, img: st.icon, name: st.name, sub: "", text: (st.bonuses || []).map((b) => `${b.pieces}${S(" keping", "-pc")}: ${b.text}`).join("  ·  "), used: bf.sets.some((v, k) => v.id === st.id && k !== ix) }));
+            pickModal(S("Pilih set modul", "Choose a module set"), items, (k) => { bf.sets[ix].id = k; render(); }, true);
+          }
+          return;
+        }
         if (t.id === "pbSendB") {
           keep();
           const credit = { name: form.cname || (user.displayName || ""), url: form.url };
-          const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), why: bf.why, credit };
+          const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), rotation: bf.rotation, why: bf.why, credit };
           if (members.length > 1) raw.team = { members: members.slice(), roles: members.map((sl) => roles[sl] || "") };
-          const r = P.sanitizeBuild(raw, { ...V.ctx, espers: known }, cur);
+          const ceT = (es.find((x) => x.slug === cur) || {}).arcType;
+          const r = P.sanitizeBuild(raw, { ...V.ctx, arcs: V.arcList.filter((a) => a.type === ceT).map((a) => a.slug), espers: known }, cur);
           errs = r.errors; if (!r.build) { render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
@@ -2224,7 +2260,7 @@
       } catch (e) { toast(fbErr(e)); render(); }
     });
     root.addEventListener("change", (ev) => {
-      if (ev.target.id === "pbEsper") { keep(); cur = ev.target.value; members = [cur].concat(members.filter((s) => s !== cur)).slice(0, 4); errs = []; render(); }
+      if (ev.target.id === "pbEsper") { keep(); cur = ev.target.value; members = [cur].concat(members.filter((s) => s !== cur)).slice(0, 4); errs = []; const nt = (es.find((x) => x.slug === cur) || {}).arcType; bf.arcs = bf.arcs.map((sl) => { const a = V && V.arcList.find((x) => x.slug === sl); return a && a.type === nt ? sl : ""; }); render(); }
     });
   }
 
