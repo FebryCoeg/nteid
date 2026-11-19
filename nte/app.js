@@ -2068,7 +2068,7 @@
     const stats = (b.stats || []).map((t, i) => chip(`${i + 1}. ${esc(t)}`)).join("");
     const sub = (b.sub || []).map((t, i) => chip(`${i + 1}. ${esc(t)}`)).join("");
     const awks = (b.awks || []).map((n, i) => { const a = (ce.awakening || [])[n - 1]; return chip(`${i + 1}. A${n}${a ? " · " + esc(a.name) : ""}`); }).join("");
-    const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. ${esc(k ? k.name : g)}`); }).join("");
+    const skills = (b.skills || []).map((g, i) => { const k = (ce.skills || []).find((x) => x.group === g); return chip(`${i + 1}. <b>${esc(LABEL.group[g] || g)}</b>: ${esc(k ? k.name : g)}`); }).join("");
     const row = (label, html) => (html ? `<p class="mono cb-lab">${label}</p><div class="cb-chips">${html}</div>` : "");
     return `<div class="bd-tm"><div class="bd-tm-head"><b>${esc(b.name)}</b><em>${S("KOMUNITAS", "COMMUNITY")}</em></div>
       ${team}${b.rotation ? `<p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p><p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}${row(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs)}${row(S("SET MODUL", "MODULE SETS"), sets)}${row(S("STAT UTAMA", "MAIN STATS"), stats)}${row(S("SUB-STAT", "SUB STATS"), sub)}${row(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks)}${row(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills)}
@@ -2167,7 +2167,7 @@
         const arcItem = (sl) => { const a = sl && V.arcList.find((x) => x.slug === sl); return a ? { img: a.icon, name: a.name, sub: `${a.type} · ★${a.rarity}` } : null; };
         const setItem = (id) => { const st = id && V.setList.find((x) => x.id === id); return st ? { img: st.icon, name: st.name, sub: "" } : null; };
         const awkOpts = (ce.awakening || []).slice(0, 6).map((x, k) => [String(k + 1), `A${k + 1} · ${x.name}`]);
-        const sklOpts = ["basic", "redirect", "ultimate", "support"].map((g) => { const k = (ce.skills || []).find((x) => x.group === g); return [g, k ? k.name : g]; });
+        const sklOpts = ["basic", "redirect", "ultimate", "support"].map((g) => { const k = (ce.skills || []).find((x) => x.group === g); return [g, `${LABEL.group[g] || g}: ${k ? k.name : g}`]; });
         html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Karakter dan nama usulan", "Character and suggestion name")}</h3>
           ${field("char", S("Usulan ini untuk halaman karakter", "This suggestion is for the page of"), `<select id="pbEsper">${es.filter((x) => x.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}
           ${field("bname", S("Nama usulan", "Suggestion name"), `<input type="text" id="pbBName" maxlength="40" value="${esc(bf.name)}" autocomplete="off" placeholder="${S("mis. Nova Burst untuk boss", "e.g. Nova Burst for bosses")}">`, "pbBName")}
