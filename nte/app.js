@@ -950,7 +950,7 @@
       const bsec = qbList ? `<label style="margin-top:14px;display:block">Usulan build komunitas</label>${qbList.length ? `<ul class="pb-list">${qbList.map((p) => {
         const r = VB ? PX.sanitizeBuild({ ...(p.build || {}), credit: p.credit }, { ...VB.ctx, espers: knownE() }, p.esper) : { build: null, errors: ["Daftar pilihan belum dimuat."] };
         if (!r.build) return `<li><b>Usulan build tidak valid</b> dari ${esc(p.name || "?")}: ${esc(r.errors.join(" "))}<br><button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
-        return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${buildCardHtml(r.build, VB, creditHtml(r.build.credit, "USULAN OLEH"), { list: es, esper: p.esper })}<button class="btn" type="button" data-qb-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
+        return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${p.updatedAt ? ` · <b class="pb-st pending">DIEDIT PENGUSUL (menggantikan versi yang tayang)</b>` : ""}${buildCardHtml(r.build, VB, creditHtml(r.build.credit, "USULAN OLEH"), { list: es, esper: p.esper })}<button class="btn" type="button" data-qb-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
       }).join("")}</ul>` : "<em>Tidak ada usulan build menunggu.</em>"}` : "";
       qbox.innerHTML = `<div class="adm-box"><label>Usulan tim komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
         ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => {
@@ -2043,9 +2043,9 @@
     ${t.why ? `<p class="bd-tm-metric">${esc(t.why)}</p>` : ""}${extra || ""}</div>`;
   const creditHtml = (c, label) => {
     if (!c || !c.name) return "";
-    const url = window.NteProposals ? window.NteProposals.facebookUrl(c.url || "") : null;
-    const nm = url ? `<a href="${esc(url)}" target="_blank" rel="noopener nofollow ugc">${esc(c.name)} ↗</a>` : esc(c.name);
-    return `<p class="bd-tm-credit mono">${label || S("SUSUNAN TIM OLEH", "TEAM BY")} ${nm}</p>`;
+    const url = window.NteProposals ? window.NteProposals.mediaUrl(c.url || "") : null;
+    const lnk = url ? ` · <a class="bd-tm-link" href="${esc(url)}" target="_blank" rel="noopener nofollow ugc">${S("Link Media", "Media link")} ↗</a>` : "";
+    return `<p class="bd-tm-credit mono">${label || S("SUSUNAN TIM OLEH", "TEAM BY")} ${esc(c.name)}${lnk}</p>`;
   };
   // Kosakata pilihan usulan build: Arc, set modul, stat utama, dan sub-stat dikumpulkan dari data situs.
   let vocabP = null;
@@ -2129,11 +2129,14 @@
     try { fb = await fbLoad(); } catch (e) { root.innerHTML = `<p class="txt">${S("Layanan login gagal dimuat (mungkin diblokir ekstensi atau offline). Coba lagi nanti.", "The login service failed to load (blocked by an extension or offline). Try again later.")}</p>`; return; }
 
     const known = es.filter((e) => e.slug !== "exe").map((e) => e.slug);
-    const publishedTeams = (sl) => [].concat(((curated[sl] || {}).teams) || [], (comm && comm[sl]) || [], ((commB && commB[sl]) || []).map((b) => b && b.team).filter(Boolean));
+    const publishedTeams = (sl, skipPid) => [].concat(((curated[sl] || {}).teams) || [], (comm && comm[sl]) || [], ((commB && commB[sl]) || []).filter((b) => b && b.pid !== skipPid).map((b) => b && b.team).filter(Boolean));
     const nm = (sl) => ((es.find((x) => x.slug === sl) || {}).name || sl).split(" (")[0];
     const V = await buildVocab().catch(() => null);
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], mineB = [], msg = "", errs = [];
-    let bf = { name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rot: [], rotation: "" };
+    const newBf = () => ({ name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rot: [], rotation: "" });
+    let bf = newBf(), editId = null;
+    const ROLE_PRESETS = ["DPS", "Sub DPS", "Support", "Healing", "Tank", "Costume"];
+    const roleCustom = new Set();
     let rotChar = cur;
     const pruneRot = () => { bf.rot = bf.rot.filter((x) => members.includes(x.c)); if (!members.includes(rotChar)) rotChar = cur; };
     const sentB = (sl) => mineB.find((m) => m.esper === sl) || null;
@@ -2157,11 +2160,11 @@
       bawk: S("Urutkan Awakening dari yang paling diprioritaskan (slot 1) sampai slot 6. Boleh dikosongkan atau diisi sebagian. Tidak boleh memilih Awakening yang sama dua kali.", "Order the Awakenings from highest priority (slot 1) to slot 6. You can leave it empty or fill part of it. The same Awakening cannot be picked twice."),
       bskl: S("Urutkan skill dari yang paling dulu dinaikkan levelnya (slot 1). Boleh dikosongkan. Tidak boleh memilih skill yang sama dua kali.", "Order the skills from the first one to level up (slot 1). You can leave it empty. The same skill cannot be picked twice."),
       mem: S("Pilih 2 sampai 4 karakter. Karakter halaman otomatis ikut dan tidak bisa dilepas. Klik lagi untuk melepas karakter lain. Angka di chip = urutan anggota.", "Pick 2 to 4 characters. The page's character is always included. Click again to remove another one. The number on a chip is the member order."),
-      role: S("Tulis peran singkat tiap anggota, misalnya DPS Utama, Sub-DPS, atau Support. Boleh dikosongkan.", "Write a short role for each member, e.g. Main DPS, Sub-DPS or Support. You can leave it empty."),
+      role: S("Pilih peran tiap anggota dari daftar (DPS, Sub DPS, Support, Healing, Tank, Costume), atau pilih \"Tulis sendiri\" untuk menulis peran lain. Boleh dikosongkan.", "Pick each member's role from the list (DPS, Sub DPS, Support, Healing, Tank, Costume), or choose \"Write your own\" for another role. You can leave it empty."),
       name: S("Nama singkat untuk susunan timmu, misalnya \"Tim Nova\". Maksimal 40 huruf.", "A short name for your team, e.g. \"Nova Team\". Max 40 characters."),
       why: S("Jelaskan singkat kenapa susunan ini bagus: sinergi, reaksi yang terbentuk, atau cara memainkannya. Maksimal 300 huruf. Boleh kosong.", "Briefly explain why this team works: synergy, reactions it forms, or how to play it. Max 300 characters. Optional."),
       cname: S("Nama ini yang tampil di bawah timmu sebagai \"Susunan tim oleh\". Bisa nama asli atau nama panggung, tidak harus sama dengan nama Google.", "This name appears under your team as \"Team by\". It can be a real name or a nickname and does not have to match your Google name."),
-      url: S("Kalau diisi, nama kreditmu bisa diklik dan membuka alamat Facebook ini. Hanya alamat facebook.com yang diterima. Kosongkan kalau tidak mau menampilkan link.", "If filled in, your credit name becomes a link to this Facebook address. Only facebook.com addresses are accepted. Leave empty for no link."),
+      url: S("Kalau diisi, usulanmu menampilkan tulisan \"Link Media\" yang membuka alamat ini. Boleh link Facebook, Instagram, YouTube, TikTok, X, Discord, dan media sosial populer lainnya. Kosongkan kalau tidak mau menampilkan link.", "If filled in, your suggestion shows a \"Media link\" that opens this address. Facebook, Instagram, YouTube, TikTok, X, Discord and other popular social media links are accepted. Leave empty for no link."),
       bname: S("Nama singkat untuk build-mu, misalnya \"Nova Burst untuk boss\". Maksimal 40 huruf.", "A short name for your build, e.g. \"Nova Burst for bosses\". Max 40 characters."),
       barc: S("Klik slot untuk membuka daftar bergambar. Hanya Arc dengan tipe yang cocok dengan karakter ini yang bisa dipilih. Pilih 1 sampai 4 Arc sesuai urutan prioritas: slot 1 yang paling kamu sarankan. Tidak boleh memilih Arc yang sama dua kali.", "Click a slot to open the picture list. Only Arcs of the type this character uses can be picked. Pick 1 to 4 Arcs in priority order: slot 1 is the one you recommend most. The same Arc cannot be picked twice."),
       bset: S("Klik slot untuk membuka daftar set bergambar lengkap dengan efek 2 dan 4 keping. Pilih sampai 3 set beserta jumlah kepingnya (2 atau 4). Boleh dikosongkan.", "Click a slot to open the picture list with the 2-piece and 4-piece effects. Pick up to 3 sets with the piece count (2 or 4). You can leave it empty."),
@@ -2170,8 +2173,8 @@
       bstat: S("Pilih 1 sampai 3 stat utama sesuai urutan prioritas. Pilihannya diambil dari daftar yang dipakai di situs ini.", "Pick 1 to 3 main stats in priority order. The choices come from the list used on this site."),
       bsub: S("Pilih sampai 4 sub-stat sesuai urutan prioritas. Boleh dikosongkan.", "Pick up to 4 sub stats in priority order. You can leave it empty."),
       bwhy: S("Jelaskan singkat kenapa build ini bagus atau untuk konten apa. Maksimal 300 huruf. Boleh kosong.", "Briefly explain why this build works or what content it is for. Max 300 characters. Optional."),
-      mine: S("Menunggu = belum ditinjau admin. Disetujui = sudah tayang di situs. Ditolak = tidak ditayangkan. Tiap karakter hanya bisa kamu usulkan satu kali, dan usulan tidak bisa diubah atau dihapus.", "Pending = not reviewed yet. Approved = live on the site. Rejected = not published. You can suggest one team per character, once, and a suggestion cannot be edited or deleted."),
-      priv: S("Usulan menyimpan ID akun dan nama tampilan Google-mu (hanya dilihat admin). Emailmu tidak ditampilkan. Yang tampil di situs hanya nama kredit dan link Facebook yang kamu isi sendiri.", "A suggestion stores your account ID and Google display name (only the admin sees them). Your email is not shown. The site only shows the credit name and Facebook link you type yourself."),
+      mine: S("Menunggu = belum ditinjau admin. Disetujui = sudah tayang di situs. Ditolak = tidak ditayangkan. Tiap karakter hanya bisa kamu usulkan satu kali, tapi usulannya boleh kamu edit kapan saja lewat tombol Edit. Setelah diedit, usulan menunggu persetujuan admin lagi, dan versi yang sudah tayang tetap tampil sampai perubahannya disetujui.", "Pending = not reviewed yet. Approved = live on the site. Rejected = not published. You can suggest once per character, but you may edit it any time with the Edit button. After an edit it waits for admin approval again, and the live version stays until the change is approved."),
+      priv: S("Usulan menyimpan ID akun dan nama tampilan Google-mu (hanya dilihat admin). Emailmu tidak ditampilkan. Yang tampil di situs hanya nama kredit dan Link Media yang kamu isi sendiri.", "A suggestion stores your account ID and Google display name (only the admin sees them). Your email is not shown. The site only shows the credit name and Media link you type yourself."),
     };
     const help = (k) => `<button type="button" class="pb-help" data-help="${k}" aria-expanded="${openHelp.has(k)}" aria-label="${S("Penjelasan", "Explanation")}">!</button>`;
     const hint = (k) => `<p class="pb-hint" ${openHelp.has(k) ? "" : "hidden"} data-hint="${k}">${esc(HELP[k])}</p>`;
@@ -2193,13 +2196,17 @@
         const setItem = (id) => { const st = id && V.setList.find((x) => x.id === id); return st ? { img: st.icon, name: st.name, sub: "" } : null; };
         const awkOpts = (ce.awakening || []).slice(0, 6).map((x, k) => [String(k + 1), `A${k + 1} · ${x.name}`]);
         const sklOpts = ["basic", "redirect", "ultimate", "support"].map((g) => { const k = (ce.skills || []).find((x) => x.group === g); return [g, `${LABEL.group[g] || g}: ${k ? k.name : g}`]; });
-        html += `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Karakter dan nama usulan", "Character and suggestion name")}</h3>
+        const mineFor = sentB(cur);
+        const banner = !mineFor ? "" : editId === mineFor.id
+          ? `<div class="pb-card pb-edit"><p><b>${S("Kamu sedang mengedit usulanmu", "You are editing your suggestion")}</b> ${S("untuk", "for")} ${esc(nm(cur))} (${esc(STATUS()[mineFor.status] || mineFor.status)}). ${S("Setelah disimpan, usulan menunggu persetujuan admin lagi. Versi yang sudah tayang tetap tampil sampai perubahan disetujui.", "After saving, it waits for admin approval again. The live version stays until the change is approved.")}</p><div class="adm-row"><button type="button" class="btn ghost sm" data-edit-cancel>${S("Batal edit", "Cancel editing")}</button></div></div>`
+          : `<div class="pb-card pb-edit"><p>${S("Kamu sudah punya usulan untuk", "You already have a suggestion for")} <b>${esc(nm(cur))}</b>: ${esc((mineFor.build && mineFor.build.name) || "?")} (${esc(STATUS()[mineFor.status] || mineFor.status)}).</p><div class="adm-row"><button type="button" class="btn" data-edit="${esc(mineFor.id)}">${S("Edit usulan ini", "Edit this suggestion")}</button></div></div>`;
+        html += banner + `<div class="pb-card"><h3 class="pb-h"><i>1</i>${S("Karakter dan nama usulan", "Character and suggestion name")}</h3>
           ${field("char", S("Usulan ini untuk halaman karakter", "This suggestion is for the page of"), `<select id="pbEsper">${es.filter((x) => x.slug !== "exe").map((x) => `<option value="${x.slug}"${x.slug === cur ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`, "pbEsper")}
           ${field("bname", S("Nama usulan", "Suggestion name"), `<input type="text" id="pbBName" maxlength="40" value="${esc(bf.name)}" autocomplete="off" placeholder="${S("mis. Nova Burst untuk boss", "e.g. Nova Burst for bosses")}">`, "pbBName")}
         </div>
         <div class="pb-card"><h3 class="pb-h"><i>2</i>${S("Susunan tim (opsional)", "Team lineup (optional)")}</h3>
           ${field("mem", `${S("Anggota tim", "Team members")} <small>(${members.length}/4)</small>`, `<div class="adm-chips pb-mem">${known.map((sl) => { const on = members.includes(sl); return `<button type="button" class="${on ? "on" : ""}" data-mem="${sl}"${sl === cur ? " disabled" : ""}>${on ? `<i>${members.indexOf(sl) + 1}</i>` : ""}${esc(chipName(sl))}</button>`; }).join("")}</div>`)}
-          ${members.length > 1 ? field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => `<label class="pb-role"><span>${esc(chipName(sl))}</span><input type="text" maxlength="24" data-role="${sl}" value="${esc(roles[sl] || "")}" placeholder="${S("mis. DPS", "e.g. DPS")}"></label>`).join("")}</div>`) : `<p class="pb-lead">${S("Pilih 1 sampai 3 karakter lagi kalau mau menyertakan susunan tim. Boleh dilewati.", "Pick 1 to 3 more characters to include a team lineup. You can skip this.")}</p>`}
+          ${members.length > 1 ? field("role", S("Peran tiap anggota (opsional)", "Each member's role (optional)"), `<div class="pb-roles">${members.map((sl) => { const v = roles[sl] || "", custom = roleCustom.has(sl) || (v && !ROLE_PRESETS.includes(v)); return `<label class="pb-role"><span>${esc(chipName(sl))}</span><select data-rolesel="${sl}"><option value="">${S("— tanpa peran —", "— no role —")}</option>${ROLE_PRESETS.map((r) => `<option value="${r}"${!custom && v === r ? " selected" : ""}>${r}</option>`).join("")}<option value="__c"${custom ? " selected" : ""}>${S("Tulis sendiri…", "Write your own…")}</option></select>${custom ? `<input type="text" maxlength="24" data-role="${sl}" value="${esc(v)}" placeholder="${S("Tulis perannya", "Write the role")}">` : ""}</label>`; }).join("")}</div>`) : `<p class="pb-lead">${S("Pilih 1 sampai 3 karakter lagi kalau mau menyertakan susunan tim. Boleh dilewati.", "Pick 1 to 3 more characters to include a team lineup. You can skip this.")}</p>`}
         </div>
         <div class="pb-card"><h3 class="pb-h"><i>3</i>${S("Arc terbaik", "Best Arcs")}</h3>
           <p class="pb-lead">${S(`Karakter ini memakai Arc tipe <b>${esc(ce.arcType || "?")}</b>, jadi hanya Arc tipe itu yang bisa dipilih.`, `This character uses <b>${esc(ce.arcType || "?")}</b> Arcs, so only that type can be picked.`)}</p>
@@ -2233,14 +2240,30 @@
         <div class="pb-card"><h3 class="pb-h"><i>9</i>${S("Catatan dan kredit", "Notes and credit")}</h3>
           ${field("bwhy", S("Catatan (opsional)", "Notes (optional)"), `<textarea id="pbBWhy" maxlength="300" rows="3">${esc(bf.why)}</textarea>`, "pbBWhy")}
           ${field("cname", S("Nama untuk kredit", "Credit name"), `<input type="text" id="pbCname" maxlength="40" value="${esc(form.cname || user.displayName || "")}" autocomplete="off">`, "pbCname")}
-          ${field("url", S("Link Facebook (opsional)", "Facebook link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.facebook.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
+          ${field("url", S("Link Media (opsional)", "Media link (optional)"), `<input type="url" id="pbUrl" maxlength="200" placeholder="https://www.instagram.com/namamu" value="${esc(form.url)}" autocomplete="off">`, "pbUrl")}
           ${errs.length ? `<ul class="tk-warn">${errs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-          ${sentB(cur) ? `<p class="pb-ok">${S("Kamu sudah mengirim usulan untuk karakter ini. Pilih karakter lain untuk mengusulkan lagi.", "You already sent a suggestion for this character. Pick another character to suggest again.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSendB" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>`}
-          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU kali (karakter lain tetap boleh) dan usulan tidak bisa diubah, jadi periksa dulu sebelum mengirim. Susunan tim yang anggotanya sama dengan tim yang sudah ada akan ditolak. Usulan tampil sebagai Build dari komunitas, terpisah dari rekomendasi resmi.", "The admin reviews it before it goes live. You can suggest ONE per character, once (other characters are still fine) and it cannot be edited, so double-check before sending. A team with the same members as an existing one is rejected. It appears as a community build, separate from the official recommendation.")}</p>
+          ${editId && mineFor && editId === mineFor.id ? `<div class="adm-row pb-send"><button class="btn" id="pbSaveB" type="button">${S("Simpan perubahan", "Save changes")}</button></div>` : mineFor ? `<p class="pb-lead">${S("Klik \"Edit usulan ini\" di bagian atas untuk mengubah usulanmu.", "Click \"Edit this suggestion\" at the top to change your suggestion.")}</p>` : `<div class="adm-row pb-send"><button class="btn" id="pbSendB" type="button">${S("Kirim usulan", "Send suggestion")}</button></div>`}
+          <p class="pb-foot">${S("Admin meninjau dulu sebelum tayang. Tiap karakter hanya bisa kamu usulkan SATU kali (karakter lain tetap boleh), tapi usulanmu boleh diedit kapan saja. Setelah diedit, usulan menunggu persetujuan admin lagi. Susunan tim yang anggotanya sama dengan tim yang sudah ada akan ditolak. Usulan tampil sebagai Build dari komunitas, terpisah dari rekomendasi resmi.", "The admin reviews it before it goes live. You can suggest ONE per character (other characters are still fine), but you may edit your suggestion any time. After an edit it waits for admin approval again. A team with the same members as an existing one is rejected. It appears as a community build, separate from the official recommendation.")}</p>
         </div>
-        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineB.length + mineList.length ? `<ul class="pb-list">${mineB.map((m) => `<li><span><b>${esc((m.build && m.build.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`).concat(mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · ${S("tim", "team")} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`)).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
+        <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineB.length + mineList.length ? `<ul class="pb-list">${mineB.map((m) => `<li><span><b>${esc((m.build && m.build.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span><button type="button" class="btn ghost sm" data-edit="${esc(m.id)}">${S("Edit", "Edit")}</button></li>`).concat(mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · ${S("tim", "team")} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`)).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
       }
       root.innerHTML = html;
+    }
+    function collectBuild() {
+      const credit = { name: form.cname || (user.displayName || ""), url: form.url };
+      const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), rot: bf.rot.map((x) => ({ c: x.c, a: x.a })), rotation: bf.rotation, why: bf.why, credit };
+      if (members.length > 1) raw.team = { members: members.slice(), roles: members.map((sl) => roles[sl] || "") };
+      const ceT = (es.find((x) => x.slug === cur) || {}).arcType;
+      return P.sanitizeBuild(raw, { ...V.ctx, arcs: V.arcList.filter((a) => a.type === ceT).map((a) => a.slug), espers: known }, cur);
+    }
+    function loadForEdit(m) {
+      const b = m.build || {}, c = m.credit || {}, pad = (arr, n, f) => Array.from({ length: n }, (_, i) => f((arr || [])[i]));
+      cur = m.esper; editId = m.id; errs = []; msg = "";
+      members = b.team && Array.isArray(b.team.members) && b.team.members.includes(cur) ? b.team.members.slice() : [cur];
+      roles = {}; roleCustom.clear();
+      if (b.team && Array.isArray(b.team.members)) b.team.members.forEach((sl, i) => { roles[sl] = (b.team.roles || [])[i] || ""; if (roles[sl] && !ROLE_PRESETS.includes(roles[sl])) roleCustom.add(sl); });
+      bf = { name: b.name || "", why: b.why || "", arcs: pad(b.arcs, 4, (x) => x || ""), sets: pad(b.sets, 3, (x) => (x ? { id: x.id, pieces: x.pieces } : { id: "", pieces: 4 })), stats: pad(b.stats, 3, (x) => x || ""), sub: pad(b.sub, 4, (x) => x || ""), awks: pad(b.awks, 6, (x) => (x ? String(x) : "")), skills: pad(b.skills, 4, (x) => x || ""), rot: (b.rot || []).map((x) => ({ c: x.c, a: x.a })), rotation: b.rotation || "" };
+      form.cname = c.name || ""; form.url = c.url || ""; rotChar = cur;
     }
     async function loadMine() {
       try { mineList = user ? await fb.mine(user) : []; } catch (e) { mineList = []; }
@@ -2272,24 +2295,29 @@
           }
           return;
         }
-        if (t.id === "pbSendB") {
+        if (t.dataset.edit) { const m = mineB.find((x) => x.id === t.dataset.edit); if (m) { loadForEdit(m); render(); root.scrollIntoView({ behavior: "smooth", block: "start" }); } return; }
+        if (t.dataset.editCancel !== undefined) { keep(); editId = null; bf = newBf(); members = [cur]; roles = {}; roleCustom.clear(); rotChar = cur; errs = []; render(); return; }
+        if (t.id === "pbSendB" || t.id === "pbSaveB") {
           keep();
-          const credit = { name: form.cname || (user.displayName || ""), url: form.url };
-          const raw = { name: bf.name, arcs: bf.arcs.filter(Boolean), sets: bf.sets.filter((x) => x.id).map((x) => ({ id: x.id, pieces: +x.pieces })), stats: bf.stats.filter(Boolean), sub: bf.sub.filter(Boolean), awks: bf.awks.filter(Boolean).map(Number), skills: bf.skills.filter(Boolean), rot: bf.rot.map((x) => ({ c: x.c, a: x.a })), rotation: bf.rotation, why: bf.why, credit };
-          if (members.length > 1) raw.team = { members: members.slice(), roles: members.map((sl) => roles[sl] || "") };
-          const ceT = (es.find((x) => x.slug === cur) || {}).arcType;
-          const r = P.sanitizeBuild(raw, { ...V.ctx, arcs: V.arcList.filter((a) => a.type === ceT).map((a) => a.slug), espers: known }, cur);
+          const saving = t.id === "pbSaveB";
+          const r = collectBuild();
           errs = r.errors; if (!r.build) { render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
           await loadMine();
-          if (sentB(cur)) { errs = [S("Kamu sudah mengirim usulan untuk karakter ini (hanya boleh satu kali).", "You already sent a suggestion for this character (only once allowed).")]; render(); return; }
-          if (r.build.team && P.duplicateOf(r.build.team.members, publishedTeams(cur))) { errs = [S("Susunan tim dengan anggota yang sama sudah ada, jadi ditolak. Ubah anggota timnya atau kosongkan bagian tim.", "A team with the same members already exists, so it is rejected. Change the members or leave the team empty.")]; render(); return; }
-          if (!(await ask(S("Kirim usulan ini? Setelah dikirim tidak bisa diubah atau dihapus, dan karakter ini tidak bisa kamu usulkan lagi.", "Send this suggestion? It cannot be edited or deleted afterwards, and you cannot suggest for this character again."), S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
+          const mineNow = sentB(cur);
+          if (!saving && mineNow) { errs = [S("Kamu sudah punya usulan untuk karakter ini. Pakai tombol Edit untuk mengubahnya.", "You already have a suggestion for this character. Use the Edit button to change it.")]; render(); return; }
+          if (saving && (!mineNow || mineNow.id !== editId)) { errs = [S("Usulan yang diedit tidak ditemukan. Muat ulang halaman.", "The suggestion being edited was not found. Reload the page.")]; render(); return; }
+          if (r.build.team && P.duplicateOf(r.build.team.members, publishedTeams(cur, saving ? editId : null))) { errs = [S("Susunan tim dengan anggota yang sama sudah ada, jadi ditolak. Ubah anggota timnya atau kosongkan bagian tim.", "A team with the same members already exists, so it is rejected. Change the members or leave the team empty.")]; render(); return; }
+          const q = saving
+            ? S("Simpan perubahan? Usulanmu akan menunggu persetujuan admin lagi. Versi yang sudah tayang tetap tampil sampai perubahan disetujui.", "Save changes? Your suggestion will wait for admin approval again. The live version stays until the change is approved.")
+            : S("Kirim usulan ini? Karakter ini tidak bisa kamu usulkan lagi, tapi usulannya masih bisa kamu edit nanti.", "Send this suggestion? You cannot suggest for this character again, but you can still edit it later.");
+          if (!(await ask(q, saving ? S("Simpan", "Save") : S("Kirim", "Send"), S("Periksa lagi", "Check again")))) return;
           t.disabled = true;
           const { credit: cr, ...core } = r.build;
-          await fb.submitBuild(user, cur, core, cr, id);
-          await loadMine(); msg = S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW."); bf.name = ""; bf.why = ""; render(); toast(S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!")); return;
+          if (saving) await fb.updateBuild(editId, core, cr); else await fb.submitBuild(user, cur, core, cr, id);
+          await loadMine(); msg = saving ? S("PERUBAHAN TERSIMPAN. MENUNGGU PERSETUJUAN ADMIN.", "CHANGES SAVED. WAITING FOR ADMIN APPROVAL.") : S("USULAN TERKIRIM. MENUNGGU TINJAUAN ADMIN.", "SUGGESTION SENT. WAITING FOR ADMIN REVIEW.");
+          editId = null; bf = newBf(); members = [cur]; roles = {}; roleCustom.clear(); rotChar = cur; render(); toast(saving ? S("Perubahan tersimpan.", "Changes saved.") : S("Usulan terkirim. Terima kasih!", "Suggestion sent. Thank you!")); return;
         }
         if (t.id === "pbIn") { await fb.login(); return; }
         if (t.id === "pbOut") { await fb.logout(); return; }
@@ -2301,7 +2329,13 @@
       } catch (e) { toast(fbErr(e)); render(); }
     });
     root.addEventListener("change", (ev) => {
-      if (ev.target.id === "pbEsper") { keep(); cur = ev.target.value; members = [cur].concat(members.filter((s) => s !== cur)).slice(0, 4); errs = []; const nt = (es.find((x) => x.slug === cur) || {}).arcType; bf.arcs = bf.arcs.map((sl) => { const a = V && V.arcList.find((x) => x.slug === sl); return a && a.type === nt ? sl : ""; }); render(); }
+      const rs = ev.target.dataset && ev.target.dataset.rolesel;
+      if (rs) {
+        keep(); const v = ev.target.value;
+        if (v === "__c") { roleCustom.add(rs); if (ROLE_PRESETS.includes(roles[rs])) roles[rs] = ""; } else { roleCustom.delete(rs); roles[rs] = v; }
+        render(); const inp = $(`[data-role="${rs}"]`); if (inp) inp.focus(); return;
+      }
+      if (ev.target.id === "pbEsper") { keep(); cur = ev.target.value; if (editId) { editId = null; bf = newBf(); members = [cur]; roles = {}; roleCustom.clear(); rotChar = cur; } members = [cur].concat(members.filter((s) => s !== cur)).slice(0, 4); errs = []; const nt = (es.find((x) => x.slug === cur) || {}).arcType; bf.arcs = bf.arcs.map((sl) => { const a = V && V.arcList.find((x) => x.slug === sl); return a && a.type === nt ? sl : ""; }); render(); }
     });
   }
 

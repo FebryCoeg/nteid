@@ -83,7 +83,7 @@ await t("build: isi build tidak valid ditolak", async () => {
     await assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { build: b })));
 });
 await t("build: kredit dengan link bukan Facebook ditolak", () => assertFails(setDoc(B(bob, "bob_akane-rin"), mb("bob", { credit: { name: "B", url: "https://evil.com/x" } }))));
-await t("build: pemilik tidak boleh mengganti atau menghapus (sekali saja)", async () => { await assertFails(setDoc(B(alice, "alice_akane-rin"), mb("alice", { name: "Lain" }))); await assertFails(deleteDoc(B(alice, "alice_akane-rin"))); });
+await t("build: pemilik tidak boleh menimpa dengan dokumen baru (createdAt berubah) ataupun menghapus", async () => { await assertFails(setDoc(B(alice, "alice_akane-rin"), mb("alice", { name: "Lain" }))); await assertFails(deleteDoc(B(alice, "alice_akane-rin"))); });
 await t("build: karakter lain untuk pengguna sama boleh", () => assertSucceeds(setDoc(B(alice, "alice_blackbird"), mb("alice", { esper: "blackbird" }))));
 await t("build: pemilik dan admin boleh membaca, orang lain tidak", async () => { await assertSucceeds(getDoc(B(alice, "alice_akane-rin"))); await assertSucceeds(getDoc(B(admin, "alice_akane-rin"))); await assertFails(getDoc(B(bob, "alice_akane-rin"))); await assertFails(getDoc(B(anon, "alice_akane-rin"))); });
 await t("build: pemilik tidak boleh menyetujui sendiri, admin boleh ubah status saja", async () => { await assertFails(updateDoc(B(alice, "alice_akane-rin"), { status: "approved" })); await assertFails(updateDoc(B(admin, "alice_akane-rin"), { build: { ...build, name: "Lain" } })); await assertSucceeds(updateDoc(B(admin, "alice_akane-rin"), { status: "approved", reviewedAt: serverTimestamp() })); });
@@ -109,6 +109,32 @@ await t("rotasi berurutan: opsional, maksimal 24 langkah, harus berupa daftar", 
   await assertSucceeds(setDoc(B(ctxOf("o1", "o1@x.com"), "o1_akane-rin"), mb("o1", { build: { ...build, rot: [step, step] } })));
   await assertFails(setDoc(B(ctxOf("o2", "o2@x.com"), "o2_akane-rin"), mb("o2", { build: { ...build, rot: Array(25).fill(step) } })));
   await assertFails(setDoc(B(ctxOf("o3", "o3@x.com"), "o3_akane-rin"), mb("o3", { build: { ...build, rot: "e" } })));
+});
+// edit usulan oleh pemilik
+const upd = (db, id, over = {}) => updateDoc(B(db, id), { build: { ...build, name: "Diedit" }, credit, status: "pending", updatedAt: serverTimestamp(), ...over });
+await t("edit: pemilik boleh mengedit build dan kreditnya sendiri, status tetap pending", () => assertSucceeds(upd(alice, "alice_akane-rin")));
+await t("edit: setelah admin menyetujui, edit pemilik mengembalikan status ke pending", async () => {
+  await assertSucceeds(updateDoc(B(admin, "alice_akane-rin"), { status: "approved", reviewedAt: serverTimestamp() }));
+  await assertSucceeds(upd(alice, "alice_akane-rin", { build: { ...build, name: "Edit kedua" } }));
+  const d = await getDoc(B(admin, "alice_akane-rin")); if (d.data().status !== "pending" || d.data().build.name !== "Edit kedua") throw new Error("status atau isi tidak sesuai");
+});
+await t("edit: pemilik tidak boleh menyetujui diri sendiri lewat edit", () => assertFails(upd(alice, "alice_akane-rin", { status: "approved" })));
+await t("edit: orang lain tidak boleh mengedit usulan ini", () => assertFails(upd(bob, "alice_akane-rin")));
+await t("edit: tanpa login ditolak", () => assertFails(upd(anon, "alice_akane-rin")));
+await t("edit: tidak boleh mengubah karakter, uid, nama, createdAt, atau reviewedAt", async () => {
+  for (const o of [{ esper: "blackbird" }, { uid: "bob" }, { name: "Palsu" }, { createdAt: new Date("2000-01-01") }, { reviewedAt: serverTimestamp() }, { isAdmin: true }])
+    await assertFails(upd(alice, "alice_akane-rin", o));
+});
+await t("edit: updatedAt palsu ditolak", () => assertFails(upd(alice, "alice_akane-rin", { updatedAt: new Date("2000-01-01") })));
+await t("edit: isi tidak valid ditolak (Arc kosong, link bukan media, catatan terlalu panjang)", async () => {
+  await assertFails(upd(alice, "alice_akane-rin", { build: { ...build, arcs: [] } }));
+  await assertFails(upd(alice, "alice_akane-rin", { credit: { name: "B", url: "https://evil.com/x" } }));
+  await assertFails(upd(alice, "alice_akane-rin", { build: { ...build, why: "x".repeat(301) } }));
+});
+await t("link media: YouTube, Instagram, TikTok, X diterima; situs lain dan tipuan host ditolak", async () => {
+  let i = 0;
+  for (const u of ["https://www.youtube.com/@budi", "https://instagram.com/budi", "https://www.tiktok.com/@budi", "https://x.com/budi", "https://linktr.ee/budi", "https://youtu.be/abc"]) { i++; await assertSucceeds(setDoc(B(ctxOf("m" + i, "m@x.com"), "m" + i + "_akane-rin"), mb("m" + i, { credit: { name: "B", url: u } }))); }
+  for (const u of ["https://evil.com/x", "https://youtube.com.evil.com/x", "https://instagram.com@evil.com/x", "https://instagram.com", "http://x.com/budi", "https://notx.com/a"]) { i++; await assertFails(setDoc(B(ctxOf("m" + i, "m@x.com"), "m" + i + "_akane-rin"), mb("m" + i, { credit: { name: "B", url: u } }))); }
 });
 console.log(n + " uji aturan lulus");
 await env.cleanup();

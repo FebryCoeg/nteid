@@ -51,19 +51,19 @@ test("sanitizeTeam: link Facebook opsional, tapi bila diisi harus valid", () => 
   assert.ok(bad.errors.length);
 });
 
-test("facebookUrl: host resmi diterima dan dinormalkan", () => {
-  assert.equal(P.facebookUrl("https://www.facebook.com/budi.santoso"), "https://www.facebook.com/budi.santoso");
-  assert.equal(P.facebookUrl("facebook.com/budi"), "https://facebook.com/budi");
-  assert.equal(P.facebookUrl("http://m.facebook.com/profile.php?id=123#x"), "https://m.facebook.com/profile.php?id=123");
-  assert.equal(P.facebookUrl("https://fb.com/budi"), "https://fb.com/budi");
-  assert.equal(P.facebookUrl("  https://web.facebook.com/budi  "), "https://web.facebook.com/budi");
+test("mediaUrl: host Facebook diterima dan dinormalkan", () => {
+  assert.equal(P.mediaUrl("https://www.facebook.com/budi.santoso"), "https://www.facebook.com/budi.santoso");
+  assert.equal(P.mediaUrl("facebook.com/budi"), "https://facebook.com/budi");
+  assert.equal(P.mediaUrl("http://m.facebook.com/profile.php?id=123#x"), "https://m.facebook.com/profile.php?id=123");
+  assert.equal(P.mediaUrl("https://fb.com/budi"), "https://fb.com/budi");
+  assert.equal(P.mediaUrl("  https://web.facebook.com/budi  "), "https://web.facebook.com/budi");
 });
 
-test("facebookUrl: host palsu, skema berbahaya, kredensial, dan jalur kosong ditolak", () => {
+test("mediaUrl: host palsu, skema berbahaya, kredensial, dan jalur kosong ditolak", () => {
   for (const u of ["https://facebook.com.evil.com/x", "https://evilfacebook.com/x", "https://facebook.com@evil.com/x", "https://user:pw@facebook.com/x",
     "javascript:alert(1)", "data:text/html,x", "ftp://facebook.com/x", "https://facebook.com", "https://facebook.com/", "https://facebook.com:8080/x",
     "https://facebооk.com/x", "https://" + "a".repeat(10) + ".com", "", "bukan url", "https://facebook.com/" + "a".repeat(250)])
-    assert.equal(P.facebookUrl(u), null, u);
+    assert.equal(P.mediaUrl(u), null, u);
 });
 
 test("docId: gabungan uid dan slug, karakter aneh ditolak", () => {
@@ -195,4 +195,27 @@ test("sanitizeBuild: tanpa tim, rotasi hanya boleh memakai karakter halaman; bid
   assert.ok(P.sanitizeBuild({ ...bok, rot: [{ c: "blackbird", a: "q" }] }, bctx, "akane-rin").errors.length);
   const b = P.sanitizeBuild({ ...bok, rot: [{ c: "akane-rin", a: "q", evil: "<x>" }] }, bctx, "akane-rin");
   assert.deepEqual(b.build.rot, [{ c: "akane-rin", a: "q" }]);
+});
+
+test("mediaUrl: media sosial lain (YouTube, Instagram, TikTok, X, dll) diterima dan dinormalkan", () => {
+  assert.equal(P.mediaUrl("https://www.youtube.com/@budi"), "https://www.youtube.com/@budi");
+  assert.equal(P.mediaUrl("youtu.be/abc123"), "https://youtu.be/abc123");
+  assert.equal(P.mediaUrl("instagram.com/budi.santoso"), "https://instagram.com/budi.santoso");
+  assert.equal(P.mediaUrl("https://www.tiktok.com/@budi"), "https://www.tiktok.com/@budi");
+  assert.equal(P.mediaUrl("https://x.com/budi"), "https://x.com/budi");
+  assert.equal(P.mediaUrl("https://twitter.com/budi"), "https://twitter.com/budi");
+  assert.equal(P.mediaUrl("https://linktr.ee/budi"), "https://linktr.ee/budi");
+  assert.equal(P.mediaUrl("https://discord.gg/abc"), "https://discord.gg/abc");
+  assert.equal(P.mediaUrl("https://m.youtube.com/channel/UC123"), "https://m.youtube.com/channel/UC123");
+});
+
+test("mediaUrl: situs di luar daftar media dan tipuan host tetap ditolak", () => {
+  for (const u of ["https://evil.com/x", "https://youtube.com.evil.com/x", "https://evilyoutube.com/x", "https://instagram.com@evil.com/x", "https://instagram.com", "https://x.com/", "javascript:alert(1)", "https://notx.com/a", "https://tiktok.com:81/a", "https://exam-ple.com/a"])
+    assert.equal(P.mediaUrl(u), null, u);
+});
+
+test("sanitizeCredit lewat sanitizeTeam: link YouTube diterima", () => {
+  const r = P.sanitizeTeam({ ...ok, credit: { name: "Budi", url: "https://www.youtube.com/@budi" } }, ctx, "akane-rin");
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.team.credit.url, "https://www.youtube.com/@budi");
 });

@@ -5,14 +5,16 @@
   else root.NteProposals = factory();
 })(typeof self !== "undefined" ? self : this, function () {
   const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500, rotSteps: 24 };
-  const FB_HOSTS = new Set(["facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com", "mbasic.facebook.com", "fb.com", "www.fb.com"]);
+  // Link Media: alamat profil/halaman di media sosial populer (bukan situs sembarang). Subdomain resmi ikut diterima.
+  const MEDIA_DOMAINS = ["facebook.com", "fb.com", "instagram.com", "youtube.com", "youtu.be", "tiktok.com", "x.com", "twitter.com", "threads.net", "discord.gg", "discord.com", "twitch.tv", "linktr.ee", "reddit.com", "github.com", "t.me", "saweria.co", "trakteer.id"];
+  const mediaHost = (h) => MEDIA_DOMAINS.some((d) => h === d || h.endsWith("." + d));
 
   // Rapikan teks bebas: buang karakter kontrol, ratakan spasi/baris baru, potong.
   const CTRL = new RegExp("[\u0000-\u001f\u007f-\u009f\u2028\u2029]+", "g");
   const clean = (v, max) => (typeof v === "string" ? v.replace(CTRL, " ").replace(/\s+/g, " ").trim().slice(0, max) : "");
 
-  // Hanya alamat Facebook resmi (https). Mengembalikan alamat yang sudah dinormalkan, atau null.
-  function facebookUrl(input) {
+  // Hanya alamat https dari daftar media sosial. Mengembalikan alamat yang sudah dinormalkan, atau null.
+  function mediaUrl(input) {
     if (typeof input !== "string") return null;
     let s = input.trim();
     if (!s || s.length > MAX.url + 50) return null;
@@ -21,7 +23,7 @@
     try { u = new URL(s); } catch (e) { return null; }
     if (u.protocol !== "https:" && u.protocol !== "http:") return null;
     if (u.username || u.password || u.port) return null;
-    if (!FB_HOSTS.has(u.hostname.toLowerCase())) return null;
+    if (!mediaHost(u.hostname.toLowerCase())) return null;
     if (u.pathname.length <= 1) return null;
     const out = "https://" + u.hostname.toLowerCase() + u.pathname + u.search;
     return out.length <= MAX.url ? out : null;
@@ -34,8 +36,8 @@
     if (!name) errors.push("Nama pembuat (untuk kredit) wajib diisi.");
     let url = "";
     if (typeof c.url === "string" && c.url.trim()) {
-      url = facebookUrl(c.url);
-      if (!url) { errors.push("Link Facebook tidak valid. Gunakan alamat profil atau halaman di facebook.com."); url = ""; }
+      url = mediaUrl(c.url);
+      if (!url) { errors.push("Link Media tidak valid. Gunakan alamat profil atau halaman dari media sosial (Facebook, Instagram, YouTube, TikTok, X, dan sejenisnya)."); url = ""; }
     }
     return { name, url };
   }
@@ -145,5 +147,5 @@
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { MAX, ROT_ACTIONS, clean, facebookUrl, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
+  return { MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
 });

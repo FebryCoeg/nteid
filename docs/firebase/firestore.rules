@@ -23,7 +23,7 @@ service cloud.firestore {
         && c.keys().hasOnly(['name', 'url'])
         && c.name is string && c.name.size() >= 1 && c.name.size() <= 40
         && c.url is string && c.url.size() <= 200
-        && (c.url == '' || c.url.matches('^https://((www|m|web|mbasic)[.])?facebook[.]com/[^ ]+$') || c.url.matches('^https://(www[.])?fb[.]com/[^ ]+$'));
+        && (c.url == '' || c.url.matches('^https://([a-z0-9-]+[.])*(facebook[.]com|fb[.]com|instagram[.]com|youtube[.]com|youtu[.]be|tiktok[.]com|x[.]com|twitter[.]com|threads[.]net|discord[.]gg|discord[.]com|twitch[.]tv|linktr[.]ee|reddit[.]com|github[.]com|t[.]me|saweria[.]co|trakteer[.]id)/[^ ]+$'));
     }
     // "key" = anggota tim diurutkan dan digabung dengan titik; harus cocok dengan daftar anggota.
     function validKey(d) {
@@ -69,15 +69,19 @@ service cloud.firestore {
         && (!('rotation' in b) || (b.rotation is string && b.rotation.size() <= 500))
         && b.why is string && b.why.size() <= 300;
     }
+    // isi usulan (dipakai saat membuat dan saat pemilik mengedit)
+    function validBuildBody(d) {
+      return d.name is string && d.name.size() <= 80
+        && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
+        && validBuild(d.build)
+        && validCredit(d.credit);
+    }
     function validBuildProposal(d) {
       return d.keys().hasOnly(['uid', 'name', 'esper', 'build', 'credit', 'status', 'createdAt'])
         && d.uid == request.auth.uid
-        && d.name is string && d.name.size() <= 80
-        && d.esper is string && d.esper.size() >= 1 && d.esper.size() <= 64
         && d.status == 'pending'
         && d.createdAt == request.time
-        && validBuild(d.build)
-        && validCredit(d.credit);
+        && validBuildBody(d);
     }
 
     match /proposals/{id} {
@@ -109,14 +113,26 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Usulan lengkap (tim opsional, Arc, set, stat, Awakening, skill): satu per pengguna per karakter, sekali saja (id "<uid>_<esper>"), tanpa update/delete pemilik.
+    // Usulan lengkap (tim opsional, Arc, set, stat, Awakening, skill, rotasi): satu per pengguna per karakter (id "<uid>_<esper>").
+    // Pemilik boleh mengedit usulannya kapan saja, tapi setiap edit mengembalikan status ke 'pending' (admin menyetujui ulang).
     match /buildProposals/{id} {
       allow create: if signedIn()
         && id == request.auth.uid + '_' + request.resource.data.esper
         && validBuildProposal(request.resource.data);
+
+      // Edit oleh pemilik: hanya build, credit, status (harus 'pending'), dan updatedAt yang boleh berubah.
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['build', 'credit', 'status', 'updatedAt'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.updatedAt == request.time
+        && validBuildBody(request.resource.data);
+
+      // Admin hanya boleh mengubah status dan menambahkan reviewedAt.
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedAt'])
         && request.resource.data.status in ['approved', 'rejected', 'pending'];
+
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow delete: if isAdmin();
     }

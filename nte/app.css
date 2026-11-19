@@ -1761,3 +1761,9 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 
 .rt-build > .btn { justify-self: start; }
 .rt-key.rt-sw { color: #ffc24d; white-space: nowrap; }
+
+/* ---- edit usulan, peran preset, link media ---- */
+.pb-edit { border-color: #ffc24d66; }
+.pb-edit p { margin: 0; }
+.pb-role select { margin-bottom: 4px; }
+.bd-tm-link { color: var(--accent, #ff5a7a); }

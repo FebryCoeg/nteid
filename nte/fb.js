@@ -32,3 +32,5 @@ export async function submitBuild(user, esper, build, credit, id) {
 export async function mineBuilds(user) { return rows(await F.getDocs(F.query(F.collection(db, BCOL), F.where("uid", "==", user.uid)))); }
 export async function pendingBuilds() { return rows(await F.getDocs(F.query(F.collection(db, BCOL), F.where("status", "==", "pending")))); }
 export const setBuildStatus = (id, status) => F.updateDoc(F.doc(db, BCOL, id), { status, reviewedAt: F.serverTimestamp() });
+// Pemilik mengedit usulannya sendiri; status otomatis kembali ke "pending" supaya admin menyetujui ulang.
+export const updateBuild = (id, build, credit) => F.updateDoc(F.doc(db, BCOL, id), { build, credit, status: "pending", updatedAt: F.serverTimestamp() });
