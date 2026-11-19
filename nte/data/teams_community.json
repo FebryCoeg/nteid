@@ -1,1 +1,25 @@
-{}
+{
+ "lacrimosa": [
+  {
+   "name": "Tim Lacri Seikan",
+   "members": [
+    "lacrimosa",
+    "sakiri",
+    "blackbird",
+    "iroi"
+   ],
+   "roles": [
+    "DPS",
+    "Support",
+    "Support/Sub-DPS",
+    "Support"
+   ],
+   "why": "",
+   "credit": {
+    "name": "Seikan Seimachi",
+    "url": ""
+   },
+   "pid": "cDoUK7hfURd9ej6d34XP3jUWlBD3_lacrimosa"
+  }
+ ]
+}
