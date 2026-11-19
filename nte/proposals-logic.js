@@ -4,7 +4,7 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.NteProposals = factory();
 })(typeof self !== "undefined" ? self : this, function () {
-  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500 };
+  const MAX = { name: 40, role: 24, why: 300, credit: 40, url: 200, members: 4, minMembers: 2, rotation: 500, rotSteps: 24 };
   const FB_HOSTS = new Set(["facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com", "mbasic.facebook.com", "fb.com", "www.fb.com"]);
 
   // Rapikan teks bebas: buang karakter kontrol, ratakan spasi/baris baru, potong.
@@ -75,6 +75,8 @@
     return out;
   }
   const SKILL_GROUPS = ["basic", "redirect", "ultimate", "support"];
+  // Aksi dalam rotasi: tombol E, tombol Q, klik kiri (serangan dasar), tahan klik kiri, dan QTE (support).
+  const ROT_ACTIONS = ["e", "q", "atk", "hold", "qte"];
   function sanitizeBuild(raw, ctx, pageEsper) {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { build: null, errors: ["Data build tidak valid."] };
     const errors = [];
@@ -116,11 +118,21 @@
         }
       }
     }
+    const rot = [];
+    const rin = raw.rot === undefined ? [] : raw.rot;
+    if (!Array.isArray(rin) || rin.length > MAX.rotSteps) errors.push("Rotasi: maksimal " + MAX.rotSteps + " langkah.");
+    else {
+      const who = new Set(team ? team.members : [pageEsper]);
+      for (const x of rin) {
+        if (x && typeof x === "object" && !Array.isArray(x) && who.has(x.c) && ROT_ACTIONS.includes(x.a)) rot.push({ c: x.c, a: x.a });
+        else { errors.push("Rotasi: ada langkah dengan karakter di luar tim atau aksi yang tidak dikenal."); break; }
+      }
+    }
     const why = clean(raw.why, MAX.why);
     const rotation = clean(raw.rotation, MAX.rotation);
     const credit = sanitizeCredit(raw.credit, errors);
     if (errors.length) return { build: null, errors };
-    const build = { name, arcs, sets, stats, sub, awks, skills, rotation, why, credit };
+    const build = { name, arcs, sets, stats, sub, awks, skills, rot, rotation, why, credit };
     if (team) build.team = team;
     return { build, errors };
   }
@@ -133,5 +145,5 @@
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { MAX, clean, facebookUrl, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
+  return { MAX, ROT_ACTIONS, clean, facebookUrl, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
 });

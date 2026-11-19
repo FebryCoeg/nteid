@@ -104,5 +104,11 @@ await t("rotasi tim: opsional, maksimal 500 huruf, harus teks", async () => {
   await assertFails(setDoc(B(ctxOf("r2", "r2@x.com"), "r2_akane-rin"), mb("r2", { build: { ...build, rotation: "x".repeat(501) } })));
   await assertFails(setDoc(B(ctxOf("r3", "r3@x.com"), "r3_akane-rin"), mb("r3", { build: { ...build, rotation: 5 } })));
 });
+await t("rotasi berurutan: opsional, maksimal 24 langkah, harus berupa daftar", async () => {
+  const step = { c: "akane-rin", a: "e" };
+  await assertSucceeds(setDoc(B(ctxOf("o1", "o1@x.com"), "o1_akane-rin"), mb("o1", { build: { ...build, rot: [step, step] } })));
+  await assertFails(setDoc(B(ctxOf("o2", "o2@x.com"), "o2_akane-rin"), mb("o2", { build: { ...build, rot: Array(25).fill(step) } })));
+  await assertFails(setDoc(B(ctxOf("o3", "o3@x.com"), "o3_akane-rin"), mb("o3", { build: { ...build, rot: "e" } })));
+});
 console.log(n + " uji aturan lulus");
 await env.cleanup();
