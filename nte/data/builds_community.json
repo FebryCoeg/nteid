@@ -447,6 +447,10 @@
      "a": "e"
     },
     {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
      "c": "iroi",
      "a": "switch"
     },
@@ -541,6 +545,10 @@
     {
      "c": "elyms",
      "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
     },
     {
      "c": "iroi",
@@ -591,8 +599,8 @@
      "a": "q"
     }
    ],
-   "repeat": 22,
-   "rotation": "Untuk elyms di langkah 7 dan 31 bisa di skip atau lebih tepat nya tidak akan bisa di lakukan jika Akane Melakukan Cycle ke Elyms. Dan untuk langkah 15 dan 38 hanya di lakukan jika cycle iroi penuh jika tidak penuh maka bisa di skip. Untuk ULTI Shinku yaitu 19-22 dan 42-45 itu adalah keseluruhan ULTI nya jadi basic atk di lakukan trs menerus dan gunakan skill nya jika aktif max 5x dan gunakan ULTI lagi jika sudah aktif kembali",
+   "repeat": 23,
+   "rotation": "Untuk elyms di langkah 7 dan 32 bisa di skip atau lebih tepat nya tidak akan bisa di lakukan jika Akane Melakukan Cycle ke Elyms. Dan untuk langkah 16 dan 40 hanya di lakukan jika cycle iroi penuh jika tidak penuh maka bisa di skip. Untuk ULTI Shinku yaitu 20-23 dan 44-47 itu adalah keseluruhan ULTI nya jadi basic atk di lakukan trs menerus dan gunakan skill nya jika aktif max 5x dan gunakan ULTI lagi jika sudah aktif kembali",
    "why": "",
    "credit": {
     "name": "Seikan Seimachi",
