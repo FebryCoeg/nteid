@@ -819,5 +819,125 @@
    },
    "pid": "dJynE11bAVOtLfL94CI1SD8NqPZ2_chaos"
   }
+ ],
+ "akane-rin": [
+  {
+   "name": "Rotasi DoubleBlossom untuk Charge Shinku",
+   "arcs": [
+    "far-side-of-the-moon"
+   ],
+   "sets": [],
+   "stats": [
+    "CRIT DMG",
+    "Lakshana DMG"
+   ],
+   "sub": [
+    "CRIT Rate / CRIT DMG"
+   ],
+   "awks": [],
+   "skills": [
+    "redirect"
+   ],
+   "rot": [
+    {
+     "c": "shinku",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    }
+   ],
+   "repeat": 10,
+   "rotation": "Standar rotasi Shinku cuma kalo ada akane cukup 1x cycle remoranya di awal + skill akane harus selalu terhubung biar jadi permanen remora dan fokus cycle pindah ke blossom double blossom + copy dari iroi jadi 4 blossom",
+   "why": "",
+   "credit": {
+    "name": "Player Shinku",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "akane-rin",
+     "shinku",
+     "iroi",
+     "zero-1051"
+    ],
+    "roles": [
+     "Sub Dps Unlimite Remora",
+     "DPS",
+     "Support",
+     "Cycle"
+    ]
+   },
+   "pid": "tpDAgesu7gbqagRGvzkx8v3laJd2_akane-rin"
+  }
  ]
 }
