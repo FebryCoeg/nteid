@@ -1821,3 +1821,10 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .cb-detail .bd-tm-mem { margin: 4px 0 0; }
 .cb-star b { font: 800 0.85rem var(--body); }
 .cb-badges .cb-feat { font: 700 0.56rem var(--mono); font-style: normal; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; background: #4ade8022; color: #4ade80; }
+
+/* ---- aksi rotasi umum: SK, UL, BA ---- */
+.rt-key.rt-sk { color: #33d6e8; }
+.rt-key.rt-ul { color: #f1c044; }
+.rt-key.rt-ba { color: #ff6fa5; }
+.rt-key.rt-sw { color: #b69cff; white-space: nowrap; }
+.rt-key { letter-spacing: 0.02em; }
