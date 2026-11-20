@@ -1005,13 +1005,21 @@
         }
       } catch (e) { fMsg = /GitHub/.test(String(e && e.message)) ? "Gagal menyimpan ke GitHub: " + e.message + ". Periksa token (izin Contents: Read and write)." : "Terjadi kesalahan: " + String(e && e.message || e); renderFeat(); }
     });
+    const baseTitle = document.title.replace(/^\(\d+\)\s*/, "");
+    async function loadQueue() {
+      VB = await buildVocab().catch(() => null);
+      qList = await fbm.pending(); qbList = await fbm.pendingBuilds(); qMsg = ""; renderQueue();
+    }
     function renderQueue() {
+      const pn = qList ? qList.length + (qbList ? qbList.length : 0) : null;
+      document.title = (pn ? `(${pn}) ` : "") + baseTitle;
+      const summary = pn === null ? "" : pn ? `<p class="pb-ok"><b>${pn}</b> usulan menunggu persetujuanmu (tim: ${qList.length}, build: ${qbList ? qbList.length : 0}).</p>` : `<p class="pb-ok">Tidak ada usulan yang menunggu.</p>`;
       const bsec = qbList ? `<label style="margin-top:14px;display:block">Usulan build komunitas</label>${qbList.length ? `<ul class="pb-list">${qbList.map((p) => {
         const r = VB ? PX.sanitizeBuild({ ...(p.build || {}), credit: p.credit }, { ...VB.ctx, espers: knownE() }, p.esper) : { build: null, errors: ["Daftar pilihan belum dimuat."] };
         if (!r.build) return `<li><b>Usulan build tidak valid</b> dari ${esc(p.name || "?")}: ${esc(r.errors.join(" "))}<br><button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
         return `<li>Untuk halaman <b>${esc((es.find((x) => x.slug === p.esper) || { name: p.esper }).name)}</b> · akun Google: ${esc(p.name || "?")}${p.updatedAt ? ` · <b class="pb-st pending">DIEDIT PENGUSUL (menggantikan versi yang tayang)</b>` : ""}${buildCardHtml(r.build, VB, creditHtml(r.build.credit, "USULAN OLEH"), { list: es, esper: p.esper })}<button class="btn" type="button" data-qb-ok="${esc(p.id)}">Setujui dan simpan ke GitHub</button> <button class="btn ghost" type="button" data-qb-reject="${esc(p.id)}">Tolak</button></li>`;
       }).join("")}</ul>` : "<em>Tidak ada usulan build menunggu.</em>"}` : "";
-      qbox.innerHTML = `<div class="adm-box"><label>Usulan tim komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
+      qbox.innerHTML = `<div class="adm-box"><label>Usulan tim komunitas</label><div class="adm-row"><button class="btn" id="qLoad" type="button">${qList ? "Muat ulang antrean" : "Login Google admin dan muat antrean"}</button></div>${summary}${qMsg ? `<p class="mono adm-note">${esc(qMsg)}</p>` : ""}
         ${qList ? (qList.length ? `<ul class="pb-list">${qList.map((p) => {
           const r = PX.sanitizeTeam({ ...p.team, credit: p.credit }, { espers: knownE() }, p.esper);
           if (!r.team) return `<li><b>Usulan tidak valid</b> dari ${esc(p.name || "?")}: ${esc(r.errors.join(" "))}<br><button class="btn ghost" type="button" data-q-reject="${esc(p.id)}">Tolak</button></li>`;
@@ -1019,6 +1027,9 @@
         }).join("")}</ul>` : "<em>Tidak ada usulan menunggu.</em>") : ""}${bsec}</div>`;
     }
     renderQueue();
+    // Kalau admin sudah pernah login di browser ini, antrean dimuat otomatis tanpa klik (tanpa popup).
+    let admHint = false; try { admHint = localStorage.getItem("nte_fb") === "1"; } catch (e) {}
+    if (PX && admHint) fbLoad().then(async (f) => { fbm = f; const u = await f.whenUser(); if (u && f.isAdmin(u)) await loadQueue(); }).catch(() => {});
     qbox.addEventListener("click", async (ev) => {
       const t = ev.target.closest("button"); if (!t) return;
       try {
@@ -1027,8 +1038,8 @@
           fbm = fbm || await fbLoad();
           const u = await fbm.login();
           if (!fbm.isAdmin(u.user)) { await fbm.logout(); qMsg = "Akun ini bukan admin."; qList = null; renderQueue(); return; }
-          VB = await buildVocab().catch(() => null);
-          qList = await fbm.pending(); qbList = await fbm.pendingBuilds(); qMsg = ""; renderQueue(); return;
+          try { localStorage.setItem("nte_fb", "1"); } catch (e2) {}
+          await loadQueue(); return;
         }
         if (t.dataset.qbOk || t.dataset.qbReject) {
           const bid = t.dataset.qbOk || t.dataset.qbReject; const bp = (qbList || []).find((x) => x.id === bid); if (!bp) return;
