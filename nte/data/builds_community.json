@@ -380,6 +380,239 @@
     ]
    },
    "pid": "LNed9whxOnTBMfzJt56KIg9Bq9E2_shinku"
+  },
+  {
+   "name": "Tim Shinku",
+   "arcs": [
+    "blushing-mirage"
+   ],
+   "sets": [
+    {
+     "id": "Suit6",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT Rate",
+    "CRIT DMG"
+   ],
+   "sub": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "DMG %",
+    "ATK %"
+   ],
+   "awks": [],
+   "skills": [
+    "ultimate",
+    "basic",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "hold"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "switch"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "atk"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "hold"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "switch"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "atk"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    }
+   ],
+   "repeat": 22,
+   "rotation": "Untuk elyms di langkah 7 dan 31 bisa di skip atau lebih tepat nya tidak akan bisa di lakukan jika Akane Melakukan Cycle ke Elyms. Dan untuk langkah 15 dan 38 hanya di lakukan jika cycle iroi penuh jika tidak penuh maka bisa di skip. Untuk ULTI Shinku yaitu 19-22 dan 42-45 itu adalah keseluruhan ULTI nya jadi basic atk di lakukan trs menerus dan gunakan skill nya jika aktif max 5x dan gunakan ULTI lagi jika sudah aktif kembali",
+   "why": "",
+   "credit": {
+    "name": "Seikan Seimachi",
+    "url": "https://discord.gg/qbHaUcQ6"
+   },
+   "team": {
+    "members": [
+     "shinku",
+     "akane-rin",
+     "elyms",
+     "iroi"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Support",
+     "Support"
+    ]
+   },
+   "pid": "cDoUK7hfURd9ej6d34XP3jUWlBD3_shinku"
   }
  ]
 }
