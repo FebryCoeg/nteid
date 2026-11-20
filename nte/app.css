@@ -1795,3 +1795,29 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .rt-loop b { font-size: 0.72rem; font-weight: 800; }
 .rt-loop.end { padding: 0 8px; }
 .rt-rp { margin-top: 3px; width: 22px; height: 18px; padding: 0; font-size: 0.8rem; line-height: 1; text-align: center; }
+
+/* ---- build komunitas: pemilih dan detail ala build resmi ---- */
+.cb-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 14px; }
+.cb-tab { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; border: 2px solid var(--edge); background: var(--panel-2); color: var(--text); font: 700 0.8rem var(--body); cursor: pointer; max-width: 100%; }
+.cb-tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cb-tab em { font-style: normal; font: 800 0.72rem var(--body); color: #ffc24d; }
+.cb-tab:hover { border-color: #ffffff55; }
+.cb-tab.on { background: var(--pink); border-color: var(--edge); color: #fff; }
+.cb-tab.on em { color: #fff; }
+.cb-detail { padding: 14px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); }
+.cb-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.cb-name { display: block; font: 800 1.05rem var(--display); text-transform: uppercase; }
+.cb-head .bd-tm-credit { margin: 6px 0 0; }
+.cb-badges { display: flex; align-items: center; gap: 8px; }
+.cb-badges .cb-star { margin-left: 0; }
+.cb-block { margin-top: 14px; }
+.cb-block .cb-lab { margin: 0 0 6px; }
+.cb-why { margin: 10px 0 0; }
+.cb-bn { margin: 4px 0 0; font-size: 0.74rem; line-height: 1.45; color: var(--text-2); }
+.cb-detail .bd-arcs { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.cb-detail .bd-set { margin-top: 6px; background: var(--panel-2); }
+.cb-detail .bd-set:first-of-type { margin-top: 0; }
+.cb-detail .bd-arc, .cb-detail .bd-skill { background: var(--panel-2); }
+.cb-detail .bd-tm-mem { margin: 4px 0 0; }
+.cb-star b { font: 800 0.85rem var(--body); }
+.cb-badges .cb-feat { font: 700 0.56rem var(--mono); font-style: normal; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; background: #4ade8022; color: #4ade80; }

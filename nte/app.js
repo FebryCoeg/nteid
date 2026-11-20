@@ -636,7 +636,11 @@
         }
         if (VOC) {
           const cb = ((COMMB && COMMB[e.slug]) || []).filter((b) => b && b.name && Array.isArray(b.arcs));
-          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${cb.length ? `<div class="bd-teams">${window.NteProposals.rankByStars(cb, starState.counts).map((b) => buildCardHtml(b, VOC, creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY")), { list, esper: e.slug, star: { count: starState.counts[b.pid] || 0, mine: starState.mine.has(b.pid) }, featured: !!(FEAT[e.slug] && FEAT[e.slug].pid === b.pid) })).join("")}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:8px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
+          const ranked = window.NteProposals.rankByStars(cb, starState.counts);
+          const featPid = FEAT[e.slug] && FEAT[e.slug].pid;
+          const detail = (i) => communityDetailHtml(ranked[i], { V: VOC, list, e, icons, atk: (sl) => ((SD.arcs || {})[sl] || {}).atk, featured: !!(featPid && ranked[i].pid === featPid), star: { count: starState.counts[ranked[i].pid] || 0, mine: starState.mine.has(ranked[i].pid) } });
+          cbCtx = { ranked, detail, sel: 0 };
+          html += `<div class="af-sec"><h4>${S("Build dari komunitas", "Community builds")}</h4><p class="mono">${S("USULAN PEMAIN, BUKAN REKOMENDASI RESMI", "PLAYER SUGGESTIONS, NOT OFFICIAL RECOMMENDATIONS")}</p>${ranked.length ? `<div class="cb-tabs" role="tablist">${ranked.map((b, i) => `<button type="button" class="cb-tab${i === 0 ? " on" : ""}" role="tab" data-cbsel="${i}"><span>${esc(b.name)}</span><em data-tabcount="${esc(b.pid)}">★ ${starState.counts[b.pid] || 0}</em></button>`).join("")}</div><div id="cbDetail">${detail(0)}</div>` : `<p class="txt">${S("Belum ada build dari komunitas.", "No community builds yet.")}</p>`}<p class="mono" style="margin-top:10px"><a class="chip" href="/usulan" data-link>${S("Usulkan build dan tim", "Suggest a build and team")}</a></p></div>`;
         }
         return html;
       },
@@ -2176,6 +2180,7 @@
       b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
       const n = b.querySelector("b"); if (n) n.textContent = String(starState.counts[b.dataset.star] || 0);
     });
+    document.querySelectorAll("[data-tabcount]").forEach((x) => { x.textContent = "★ " + (starState.counts[x.dataset.tabcount] || 0); });
   }
   document.addEventListener("click", async (ev) => {
     const b = ev.target.closest("[data-star]"); if (!b || b.disabled) return;
@@ -2193,6 +2198,49 @@
       starState.counts[pid] = Math.max(0, (starState.counts[pid] || 0) + (on ? 1 : -1));
       paintStars();
     } catch (e) { toast(fbErr(e)); } finally { b.disabled = false; }
+  });
+  // Build komunitas yang dipilih tampil penuh dengan tata letak seperti build resmi (Arc bergambar, cartridge, stat, Awakening, skill, rotasi).
+  let cbCtx = null;
+  const communityDetailHtml = (b, o) => {
+    if (!b) return "";
+    const { V, list, e } = o;
+    const rank = (i) => `<i class="bd-rank r${i + 1}">${i + 1}</i>`;
+    const blk = (label, html) => (html ? `<div class="cb-block"><p class="mono cb-lab">${label}</p>${html}</div>` : "");
+    const arcs = (b.arcs || []).map((sl, i) => {
+      const a = V.arcList.find((x) => x.slug === sl); if (!a) return "";
+      const at = o.atk ? o.atk(sl) : null;
+      return `<a class="bd-arc q${a.rarity}" href="/arc/${a.slug}" data-link>${rank(i)}<img src="${img(a.icon)}" alt="" loading="lazy"><span><b>${esc(a.name)}</b><small>${esc(a.type)} · ★${a.rarity}${Array.isArray(at) && at.length ? ` · ATK ${esc(at[at.length - 1])}` : ""}</small></span></a>`;
+    }).join("");
+    const sets = (b.sets || []).map((x, i) => {
+      const st = V.setList.find((m) => m.id === x.id); if (!st) return "";
+      const bn = (st.bonuses || []).find((z) => z.pieces === x.pieces);
+      return `<div class="bd-set">${rank(i)}${st.icon ? `<img src="${img(st.icon)}" alt="" loading="lazy">` : ""}<div><b>${esc(st.name)} <em>${x.pieces}${S(" keping", "-pc")}</em></b>${bn ? `<p class="cb-bn">${esc(bn.text)}</p>` : ""}</div></div>`;
+    }).join("");
+    const stats = (b.stats || []).map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("");
+    const sub = (b.sub || []).map((t, i) => `<span><i>${i + 1}</i>${esc(t)}</span>`).join("");
+    const skillCard = (i, icon, name, small) => `<div class="bd-skill"><i>${i + 1}</i><span class="skill-ico">${icon ? `<img src="${img(icon)}" alt="" loading="lazy">` : ""}</span><span><b>${esc(name)}</b><small>${esc(small)}</small></span></div>`;
+    const awks = (b.awks || []).map((n, i) => { const a = (e.awakening || [])[n - 1]; return skillCard(i, a && a.icon, a ? a.name : "A" + n, "A" + n); }).join("");
+    const skills = (b.skills || []).map((g, i) => { const k = (e.skills || []).find((x) => x.group === g); return skillCard(i, (o.icons || {})[g], k ? k.name : g, LABEL.group[g] || g); }).join("");
+    const team = b.team && Array.isArray(b.team.members) && b.team.members.length > 1
+      ? `<div class="cb-block"><p class="mono cb-lab">${S("SUSUNAN TIM", "TEAM LINEUP")}</p><div class="bd-tm-mem">${b.team.members.map((sl, mi) => { const m = list.find((x) => x.slug === sl); const rl = (b.team.roles || [])[mi]; return m ? `<a href="/esper/${m.slug}" data-link class="${m.slug === e.slug ? "me" : ""}"><img src="${img(m.icon)}" alt=""><small>${esc(m.name.split(" (")[0])}</small>${rl ? `<small class="bd-tm-role">${esc(rl)}</small>` : ""}</a>` : ""; }).join("")}</div></div>` : "";
+    const rot = (b.rot && b.rot.length) || b.rotation
+      ? `<div class="cb-block"><p class="mono cb-lab">${S("ROTASI TIM", "TEAM ROTATION")}</p>${rotHtml(b.rot, list, { repeat: b.repeat })}${b.rotation ? `<p class="bd-tm-metric cb-rot">${esc(b.rotation)}</p>` : ""}</div>` : "";
+    return `<div class="cb-detail">
+      <div class="cb-head"><div><b class="cb-name">${esc(b.name)}</b>${creditHtml(b.credit, S("USULAN OLEH", "SUGGESTED BY"))}</div><div class="cb-badges">${o.featured ? `<em class="cb-feat">${S("BUILD UTAMA", "MAIN BUILD")}</em>` : ""}${o.star ? starBtn(b.pid, e.slug, o.star) : ""}</div></div>
+      ${b.why ? `<p class="bd-tm-metric cb-why">${esc(b.why)}</p>` : ""}${team}
+      ${blk(S("ARC (URUTAN = PRIORITAS)", "ARCS (ORDER = PRIORITY)"), arcs ? `<div class="bd-arcs">${arcs}</div>` : "")}
+      ${blk(S("CARTRIDGE", "CARTRIDGES"), sets)}
+      ${blk(S("STAT UTAMA", "MAIN STATS"), stats ? `<div class="bd-stats">${stats}</div>` : "")}${blk(S("SUB-STAT", "SUB STATS"), sub ? `<div class="bd-stats sub">${sub}</div>` : "")}
+      ${blk(S("AWAKENING (URUTAN PRIORITAS)", "AWAKENINGS (PRIORITY ORDER)"), awks ? `<div class="bd-skills">${awks}</div>` : "")}
+      ${blk(S("PRIORITAS NAIK LEVEL SKILL", "SKILL LEVEL-UP ORDER"), skills ? `<div class="bd-skills">${skills}</div>` : "")}${rot}
+    </div>`;
+  };
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("[data-cbsel]"); if (!t || !cbCtx) return;
+    const i = +t.dataset.cbsel; if (!cbCtx.ranked[i]) return;
+    cbCtx.sel = i;
+    document.querySelectorAll("[data-cbsel]").forEach((x) => x.classList.toggle("on", +x.dataset.cbsel === i));
+    const box = document.querySelector("#cbDetail"); if (box) box.innerHTML = cbCtx.detail(i);
   });
   // Urutan kartu sama seperti tab Build: tim, Arc, set modul, stat, Awakening, skill, catatan, kredit.
   const buildCardHtml = (b, V, extra, o) => {
