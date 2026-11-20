@@ -938,6 +938,190 @@
     ]
    },
    "pid": "tpDAgesu7gbqagRGvzkx8v3laJd2_akane-rin"
+  },
+  {
+   "name": "Premium tim",
+   "arcs": [
+    "far-side-of-the-moon",
+    "the-last-rose",
+    "fluff-of-fleetness",
+    "clear-skies"
+   ],
+   "sets": [
+    {
+     "id": "Suit5",
+     "pieces": 4
+    },
+    {
+     "id": "Suit6",
+     "pieces": 4
+    },
+    {
+     "id": "Suit8",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT DMG",
+    "Lakshana DMG",
+    "CRIT Rate"
+   ],
+   "sub": [
+    "ATK %",
+    "CRIT DMG",
+    "CRIT Rate",
+    "Universal DMG"
+   ],
+   "awks": [
+    3,
+    5,
+    2,
+    6,
+    4,
+    1
+   ],
+   "skills": [
+    "redirect",
+    "basic",
+    "ultimate",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    }
+   ],
+   "repeat": 0,
+   "rotation": "",
+   "why": "",
+   "credit": {
+    "name": "Fanyaspirant201",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "akane-rin",
+     "blackbird",
+     "elyms",
+     "iroi"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Support",
+     "Healing"
+    ]
+   },
+   "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_akane-rin"
   }
  ]
 }
