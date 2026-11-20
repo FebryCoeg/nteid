@@ -122,6 +122,77 @@
     ]
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_zankou"
+  },
+  {
+   "name": "Break Nuker",
+   "arcs": [
+    "ravenous-blade",
+    "crime-and-punishment",
+    "good-boy-s-grand-adventure",
+    "tears-beneath-the-mask"
+   ],
+   "sets": [
+    {
+     "id": "Suit4",
+     "pieces": 4
+    },
+    {
+     "id": "Suit1",
+     "pieces": 4
+    },
+    {
+     "id": "Suit3",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Incantation DMG",
+    "CRIT Rate / CRIT DMG",
+    "Cycle Intensity"
+   ],
+   "sub": [
+    "CRIT Rate / CRIT DMG",
+    "Break Intensity",
+    "Universal DMG",
+    "Cycle Intensity / CRIT Rate"
+   ],
+   "awks": [
+    5,
+    2,
+    4,
+    1,
+    3,
+    6
+   ],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [],
+   "repeat": null,
+   "rotation": "Sakiri Skill > Daffodill in > Blackbird In > Daffodill In > Daffodill Skill > Daffodill Arc Skill > Daffodill Ult > Blackbird Skill > Daffodill In > Zankou in",
+   "why": "Best Break Nuker out there that you can invest in NTE",
+   "credit": {
+    "name": "Theresa Erika von Weiss",
+    "url": "https://www.youtube.com/@TheresaBabels"
+   },
+   "team": {
+    "members": [
+     "zankou",
+     "blackbird",
+     "daffodill",
+     "sakiri"
+    ],
+    "roles": [
+     "MAIN DPS",
+     "SUB DPS / SUPPORT",
+     "MAIN BREAK",
+     "BUFFER / SUPPORT"
+    ]
+   },
+   "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_zankou"
   }
  ],
  "shinku": [
