@@ -1,7 +1,7 @@
 // Uji aturan Firestore dengan emulator. Jalankan (butuh Java + firebase-tools + @firebase/rules-unit-testing):
 //   firebase emulators:exec --only firestore "node firestore.rules.test.mjs"   (salin berkas ini ke folder yang berisi paketnya)
 import { initializeTestEnvironment, assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp, collection, getDocs, query, where, writeBatch } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp, collection, getDocs, query, where, writeBatch, runTransaction } from "firebase/firestore";
 import { readFileSync } from "node:fs";
 
 const env = await initializeTestEnvironment({ projectId: "demo-nte", firestore: { rules: readFileSync(process.env.RULES || "firestore.rules", "utf8"), host: "127.0.0.1", port: 8080 } });
@@ -188,5 +188,23 @@ await t("bintang: penghitung tidak bisa dihapus dan jumlah tidak bisa menjadi ne
   await assertFails(updateDoc(C1(s3, "s1_akane-rin"), { count: -1 }));
 });
 await t("bintang: setelah dicabut, pengguna boleh memberi bintang lagi", () => assertSucceeds(giveStar(s2, "s2", "s1_akane-rin", { count: 1 })));
+// meniru setStar di nte/fb.js (transaksi seperti yang dipakai situs)
+const clientSetStar = (db, uid, pid, esper, on) => runTransaction(db, async (tx) => {
+  const sref = doc(db, "stars", pid + "__" + uid), cref = doc(db, "buildStars", pid);
+  const c = await tx.get(cref);
+  if (on) {
+    tx.set(sref, { uid, pid, esper, createdAt: serverTimestamp() });
+    if (c.exists()) tx.update(cref, { count: c.data().count + 1 }); else tx.set(cref, { esper, count: 1 });
+  } else {
+    if (!c.exists()) return;
+    tx.delete(sref);
+    tx.update(cref, { count: Math.max(0, c.data().count - 1) });
+  }
+});
+const s5 = ctxOf("s5", "s5@x.com"), s6 = ctxOf("s6", "s6@x.com");
+await t("bintang (alur situs): proposal siap, bintang pertama lewat transaksi berhasil", async () => { await assertSucceeds(setDoc(B(s5, "s5_akane-rin"), mb("s5"))); await assertSucceeds(clientSetStar(s6, "s6", "s5_akane-rin", "akane-rin", true)); });
+await t("bintang (alur situs): bintang kedua dari pengguna lain dan pencabutan lewat transaksi berhasil", async () => { await assertSucceeds(clientSetStar(s1, "s1", "s5_akane-rin", "akane-rin", true)); await assertSucceeds(clientSetStar(s6, "s6", "s5_akane-rin", "akane-rin", false)); const d = await getDoc(C1(anon, "s5_akane-rin")); if (d.data().count !== 1) throw new Error("jumlah seharusnya 1, bukan " + d.data().count); });
+await t("bintang (alur situs): query bintang milik sendiri per karakter diizinkan", () => assertSucceeds(getDocs(query(collection(s1, "stars"), where("uid", "==", "s1"), where("esper", "==", "akane-rin")))));
+await t("bintang: membaca dokumen bintang yang belum ada ditolak (karena itu klien tidak boleh membacanya, cukup membaca penghitung)", () => assertFails(getDoc(S1(s6, "s5_akane-rin__s6"))));
 console.log(n + " uji aturan lulus");
 await env.cleanup();

@@ -43,14 +43,17 @@ export async function myStars(uid, esper) {
   return new Set(snap.docs.map((d) => d.data().pid));
 }
 // Bintang dan penghitung diubah bersama dalam satu transaksi (aturan Firestore menjaga +1 / -1).
+// Yang dibaca hanya penghitung (publik). Dokumen bintang tidak dibaca karena membaca dokumen yang belum ada ditolak aturan;
+// status "sudah memberi bintang" berasal dari myStars().
 export async function setStar(user, pid, esper, on) {
   const sref = F.doc(db, "stars", pid + "__" + user.uid), cref = F.doc(db, "buildStars", pid);
   await F.runTransaction(db, async (tx) => {
-    const c = await tx.get(cref), s = await tx.get(sref);
-    if (on && !s.exists()) {
+    const c = await tx.get(cref);
+    if (on) {
       tx.set(sref, { uid: user.uid, pid, esper, createdAt: F.serverTimestamp() });
       if (c.exists()) tx.update(cref, { count: c.data().count + 1 }); else tx.set(cref, { esper, count: 1 });
-    } else if (!on && s.exists() && c.exists()) {
+    } else {
+      if (!c.exists()) return;
       tx.delete(sref);
       tx.update(cref, { count: Math.max(0, c.data().count - 1) });
     }

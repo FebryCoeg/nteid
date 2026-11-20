@@ -2185,8 +2185,9 @@
   document.addEventListener("click", async (ev) => {
     const b = ev.target.closest("[data-star]"); if (!b || b.disabled) return;
     ev.preventDefault(); b.disabled = true;
+    let fbm = null, u = null;
     try {
-      const fbm = await fbLoad(); let u = fbm.current();
+      fbm = await fbLoad(); u = fbm.current();
       if (!u) { await fbm.login(); u = fbm.current(); }
       if (!u) return;
       try { localStorage.setItem("nte_fb", "1"); } catch (e) {}
@@ -2197,7 +2198,13 @@
       if (on) starState.mine.add(pid); else starState.mine.delete(pid);
       starState.counts[pid] = Math.max(0, (starState.counts[pid] || 0) + (on ? 1 : -1));
       paintStars();
-    } catch (e) { toast(fbErr(e)); } finally { b.disabled = false; }
+    } catch (e) {
+      // Status bintang di layar bisa tidak sinkron (mis. bintang dari perangkat lain): segarkan lalu minta coba lagi.
+      if (fbm && u && String(e && e.code).includes("permission-denied")) {
+        try { starState.mine = await fbm.myStars(u.uid, b.dataset.starEsper); starState.hydrated = true; paintStars(); toast(S("Status bintangmu sudah disegarkan. Coba klik bintang sekali lagi.", "Your star status was refreshed. Click the star once more.")); return; } catch (e2) {}
+      }
+      toast(fbErr(e));
+    } finally { b.disabled = false; }
   });
   // Build komunitas yang dipilih tampil penuh dengan tata letak seperti build resmi (Arc bergambar, cartridge, stat, Awakening, skill, rotasi).
   let cbCtx = null;
