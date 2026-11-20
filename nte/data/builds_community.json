@@ -1695,5 +1695,179 @@
    },
    "pid": "GBVru2HrSATMYvHqqFi94e0MYh53_mint"
   }
+ ],
+ "blackbird": [
+  {
+   "name": "Mdps raven",
+   "arcs": [
+    "crime-and-punishment",
+    "fluff-of-finesse",
+    "tears-beneath-the-mask",
+    "cosmos-daze-wild-reverie"
+   ],
+   "sets": [
+    {
+     "id": "Suit3",
+     "pieces": 4
+    },
+    {
+     "id": "Suit6",
+     "pieces": 4
+    },
+    {
+     "id": "Suit12",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT DMG",
+    "Psyche DMG",
+    "Mental Damage"
+   ],
+   "sub": [
+    "ATK %",
+    "CRIT DMG",
+    "CRIT Rate",
+    "Universal DMG"
+   ],
+   "awks": [
+    3,
+    1,
+    6,
+    5,
+    4,
+    2
+   ],
+   "skills": [
+    "ultimate",
+    "basic",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "skia",
+     "a": "switch"
+    },
+    {
+     "c": "skia",
+     "a": "q"
+    },
+    {
+     "c": "skia",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    }
+   ],
+   "repeat": 0,
+   "rotation": "",
+   "why": "",
+   "credit": {
+    "name": "Fanyaspirant201",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "blackbird",
+     "skia",
+     "sakiri",
+     "elyms"
+    ],
+    "roles": [
+     "DPS",
+     "Support",
+     "Support",
+     "Sub DPS"
+    ]
+   },
+   "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_blackbird"
+  }
  ]
 }
