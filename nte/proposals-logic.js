@@ -191,8 +191,16 @@
   const sameTeam = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && teamKey(a) === teamKey(b);
   const duplicateOf = (members, list) => (Array.isArray(list) ? list.find((t) => t && Array.isArray(t.members) && sameTeam(members, t.members)) || null : null);
 
+  // Bentrok tim saat mengirim atau mengedit. Saat mengedit, pemeriksaan hanya berlaku bila anggota tim diubah
+  // (usulan lama yang sudah disetujui tidak boleh terkunci karena ada tim lain yang kebetulan sama).
+  function teamClash(members, previousMembers, published) {
+    if (!Array.isArray(members) || !members.length) return null;
+    if (Array.isArray(previousMembers) && sameTeam(members, previousMembers)) return null;
+    return duplicateOf(members, published);
+  }
+
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { statVocab, starId, rankByStars, featuredBuild, MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
+  return { teamClash, statVocab, starId, rankByStars, featuredBuild, MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
 });

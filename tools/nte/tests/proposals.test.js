@@ -325,3 +325,27 @@ test("sanitizeBuild: Break Intensity diterima sebagai stat utama dan sub-stat bi
   assert.deepEqual(r.build.stats, ["Break Intensity"].concat(v.stats.includes("CRIT DMG") ? ["CRIT DMG"] : []));
   assert.deepEqual(r.build.sub, ["Break Intensity"]);
 });
+
+// ---- bentrok tim saat mengirim atau mengedit ----
+test("teamClash: pengiriman baru ditolak bila anggotanya sama dengan tim yang sudah ada", () => {
+  const others = [{ name: "A", members: ["b", "a", "c"] }];
+  assert.equal(P.teamClash(["a", "b", "c"], null, others).name, "A");
+  assert.equal(P.teamClash(["a", "b", "d"], null, others), null);
+});
+
+test("teamClash: edit tanpa mengubah anggota tim tidak ditolak, walau ada tim lain yang kembar", () => {
+  const others = [{ name: "Milik orang lain", members: ["a", "b", "c"] }];
+  assert.equal(P.teamClash(["c", "a", "b"], ["a", "b", "c"], others), null);
+});
+
+test("teamClash: edit yang mengubah anggota tetap diperiksa terhadap tim lain", () => {
+  const others = [{ name: "Milik orang lain", members: ["a", "b", "d"] }];
+  assert.equal(P.teamClash(["a", "b", "d"], ["a", "b", "c"], others).name, "Milik orang lain");
+  assert.equal(P.teamClash(["a", "b", "e"], ["a", "b", "c"], others), null);
+});
+
+test("teamClash: tanpa tim baru atau data rusak tidak crash", () => {
+  assert.equal(P.teamClash(undefined, null, []), null);
+  assert.equal(P.teamClash(["a", "b"], "x", undefined), null);
+  assert.equal(P.teamClash(["a", "b"], undefined, [null, { members: "x" }]), null);
+});

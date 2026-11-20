@@ -2303,7 +2303,7 @@
     const V = await buildVocab().catch(() => null);
     let user = null, cur = es[0].slug, members = [cur], roles = {}, form = { name: "", why: "", cname: "", url: "" }, mineList = [], mineB = [], msg = "", errs = [];
     const newBf = () => ({ name: "", why: "", arcs: ["", "", "", ""], sets: [{ id: "", pieces: 4 }, { id: "", pieces: 4 }, { id: "", pieces: 4 }], stats: ["", "", ""], sub: ["", "", "", ""], awks: ["", "", "", "", "", ""], skills: ["", "", "", ""], rot: [], repeat: null, rotation: "" });
-    let bf = newBf(), editId = null;
+    let bf = newBf(), editId = null, errFocus = false;
     const ROLE_PRESETS = ["DPS", "Sub DPS", "Support", "Healing", "Tank", "Costume"];
     const roleCustom = new Set();
     let rotChar = cur;
@@ -2417,6 +2417,7 @@
         <div class="pb-card"><div class="pb-lab"><h3 class="pb-h pb-h2">${S("Usulanku", "My suggestions")}</h3>${help("mine")}</div>${hint("mine")}${mineB.length + mineList.length ? `<ul class="pb-list">${mineB.map((m) => `<li><span><b>${esc((m.build && m.build.name) || "?")}</b><small>${esc(nm(m.esper))} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span><button type="button" class="btn ghost sm" data-edit="${esc(m.id)}">${S("Edit", "Edit")}</button></li>`).concat(mineList.map((m) => `<li><span><b>${esc((m.team && m.team.name) || "?")}</b><small>${esc(nm(m.esper))} · ${S("tim", "team")} · <em class="pb-st ${esc(m.status)}">${esc(STATUS()[m.status] || m.status)}</em></small></span></li>`)).join("")}</ul>` : `<p class="txt">${S("Belum ada usulan.", "No suggestions yet.")}</p>`}</div>`;
       }
       root.innerHTML = html;
+      if (errFocus) { errFocus = false; const w = root.querySelector(".tk-warn"); if (w) w.scrollIntoView({ behavior: "smooth", block: "center" }); }
     }
     function collectBuild() {
       const credit = { name: form.cname || (user.displayName || ""), url: form.url };
@@ -2475,14 +2476,14 @@
           keep();
           const saving = t.id === "pbSaveB";
           const r = collectBuild();
-          errs = r.errors; if (!r.build) { render(); return; }
+          errs = r.errors; if (!r.build) { errFocus = true; render(); return; }
           const id = P.docId(user.uid, cur);
           if (!id) { toast(S("Data akun tidak valid.", "Invalid account data.")); return; }
           await loadMine();
           const mineNow = sentB(cur);
-          if (!saving && mineNow) { errs = [S("Kamu sudah punya usulan untuk karakter ini. Pakai tombol Edit untuk mengubahnya.", "You already have a suggestion for this character. Use the Edit button to change it.")]; render(); return; }
-          if (saving && (!mineNow || mineNow.id !== editId)) { errs = [S("Usulan yang diedit tidak ditemukan. Muat ulang halaman.", "The suggestion being edited was not found. Reload the page.")]; render(); return; }
-          if (r.build.team && P.duplicateOf(r.build.team.members, publishedTeams(cur, saving ? editId : null))) { errs = [S("Susunan tim dengan anggota yang sama sudah ada, jadi ditolak. Ubah anggota timnya atau kosongkan bagian tim.", "A team with the same members already exists, so it is rejected. Change the members or leave the team empty.")]; render(); return; }
+          if (!saving && mineNow) { errs = [S("Kamu sudah punya usulan untuk karakter ini. Pakai tombol Edit untuk mengubahnya.", "You already have a suggestion for this character. Use the Edit button to change it.")]; errFocus = true; render(); return; }
+          if (saving && (!mineNow || mineNow.id !== editId)) { errs = [S("Usulan yang diedit tidak ditemukan. Muat ulang halaman.", "The suggestion being edited was not found. Reload the page.")]; errFocus = true; render(); return; }
+          if (r.build.team && P.teamClash(r.build.team.members, saving && mineNow && mineNow.build && mineNow.build.team ? mineNow.build.team.members : null, publishedTeams(cur, saving ? editId : null))) { errs = [S("Susunan tim dengan anggota yang sama sudah ada, jadi ditolak. Ubah anggota timnya atau kosongkan bagian tim.", "A team with the same members already exists, so it is rejected. Change the members or leave the team empty.")]; errFocus = true; render(); return; }
           const q = saving
             ? S("Simpan perubahan? Usulanmu akan menunggu persetujuan admin lagi. Versi yang sudah tayang tetap tampil sampai perubahan disetujui.", "Save changes? Your suggestion will wait for admin approval again. The live version stays until the change is approved.")
             : S("Kirim usulan ini? Karakter ini tidak bisa kamu usulkan lagi, tapi usulannya masih bisa kamu edit nanti.", "Send this suggestion? You cannot suggest for this character again, but you can still edit it later.");
