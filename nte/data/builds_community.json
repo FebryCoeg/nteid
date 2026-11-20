@@ -622,5 +622,202 @@
    },
    "pid": "cDoUK7hfURd9ej6d34XP3jUWlBD3_shinku"
   }
+ ],
+ "chaos": [
+  {
+   "name": "Chaos Supremacy",
+   "arcs": [
+    "what-s-desired",
+    "a-time-will-come"
+   ],
+   "sets": [
+    {
+     "id": "Suit5",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Lakshana DMG",
+    "CRIT DMG",
+    "ATK"
+   ],
+   "sub": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "DMG %",
+    "ATK"
+   ],
+   "awks": [],
+   "skills": [
+    "basic",
+    "ultimate",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "chaos",
+     "a": "switch"
+    },
+    {
+     "c": "chaos",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "q"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "chaos",
+     "a": "switch"
+    },
+    {
+     "c": "chaos",
+     "a": "e"
+    },
+    {
+     "c": "chaos",
+     "a": "q"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "hold"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "atk"
+    },
+    {
+     "c": "chaos",
+     "a": "hold"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    }
+   ],
+   "repeat": 0,
+   "rotation": "",
+   "why": "",
+   "credit": {
+    "name": "Nandana Arin",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "chaos",
+     "blackbird",
+     "elyms",
+     "hathor"
+    ],
+    "roles": [
+     "DPS",
+     "ATK Buffer + Burst",
+     "Sub DPS",
+     "Damage Buffer for Chaos"
+    ]
+   },
+   "pid": "dJynE11bAVOtLfL94CI1SD8NqPZ2_chaos"
+  }
  ]
 }
