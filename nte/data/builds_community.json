@@ -123,5 +123,192 @@
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_zankou"
   }
+ ],
+ "shinku": [
+  {
+   "name": "Cosmos Nuke Single Boss",
+   "arcs": [
+    "blushing-mirage"
+   ],
+   "sets": [
+    {
+     "id": "Suit6",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "Cosmos DMG"
+   ],
+   "sub": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "ATK %",
+    "Universal DMG"
+   ],
+   "awks": [
+    3,
+    4,
+    6,
+    2,
+    1,
+    5
+   ],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "switch"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "e"
+    },
+    {
+     "c": "shinku",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "switch"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    }
+   ],
+   "repeat": 30,
+   "rotation": "Tunggu shinku mencapai 16 stack sebelum switch dari akane ke shinku dilangkah 18",
+   "why": "",
+   "credit": {
+    "name": "Cakra FA",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "shinku",
+     "akane-rin",
+     "elyms",
+     "iroi"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Sub DPS",
+     "Healing"
+    ]
+   },
+   "pid": "LNed9whxOnTBMfzJt56KIg9Bq9E2_shinku"
+  }
  ]
 }
