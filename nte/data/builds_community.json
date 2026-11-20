@@ -1,1 +1,127 @@
-{}
+{
+ "zankou": [
+  {
+   "name": "Brenov burst",
+   "arcs": [
+    "ravenous-blade",
+    "fluff-of-finesse",
+    "tears-beneath-the-mask",
+    "failing-you-heavy-in-my-heart"
+   ],
+   "sets": [
+    {
+     "id": "Suit4",
+     "pieces": 4
+    },
+    {
+     "id": "Suit8",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT DMG",
+    "Incantation DMG"
+   ],
+   "sub": [
+    "Break Intensity",
+    "CRIT Rate",
+    "CRIT DMG",
+    "Universal DMG"
+   ],
+   "awks": [
+    5,
+    2,
+    4,
+    1,
+    6,
+    3
+   ],
+   "skills": [
+    "ultimate",
+    "basic",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "linko",
+     "a": "e"
+    },
+    {
+     "c": "linko",
+     "a": "q"
+    },
+    {
+     "c": "linko",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    }
+   ],
+   "repeat": null,
+   "rotation": "-Jika punya dupe 1 zankou ambil A5 untuk rotasi awalan memakai skill biasa bukan skill enchanced dan usahakan skill Lingko ke support skill raven(black bird) -urutan ke 15 pakai skill enchanced zankou setelah toughness bar nya full",
+   "why": "",
+   "credit": {
+    "name": "Fanyaspirant201",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "zankou",
+     "blackbird",
+     "linko",
+     "daffodill"
+    ],
+    "roles": [
+     "DPS",
+     "Nova burst",
+     "Support",
+     "Breaker"
+    ]
+   },
+   "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_zankou"
+  }
+ ]
+}
