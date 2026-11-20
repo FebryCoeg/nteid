@@ -1123,5 +1123,156 @@
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_akane-rin"
   }
+ ],
+ "chiz": [
+  {
+   "name": "Hypercarry",
+   "arcs": [
+    "contemplative-cat"
+   ],
+   "sets": [
+    {
+     "id": "Suit6",
+     "pieces": 4
+    },
+    {
+     "id": "Suit8",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT DMG",
+    "Cosmos DMG",
+    "ATK %"
+   ],
+   "sub": [
+    "CRIT DMG",
+    "Universal DMG",
+    "CRIT Rate",
+    "ATK %"
+   ],
+   "awks": [
+    3,
+    2,
+    6,
+    1,
+    4,
+    5
+   ],
+   "skills": [
+    "redirect",
+    "ultimate",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "chiz",
+     "a": "atk"
+    },
+    {
+     "c": "chiz",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "chiz",
+     "a": "q"
+    },
+    {
+     "c": "chiz",
+     "a": "e"
+    },
+    {
+     "c": "chiz",
+     "a": "atk"
+    },
+    {
+     "c": "chiz",
+     "a": "atk"
+    },
+    {
+     "c": "chiz",
+     "a": "e"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Usahakan main chiz liat grain naik turun nya,grain naik pake skill kalo grain turun pake basic attack aja",
+   "why": "",
+   "credit": {
+    "name": "Fanyaspirant201",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "chiz",
+     "elyms",
+     "iroi",
+     "sakiri"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Healing",
+     "Support"
+    ]
+   },
+   "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_chiz"
+  }
  ]
 }
