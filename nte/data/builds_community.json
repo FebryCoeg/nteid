@@ -1570,8 +1570,8 @@
   {
    "name": "Mint blossom spam",
    "arcs": [
+    "the-last-rose",
     "fluff-of-fleetness",
-    "mind-royale",
     "clear-skies"
    ],
    "sets": [
@@ -1586,10 +1586,10 @@
     "CRIT Rate"
    ],
    "sub": [
-    "ATK %",
+    "ATK",
     "CRIT Rate",
     "CRIT DMG",
-    "Cycle Intensity"
+    "HP %"
    ],
    "awks": [],
    "skills": [
@@ -1605,7 +1605,15 @@
     },
     {
      "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
      "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "atk"
     },
     {
      "c": "elyms",
@@ -1649,11 +1657,11 @@
     },
     {
      "c": "mint",
-     "a": "q"
+     "a": "e"
     },
     {
      "c": "mint",
-     "a": "e"
+     "a": "q"
     },
     {
      "c": "mint",
@@ -1672,9 +1680,9 @@
      "a": "switch"
     }
    ],
-   "repeat": 17,
-   "rotation": "Skill sampai bar sinyal Elyms penuh. Setelah menggunakan skill Mint, basic attack dahulu agar gauge ultimate-nya terisi (minimal setengah gauge), lalu langsung switch ke Elyms. Repeat.",
-   "why": "Kenapa gak pakai DPS anima lain? Build dan tim ini khusus bagi pecinta kucing biru yang imut dan agak bego.😻 Kamu bukan pecinta Mint? 😿 Bisa ganti Mint dengan Nanally sebagai DPS utama",
+   "repeat": 19,
+   "rotation": "Setelah Mint melakukan Ultimate, basic attack dahulu agar gauge ultimate-nya terisi lagi (minimal setengah gauge), lalu langsung switch ke Elyms. Repeat. Mengapa Mint pakai arc The Last Rose? Karena arc tersebut memberikan attack besar dan CRIT RATE tinggi, selain itu Mint akan mendapatkan tambahan CRIT DMG sebesar 60% setiap melakukan redirect skill, berdurasi 3 detik (pasif chaos thorn), ini akan membuat damage Ultimate Mint meledak!",
+   "why": "Build dan tim ini biasa aku gunakan saat ingin memainkan karakter Mint. Bahkan aku pernah mengalahkan boss Executioner yang terkenal sulit itu dengan tim ini. Kelebihan dari komposisi tim ini ialah: Rotasi sangat luwes, sangat sustain, easy to play. Kekurangannya ialah: Damage nyicil, tidak burst.",
    "credit": {
     "name": "Pratama Ag",
     "url": "https://www.facebook.com/share/1FJQjinSrC/"
@@ -1689,7 +1697,7 @@
     "roles": [
      "DPS",
      "Support",
-     "Sub DPS",
+     "Support",
      "Support"
     ]
    },
