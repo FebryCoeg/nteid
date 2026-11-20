@@ -1527,8 +1527,8 @@
      "a": "switch"
     }
    ],
-   "repeat": null,
-   "rotation": "Skill sampai bar sinyal Elyms penuh. Setelah Mint skill, basic attack dahulu agar gauge ultimate-nya terisi (minimal setengah gauge), lalu langsung switch ke Elyms. Repeat.",
+   "repeat": 17,
+   "rotation": "Skill sampai bar sinyal Elyms penuh. Setelah menggunakan skill Mint, basic attack dahulu agar gauge ultimate-nya terisi (minimal setengah gauge), lalu langsung switch ke Elyms. Repeat.",
    "why": "Kenapa gak pakai DPS anima lain? Build dan tim ini khusus bagi pecinta kucing biru yang imut dan agak bego.😻 Kamu bukan pecinta Mint? 😿 Bisa ganti Mint dengan Nanally sebagai DPS utama",
    "credit": {
     "name": "Pratama Ag",
