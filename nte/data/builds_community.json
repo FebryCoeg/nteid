@@ -170,7 +170,152 @@
     "basic",
     "support"
    ],
-   "rot": [],
+   "rot": [
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "atk"
+    },
+    {
+     "c": "daffodill",
+     "a": "hold"
+    },
+    {
+     "c": "daffodill",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    }
+   ],
    "repeat": null,
    "rotation": "Sakiri Skill > Daffodill in > Blackbird In > Daffodill In > Daffodill Skill > Daffodill Arc Skill > Daffodill Ult > Blackbird Skill > Daffodill In > Zankou in",
    "why": "Best Break Nuker out there that you can invest in NTE",
