@@ -170,6 +170,22 @@
     };
   }
 
+  // ---- daftar pilihan stat untuk formulir usulan ----
+  // Diambil dari build bawaan, lalu ditambah stat yang pasti ada dan dikurangi yang tidak dipakai.
+  const ALWAYS_STAT = ["Break Intensity"];
+  const ALWAYS_SUB = ["Break Intensity"];
+  const DROP_SUB = ["Universal DMG %"];
+  function statVocab(curated) {
+    const st = new Set(ALWAYS_STAT), sb = new Set(ALWAYS_SUB);
+    Object.values(curated && typeof curated === "object" ? curated : {}).forEach((v) => {
+      if (!v || typeof v !== "object") return;
+      (Array.isArray(v.stats) ? v.stats : []).forEach((x) => { if (typeof x === "string" && x) st.add(x); });
+      (Array.isArray(v.sub) ? v.sub : []).forEach((x) => { if (typeof x === "string" && x) sb.add(x); });
+    });
+    DROP_SUB.forEach((x) => sb.delete(x));
+    return { stats: [...st].sort(), sub: [...sb].sort() };
+  }
+
   // Kunci tim: anggota diurutkan lalu digabung, jadi susunan yang sama selalu punya kunci yang sama.
   const teamKey = (members) => (Array.isArray(members) ? members.slice().sort().join(".") : "");
   const sameTeam = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && teamKey(a) === teamKey(b);
@@ -178,5 +194,5 @@
   const SAFE = /^[A-Za-z0-9_-]{1,128}$/;
   const docId = (uid, esper) => (typeof uid === "string" && typeof esper === "string" && SAFE.test(uid) && SAFE.test(esper) ? uid + "_" + esper : null);
 
-  return { starId, rankByStars, featuredBuild, MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
+  return { statVocab, starId, rankByStars, featuredBuild, MAX, ROT_ACTIONS, clean, mediaUrl, MEDIA_DOMAINS, sanitizeTeam, sanitizeBuild, docId, teamKey, sameTeam, duplicateOf };
 });

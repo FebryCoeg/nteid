@@ -2125,11 +2125,9 @@
   let vocabP = null;
   const buildVocab = () => (vocabP ||= (async () => {
     const [arcs, mods, cur] = await Promise.all([load("arcs"), load("modules"), load("builds_curated").catch(() => ({}))]);
-    const st = new Set(), sb = new Set();
-    Object.values(cur).forEach((v) => { ((v && v.stats) || []).forEach((x) => st.add(x)); ((v && v.sub) || []).forEach((x) => sb.add(x)); });
-    sb.delete("Universal DMG %");
+    const sv = window.NteProposals ? window.NteProposals.statVocab(cur) : { stats: [], sub: [] };
     const sets = mods.sets || [];
-    return { arcList: arcs, setList: sets, statList: [...st].sort(), subList: [...sb].sort(), ctx: { arcs: arcs.map((a) => a.slug), sets: sets.map((x) => x.id), stats: [...st], sub: [...sb] } };
+    return { arcList: arcs, setList: sets, statList: sv.stats, subList: sv.sub, ctx: { arcs: arcs.map((a) => a.slug), sets: sets.map((x) => x.id), stats: sv.stats, sub: sv.sub } };
   })().catch((e) => { vocabP = null; throw e; }));
   // Rotasi tim: deret langkah (karakter + aksi). Aksi: E, Q, klik kiri, tahan klik kiri, Switch.
   const MOUSE = `<svg class="rt-mouse" viewBox="0 0 16 22" width="13" height="18" aria-hidden="true"><path d="M8 1.5V9H1.5V8A6.5 6.5 0 0 1 8 1.5Z" fill="var(--accent,#ff5a7a)"/><rect x="1.5" y="1.5" width="13" height="19" rx="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5V9M1.5 9h13" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>`;

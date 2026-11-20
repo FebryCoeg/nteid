@@ -291,3 +291,37 @@ test("featuredBuild: tanpa tim, link tidak sah dibuang, data rusak tidak crash",
   assert.deepEqual(bd2.arcs, []);
   assert.deepEqual(bd2.stats, []);
 });
+
+// ---- daftar pilihan stat ----
+test("statVocab: gabungan stat dari build bawaan, terurut, tanpa duplikat", () => {
+  const v = P.statVocab({ a: { stats: ["CRIT DMG", "ATK %"], sub: ["DMG %", "ATK %"] }, b: { stats: ["CRIT DMG", "HP %"], sub: ["CRIT Rate"] }, c: null, d: { stats: "x" } });
+  assert.deepEqual(v.stats, v.stats.slice().sort());
+  assert.deepEqual(v.sub, v.sub.slice().sort());
+  assert.equal(new Set(v.stats).size, v.stats.length);
+  for (const s of ["ATK %", "CRIT DMG", "HP %"]) assert.ok(v.stats.includes(s), s);
+  for (const s of ["ATK %", "CRIT Rate", "DMG %"]) assert.ok(v.sub.includes(s), s);
+});
+
+test("statVocab: Break Intensity selalu ada di stat utama dan sub-stat, walau build bawaan tidak memakainya", () => {
+  const v = P.statVocab({ a: { stats: ["CRIT DMG"], sub: ["DMG %"] } });
+  assert.ok(v.stats.includes("Break Intensity"));
+  assert.ok(v.sub.includes("Break Intensity"));
+  const v2 = P.statVocab({});
+  assert.ok(v2.stats.includes("Break Intensity") && v2.sub.includes("Break Intensity"));
+  assert.ok(P.statVocab(undefined).stats.includes("Break Intensity"));
+});
+
+test("statVocab: Universal DMG % dihapus dari sub-stat tetapi Universal DMG tetap", () => {
+  const v = P.statVocab({ a: { stats: [], sub: ["Universal DMG", "Universal DMG %"] } });
+  assert.ok(v.sub.includes("Universal DMG"));
+  assert.equal(v.sub.includes("Universal DMG %"), false);
+});
+
+test("sanitizeBuild: Break Intensity diterima sebagai stat utama dan sub-stat bila ada di daftar", () => {
+  const v = P.statVocab({});
+  const ctx2 = { ...bctx, stats: v.stats, sub: v.sub };
+  const r = P.sanitizeBuild({ ...bok, stats: ["Break Intensity", "CRIT DMG"].filter((x) => v.stats.includes(x)), sub: ["Break Intensity"] }, ctx2, "akane-rin");
+  assert.deepEqual(r.errors, []);
+  assert.deepEqual(r.build.stats, ["Break Intensity"].concat(v.stats.includes("CRIT DMG") ? ["CRIT DMG"] : []));
+  assert.deepEqual(r.build.sub, ["Break Intensity"]);
+});
