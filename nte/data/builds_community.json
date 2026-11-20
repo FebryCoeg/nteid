@@ -1868,6 +1868,65 @@
     ]
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_blackbird"
+  },
+  {
+   "name": "Blackbird for Executioner Boss strategy",
+   "arcs": [
+    "crime-and-punishment"
+   ],
+   "sets": [],
+   "stats": [
+    "Psyche DMG",
+    "ATK %",
+    "CRIT Rate"
+   ],
+   "sub": [],
+   "awks": [],
+   "skills": [],
+   "rot": [
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "switch"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Strategi ini sepenuhnya mengandalkan reaksi Nova dari Blackbird serta kemampuanmu dalam menghindari serangan boss. Berikut urutan permainannya: Saat boss melompat → Gunakan skill Blackbird → Switch ke Daffodil → Reaksi Nova aktif→ Menghindar sejauh mungkin → Gunakan skill Lacrimosa → Segera switch kembali → Ulangi siklusnya. Gunakan Daffodil saat menghindari serangan Boss. Fadia berfungsi sebagai reduksi damage saat kamu gagal menghindar. Selalu bawa item healing dan pembangkitan!",
+   "why": "Blackbird bisa mengalahkan Executioner Boss dengan aman tanpa basic attack bahkan tanpa skill ultimate sekalipun! Manfaatkan Instant Cycle dan reaksi Nova-nya untuk menghasilkan damage pecah berkelanjutan. Strategi ini sangat mengandalkan kemampuan evade kamu! Full video guide ada di link media",
+   "credit": {
+    "name": "Pratama Ag",
+    "url": "https://www.facebook.com/share/v/1DxP1K68dA/"
+   },
+   "team": {
+    "members": [
+     "blackbird",
+     "daffodill",
+     "lacrimosa",
+     "fadia"
+    ],
+    "roles": [
+     "DPS",
+     "Support",
+     "Sub DPS",
+     "Tank"
+    ]
+   },
+   "pid": "GBVru2HrSATMYvHqqFi94e0MYh53_blackbird"
   }
  ]
 }
