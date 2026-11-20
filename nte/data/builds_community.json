@@ -193,6 +193,152 @@
     ]
    },
    "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_zankou"
+  },
+  {
+   "name": "DoT and Sustainable",
+   "arcs": [
+    "ravenous-blade",
+    "fluff-of-finesse",
+    "tears-beneath-the-mask"
+   ],
+   "sets": [
+    {
+     "id": "Suit4",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Incantation DMG",
+    "CRIT DMG"
+   ],
+   "sub": [
+    "ATK %",
+    "CRIT DMG",
+    "CRIT Rate",
+    "DMG %"
+   ],
+   "awks": [
+    1,
+    4,
+    2,
+    6,
+    3,
+    5
+   ],
+   "skills": [
+    "basic",
+    "ultimate",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "switch"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "atk"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "atk"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "atk"
+    },
+    {
+     "c": "lacrimosa",
+     "a": "q"
+    }
+   ],
+   "repeat": 20,
+   "rotation": "NOTE 1. Basic attack lacri setelah ulti zankou itu opsional ( bisa langsung ulti tanpa BA terlebih dahulu )",
+   "why": "Semoga bermanfaat",
+   "credit": {
+    "name": "Sung Jawir 969",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "zankou",
+     "lacrimosa",
+     "sakiri",
+     "iroi"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Support",
+     "Healing"
+    ]
+   },
+   "pid": "DrNWEHbuPYPtWWhhqCaHuL1pLtl2_zankou"
   }
  ],
  "shinku": [
