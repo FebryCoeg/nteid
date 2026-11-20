@@ -1274,5 +1274,135 @@
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_chiz"
   }
+ ],
+ "mint": [
+  {
+   "name": "Mint blossom spam",
+   "arcs": [
+    "fluff-of-fleetness",
+    "mind-royale",
+    "clear-skies"
+   ],
+   "sets": [
+    {
+     "id": "Suit2",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Anima DMG",
+    "CRIT DMG",
+    "CRIT Rate"
+   ],
+   "sub": [
+    "ATK %",
+    "CRIT Rate",
+    "CRIT DMG",
+    "Cycle Intensity"
+   ],
+   "awks": [],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "zero-1046",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1046",
+     "a": "q"
+    },
+    {
+     "c": "zero-1046",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "switch"
+    },
+    {
+     "c": "mint",
+     "a": "q"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Skill sampai bar sinyal Elyms penuh. Setelah Mint skill, basic attack dahulu agar gauge ultimate-nya terisi (minimal setengah gauge), lalu langsung switch ke Elyms. Repeat.",
+   "why": "Kenapa gak pakai DPS anima lain? Build dan tim ini khusus bagi pecinta kucing biru yang imut dan agak bego.😻 Kamu bukan pecinta Mint? 😿 Bisa ganti Mint dengan Nanally sebagai DPS utama",
+   "credit": {
+    "name": "Pratama Ag",
+    "url": "https://www.facebook.com/share/1FJQjinSrC/"
+   },
+   "team": {
+    "members": [
+     "mint",
+     "zero-1046",
+     "elyms",
+     "iroi"
+    ],
+    "roles": [
+     "DPS",
+     "Support",
+     "Sub DPS",
+     "Support"
+    ]
+   },
+   "pid": "GBVru2HrSATMYvHqqFi94e0MYh53_mint"
+  }
  ]
 }
