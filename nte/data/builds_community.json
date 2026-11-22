@@ -2331,5 +2331,199 @@
    },
    "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_nanally"
   }
+ ],
+ "zero-1051": [
+  {
+   "name": "Zero Double instant Charge",
+   "arcs": [
+    "the-rain-that-shook-the-world",
+    "day-off",
+    "reality-refuge",
+    "marching-beyond-time"
+   ],
+   "sets": [
+    {
+     "id": "Suit6",
+     "pieces": 4
+    },
+    {
+     "id": "Suit3",
+     "pieces": 4
+    },
+    {
+     "id": "Suit2",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Cosmos DMG",
+    "CRIT Rate / CRIT DMG",
+    "ATK %"
+   ],
+   "sub": [
+    "Universal DMG",
+    "CRIT DMG",
+    "CRIT Rate",
+    "ATK %"
+   ],
+   "awks": [
+    3,
+    4,
+    6,
+    2,
+    1,
+    5
+   ],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "jiuyuan",
+     "a": "atk"
+    },
+    {
+     "c": "jiuyuan",
+     "a": "hold"
+    },
+    {
+     "c": "jiuyuan",
+     "a": "e"
+    },
+    {
+     "c": "jiuyuan",
+     "a": "q"
+    },
+    {
+     "c": "zero-1051",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "atk"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "hathor",
+     "a": "atk"
+    },
+    {
+     "c": "hathor",
+     "a": "hold"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "atk"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "hathor",
+     "a": "q"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "switch"
+    },
+    {
+     "c": "blackbird",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Start from neither Zero or Blackbird if you want to start chain reaction between Remora & Stain both can trigger charge effect",
+   "why": "Best instant",
+   "credit": {
+    "name": "Theresa Erika von Weiss",
+    "url": "https://www.youtube.com/@TheresaBabels"
+   },
+   "team": {
+    "members": [
+     "zero-1051",
+     "blackbird",
+     "hathor",
+     "jiuyuan"
+    ],
+    "roles": [
+     "DPS",
+     "SUPPORT / SUB DPS",
+     "Sub DPS",
+     "Support"
+    ]
+   },
+   "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_zero-1051"
+  }
  ]
 }
