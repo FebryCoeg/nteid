@@ -418,6 +418,14 @@
      "a": "q"
     },
     {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
      "c": "zankou",
      "a": "hold"
     },
@@ -447,6 +455,10 @@
     },
     {
      "c": "lacrimosa",
+     "a": "switch"
+    },
+    {
+     "c": "lacrimosa",
      "a": "atk"
     },
     {
@@ -462,8 +474,8 @@
      "a": "q"
     }
    ],
-   "repeat": 20,
-   "rotation": "NOTE 1. Basic attack lacri setelah ulti zankou itu opsional ( bisa langsung ulti tanpa BA terlebih dahulu )",
+   "repeat": 0,
+   "rotation": "NOTE 1. Basic attack lacri setelah ulti zankou itu opsional ( bisa langsung ulti tanpa BA terlebih dahulu ) 2. Dalam situasi tertentu ( contoh : didalam area hit/skill bos ) setelah ulti, Iroi tidak perlu tahan BA dan bisa langsung switch ke Zankou",
    "why": "Semoga bermanfaat",
    "credit": {
     "name": "Sung Jawir 969",
