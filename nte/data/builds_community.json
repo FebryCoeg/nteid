@@ -2525,5 +2525,179 @@
    },
    "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_zero-1051"
   }
+ ],
+ "aurelia": [
+  {
+   "name": "Skia Follows up",
+   "arcs": [
+    "stellar-veil",
+    "song-of-the-whale",
+    "drawn-blade",
+    "oraora"
+   ],
+   "sets": [
+    {
+     "id": "Suit3",
+     "pieces": 4
+    },
+    {
+     "id": "Suit4",
+     "pieces": 4
+    },
+    {
+     "id": "Suit6",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Psyche DMG",
+    "CRIT Rate / CRIT DMG",
+    "ATK %"
+   ],
+   "sub": [
+    "Universal DMG",
+    "ATK %",
+    "CRIT Rate / CRIT DMG",
+    "Cycle Intensity / CRIT Rate"
+   ],
+   "awks": [
+    1,
+    5,
+    6,
+    2,
+    4,
+    3
+   ],
+   "skills": [
+    "basic",
+    "ultimate",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "haniel",
+     "a": "atk"
+    },
+    {
+     "c": "haniel",
+     "a": "e"
+    },
+    {
+     "c": "haniel",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "atk"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    },
+    {
+     "c": "aurelia",
+     "a": "switch"
+    },
+    {
+     "c": "aurelia",
+     "a": "q"
+    },
+    {
+     "c": "aurelia",
+     "a": "e"
+    },
+    {
+     "c": "aurelia",
+     "a": "atk"
+    },
+    {
+     "c": "aurelia",
+     "a": "hold"
+    },
+    {
+     "c": "aurelia",
+     "a": "atk"
+    },
+    {
+     "c": "aurelia",
+     "a": "atk"
+    },
+    {
+     "c": "aurelia",
+     "a": "hold"
+    },
+    {
+     "c": "haniel",
+     "a": "switch"
+    },
+    {
+     "c": "haniel",
+     "a": "q"
+    },
+    {
+     "c": "haniel",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "atk"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Start with Buffer then let Zero do Instant cycle",
+   "why": "Aurelia Main DPS - UNDERRATED Char and honestly with Blackbird she could be good but already got powercrept",
+   "credit": {
+    "name": "Theresa Erika von Weiss",
+    "url": "https://www.youtube.com/@TheresaBabels"
+   },
+   "team": {
+    "members": [
+     "aurelia",
+     "haniel",
+     "sakiri",
+     "zero-1051"
+    ],
+    "roles": [
+     "DPS",
+     "Support",
+     "Support",
+     "Sub DPS"
+    ]
+   },
+   "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_aurelia"
+  }
  ]
 }
