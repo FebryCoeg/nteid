@@ -2117,5 +2117,219 @@
    },
    "pid": "GBVru2HrSATMYvHqqFi94e0MYh53_blackbird"
   }
+ ],
+ "nanally": [
+  {
+   "name": "Ichidame DPS",
+   "arcs": [
+    "ready-ready",
+    "raging-flames",
+    "oraora",
+    "song-of-the-whale"
+   ],
+   "sets": [
+    {
+     "id": "Suit2",
+     "pieces": 4
+    },
+    {
+     "id": "Suit6",
+     "pieces": 4
+    },
+    {
+     "id": "Suit5",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Anima DMG",
+    "CRIT Rate / CRIT DMG",
+    "ATK %"
+   ],
+   "sub": [
+    "Universal DMG",
+    "CRIT Rate / CRIT DMG",
+    "Cycle Intensity / CRIT Rate",
+    "ATK %"
+   ],
+   "awks": [
+    5,
+    2,
+    1,
+    3,
+    4,
+    6
+   ],
+   "skills": [
+    "ultimate",
+    "basic",
+    "redirect",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "elyms",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "hold"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "elyms",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "atk"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "hathor",
+     "a": "atk"
+    },
+    {
+     "c": "hathor",
+     "a": "hold"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "nanally",
+     "a": "switch"
+    },
+    {
+     "c": "nanally",
+     "a": "q"
+    },
+    {
+     "c": "nanally",
+     "a": "e"
+    },
+    {
+     "c": "nanally",
+     "a": "atk"
+    },
+    {
+     "c": "nanally",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "switch"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "iroi",
+     "a": "atk"
+    },
+    {
+     "c": "elyms",
+     "a": "switch"
+    },
+    {
+     "c": "elyms",
+     "a": "e"
+    },
+    {
+     "c": "nanally",
+     "a": "switch"
+    },
+    {
+     "c": "nanally",
+     "a": "atk"
+    },
+    {
+     "c": "hathor",
+     "a": "switch"
+    },
+    {
+     "c": "hathor",
+     "a": "hold"
+    },
+    {
+     "c": "hathor",
+     "a": "e"
+    },
+    {
+     "c": "hathor",
+     "a": "atk"
+    },
+    {
+     "c": "hathor",
+     "a": "q"
+    },
+    {
+     "c": "nanally",
+     "a": "switch"
+    },
+    {
+     "c": "nanally",
+     "a": "q"
+    },
+    {
+     "c": "nanally",
+     "a": "e"
+    },
+    {
+     "c": "nanally",
+     "a": "atk"
+    },
+    {
+     "c": "nanally",
+     "a": "hold"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Start with Support first then DPS, try to keep support buffing allies team and debuff enemies then let DPS in",
+   "why": "Premium Modern",
+   "credit": {
+    "name": "Theresa Erika von Weiss",
+    "url": "https://www.youtube.com/@TheresaBabels"
+   },
+   "team": {
+    "members": [
+     "nanally",
+     "elyms",
+     "iroi",
+     "hathor"
+    ],
+    "roles": [
+     "DPS",
+     "Support",
+     "Support",
+     "Sub DPS"
+    ]
+   },
+   "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_nanally"
+  }
  ]
 }
