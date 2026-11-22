@@ -1702,6 +1702,175 @@
     ]
    },
    "pid": "GBVru2HrSATMYvHqqFi94e0MYh53_mint"
+  },
+  {
+   "name": "Mint untuk pemula",
+   "arcs": [
+    "clear-skies"
+   ],
+   "sets": [
+    {
+     "id": "Suit2",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "Anima DMG",
+    "CRIT DMG",
+    "CRIT Rate"
+   ],
+   "sub": [
+    "ATK %",
+    "CRIT DMG",
+    "CRIT Rate",
+    "Universal DMG"
+   ],
+   "awks": [
+    1,
+    5,
+    2,
+    3,
+    6,
+    4
+   ],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "zero-1046",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1046",
+     "a": "q"
+    },
+    {
+     "c": "zero-1046",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "switch"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "q"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "zero-1046",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1046",
+     "a": "e"
+    },
+    {
+     "c": "skia",
+     "a": "switch"
+    },
+    {
+     "c": "skia",
+     "a": "q"
+    },
+    {
+     "c": "skia",
+     "a": "e"
+    },
+    {
+     "c": "mint",
+     "a": "switch"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "atk"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "switch"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "zero-1046",
+     "a": "switch"
+    }
+   ],
+   "repeat": 26,
+   "rotation": "Setelah Mint ultimate; basic attack terus diselingi skill sampai cycle gaugenya penuh, lalu switch ke Zero. Untuk switch ke Sakiri, Mint tidak perlu sampai cycle gauge penuh, cukup basic attack sampai selesai dua kali, skill, lalu switch ke Sakiri. Combo atau rotasi tim ini khusus untuk mode Beyonds the Rail, untuk pertarungan biasa kalian bisa memanfaatkan instant cycle dari MC ke Mint, lalu ke Skia agar dapat buff Charge.",
+   "why": "Build dan tim Mint untuk pemula yang baru main. Pastikan kalian ambil Sakiri dari free selector karena Sakiri sangat berguna untuk ke depannya. Video guide ada di link media",
+   "credit": {
+    "name": "Pratama Ag",
+    "url": "https://www.facebook.com/share/v/1DqL9dbkRT/"
+   },
+   "team": {
+    "members": [
+     "mint",
+     "skia",
+     "zero-1046",
+     "sakiri"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Sub DPS",
+     "Support"
+    ]
+   },
+   "pid": "Cgw3rogZNNNfPS5vxZh7nZOYtdJ2_mint"
   }
  ],
  "blackbird": [
