@@ -2850,5 +2850,163 @@
    },
    "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_aurelia"
   }
+ ],
+ "adler": [
+  {
+   "name": "F2P Zankou team Adler",
+   "arcs": [
+    "umbrella",
+    "the-great-thief",
+    "the-fools-spring",
+    "fluff-of-ferocity"
+   ],
+   "sets": [
+    {
+     "id": "Suit7",
+     "pieces": 4
+    },
+    {
+     "id": "Suit4",
+     "pieces": 4
+    },
+    {
+     "id": "Suit1",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "DEF %",
+    "HP %",
+    "Break Intensity"
+   ],
+   "sub": [
+    "DEF %",
+    "DEF",
+    "HP %",
+    "Break Intensity"
+   ],
+   "awks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "sakiri",
+     "a": "atk"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "adler",
+     "a": "switch"
+    },
+    {
+     "c": "adler",
+     "a": "e"
+    },
+    {
+     "c": "adler",
+     "a": "q"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "atk"
+    },
+    {
+     "c": "daffodill",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "q"
+    },
+    {
+     "c": "daffodill",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    }
+   ],
+   "repeat": null,
+   "rotation": "Start from Sakiri first then continue with adler, both of them give debuff and buff to allies team",
+   "why": "F2P Zankou with Adler",
+   "credit": {
+    "name": "Theresa Erika von Weiss",
+    "url": "https://www.youtube.com/@TheresaBabels"
+   },
+   "team": {
+    "members": [
+     "adler",
+     "zankou",
+     "daffodill",
+     "sakiri"
+    ],
+    "roles": [
+     "Tank",
+     "DPS",
+     "Sub DPS",
+     "Support"
+    ]
+   },
+   "pid": "c1xubEZBbYZpsHAqRrLnVqNXYWC2_adler"
+  }
  ]
 }
