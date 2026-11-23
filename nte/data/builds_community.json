@@ -1425,6 +1425,157 @@
     ]
    },
    "pid": "HoEUvwjZhtglWlWNLhIPICRgxjt1_akane-rin"
+  },
+  {
+   "name": "Akane Hyper Carry (No Elyms/Linko)",
+   "arcs": [
+    "far-side-of-the-moon",
+    "the-last-rose",
+    "fluff-of-fleetness",
+    "youthful-fantasy"
+   ],
+   "sets": [
+    {
+     "id": "Suit5",
+     "pieces": 4
+    },
+    {
+     "id": "Suit6",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT DMG",
+    "Lakshana DMG"
+   ],
+   "sub": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "DMG %",
+    "ATK %"
+   ],
+   "awks": [
+    2,
+    4,
+    6,
+    3,
+    5,
+    1
+   ],
+   "skills": [
+    "basic",
+    "redirect",
+    "ultimate",
+    "support"
+   ],
+   "rot": [
+    {
+     "c": "iroi",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "sakiri",
+     "a": "q"
+    },
+    {
+     "c": "sakiri",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    },
+    {
+     "c": "iroi",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "hold"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "blackbird",
+     "a": "hold"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "blackbird",
+     "a": "q"
+    },
+    {
+     "c": "blackbird",
+     "a": "e"
+    },
+    {
+     "c": "akane-rin",
+     "a": "atk"
+    },
+    {
+     "c": "akane-rin",
+     "a": "q"
+    },
+    {
+     "c": "iroi",
+     "a": "e"
+    }
+   ],
+   "repeat": 3,
+   "rotation": "Ult hold atk Iroi penting dipakai setelah Sakiri dan BB untuk menjamin 100% uptime ultimate dan buff mereka setiap 20 detik. Menambahkan skill+hold atk iroi juga bagus jika ada awakening 1 nya. Stain dahulu sebelum BB burst akan menambah signifikan dmg ultnya, karena itu rotasi awal stain dlu sebelum buffing. Setelah Blackbird ulti pertama, hold atk buffer dan swap ketika dia membanting sayapnya (trik tanpa ribet quickswap balik blackbird lagi)",
+   "why": "Catatan untuk awakening 3, sebelum punya 3 dupe akane lebih bagus dari awakening 4 (kalau 2 dupe)",
+   "credit": {
+    "name": "DZhao",
+    "url": "https://www.youtube.com/watch?v=zqWQF3BcM9I"
+   },
+   "team": {
+    "members": [
+     "akane-rin",
+     "blackbird",
+     "iroi",
+     "sakiri"
+    ],
+    "roles": [
+     "DPS",
+     "Sub DPS",
+     "Healing",
+     "Support"
+    ]
+   },
+   "pid": "1WbcHFlW9PS7sQR47aw27mgR5gQ2_akane-rin"
   }
  ],
  "chiz": [
