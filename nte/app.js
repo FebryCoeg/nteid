@@ -3012,7 +3012,9 @@
     const bySlug = Object.fromEntries(espers.map((e) => [e.slug, e]));
     setTitle("Esper Cycle");
     const filled = (c) => CY.fill(tx(c.desc), c.nums);
-    const elChip = (el) => `<span class="cy-el ${elClass(el)}"><i></i>${esc(el)}</span>`;
+    const elIco = (el) => img(`img/ui/el-${String(el).toLowerCase()}.webp`);
+    const elChip = (el) => `<span class="cy-el ${elClass(el)}"><img src="${elIco(el)}" alt="">${esc(el)}</span>`;
+    const elBadge = (el) => `<span class="cy-ico ${elClass(el)}" title="${esc(el)}"><img src="${elIco(el)}" alt="${esc(el)}"></span>`;
     const memberText = (c, m) => {
       const e = bySlug[m.slug]; if (!e) return "";
       const pas = e.skills.filter((s) => s.group === "passive");
@@ -3022,10 +3024,10 @@
     const card = (c, i) => {
       const mem = c.members.filter((m) => bySlug[m.slug]);
       return `<article class="cy-card ${elClass(c.elements[0])}" id="cy-${c.key}" data-q="${esc((c.name + " " + mem.map((m) => bySlug[m.slug].name).join(" ")).toLowerCase())}">
-        <div class="cy-top"><i class="cy-no">${String(i + 1).padStart(2, "0")}</i><h2>${esc(c.name)}</h2><div class="cy-els">${c.elements.map(elChip).join("")}</div></div>
+        <div class="cy-top"><div class="cy-icos">${c.elements.map(elBadge).join("")}</div><div class="cy-title"><i class="cy-no">${String(i + 1).padStart(2, "0")}</i><h2>${esc(c.name)}</h2><div class="cy-els">${c.elements.map(elChip).join("")}</div></div></div>
         <p class="txt cy-desc">${rich(filled(c))}</p>
         ${mem.length ? `<details class="cy-mem"><summary><span>${S("Penguatan karakter", "Character enhancements")}</span><b>${mem.length}</b></summary>
-          <div class="cy-list">${mem.map((m) => { const e = bySlug[m.slug]; return `<div class="cy-row ${elClass(e.element)}"><a href="/esper/${e.slug}" data-link><img src="${img(e.icon)}" alt="" loading="lazy"><span><b>${esc(e.name)}</b><small>${esc(e.element)}</small></span></a><p class="txt">${rich(memberText(c, m))}</p></div>`; }).join("")}</div></details>` : ""}
+          <div class="cy-list">${mem.map((m) => { const e = bySlug[m.slug]; return `<div class="cy-row ${elClass(e.element)}"><a href="/esper/${e.slug}" data-link><img src="${img(e.icon)}" alt="" loading="lazy"><span><b>${esc(e.name)}</b><small><img src="${elIco(e.element)}" alt="">${esc(e.element)}</small></span></a><p class="txt">${rich(memberText(c, m))}</p></div>`; }).join("")}</div></details>` : ""}
       </article>`;
     };
     main.innerHTML = head("ESPER CYCLE", "Esper Cycle",

@@ -1830,16 +1830,22 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .rt-key { letter-spacing: 0.02em; }
 
 /* ---------------- Esper Cycle ---------------- */
-.cy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start; }
-.cy-card { --c: var(--pink); padding: 20px; border-radius: var(--r-lg); background: var(--panel); box-shadow: var(--ring); border-top: 4px solid var(--c); scroll-margin-top: 90px; }
+/* warna elemen mengikuti ikon resmi di halaman ini */
+.cy-grid { --el-anima: #3fe0b0; --el-lakshana: #f1c044; --el-chaos: #a99cff; --el-cosmos: #e4e0ff; --el-psyche: #4cb4ff; --el-incantation: #ff4d64; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start; }
+.cy-card { padding: 20px; border-radius: var(--r-lg); background: var(--panel); box-shadow: var(--ring); border-top: 4px solid var(--c, var(--pink)); scroll-margin-top: 90px; }
 .cy-card[hidden], .cy-empty[hidden] { display: none; }
-.cy-top { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; }
+.cy-top { display: flex; align-items: center; gap: 16px; }
+.cy-icos { display: flex; flex-shrink: 0; }
+.cy-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c, var(--pink)) 30%, var(--panel-3)), var(--bg-2) 75%); border: 4px solid var(--edge); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c, var(--pink)) 55%, transparent), 0 6px 18px color-mix(in srgb, var(--c, var(--pink)) 28%, transparent); }
+.cy-ico + .cy-ico { margin-left: -16px; }
+.cy-ico img { width: 40px; height: 40px; object-fit: contain; }
+.cy-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
 .cy-no { font: 800 0.72rem var(--mono); font-style: normal; color: var(--muted); }
-.cy-top h2 { font: 800 1.35rem var(--display); letter-spacing: -0.01em; text-transform: uppercase; }
-.cy-els { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.cy-el { --c: var(--pink); display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c) 18%, var(--panel-2)); border: 2px solid var(--edge); font: 700 0.72rem var(--body); color: var(--text); }
-.cy-el i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
-.cy-desc { margin-top: 14px; color: var(--text-2); white-space: pre-line; line-height: 1.6; }
+.cy-title h2 { font: 800 1.35rem var(--display); letter-spacing: -0.01em; text-transform: uppercase; }
+.cy-els { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
+.cy-el { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px 3px 4px; border-radius: 999px; background: color-mix(in srgb, var(--c, var(--pink)) 16%, var(--panel-2)); border: 2px solid var(--edge); font: 700 0.72rem var(--body); color: var(--text); }
+.cy-el img { width: 22px; height: 22px; object-fit: contain; }
+.cy-desc { margin-top: 16px; color: var(--text-2); white-space: pre-line; line-height: 1.6; }
 .cy-mem { margin-top: 16px; border-top: 2px dashed var(--panel-3); padding-top: 12px; }
 .cy-mem summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; list-style: none; font: 800 0.8rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
 .cy-mem summary::-webkit-details-marker { display: none; }
@@ -1847,13 +1853,13 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .cy-mem summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 8px; }
 .cy-mem[open] summary { color: var(--text); }
 .cy-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-.cy-row { --c: var(--pink); padding: 12px; border-radius: 16px; background: var(--panel-2); border-left: 4px solid var(--c); }
-.cy-row a { display: flex; align-items: center; gap: 10px; color: var(--text); }
-.cy-row img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 3px solid var(--edge); background: var(--panel-3); }
+.cy-row { padding: 12px; border-radius: 16px; background: var(--panel-2); border-left: 4px solid var(--c, var(--pink)); }
+.cy-row a { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; }
+.cy-row a img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 3px solid var(--edge); background: var(--panel-3); }
 .cy-row a span { display: flex; flex-direction: column; }
 .cy-row a b { font-weight: 800; }
-.cy-row a small { color: var(--muted); font: 500 0.7rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.cy-row a small { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font: 500 0.7rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.cy-row a small img { width: 16px; height: 16px; border: 0; border-radius: 0; background: none; object-fit: contain; }
 .cy-row .txt { margin-top: 10px; color: var(--text-2); font-size: 0.9rem; white-space: pre-line; }
 .cy-empty { text-align: center; padding: 40px 0; }
-@media (max-width: 600px) { .cy-els { margin-left: 0; } .cy-card { padding: 16px; } }
-.cy-row a { text-decoration: none; }
+@media (max-width: 600px) { .cy-card { padding: 16px; } .cy-ico { width: 56px; height: 56px; } .cy-ico img { width: 34px; height: 34px; } }
