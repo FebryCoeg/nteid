@@ -1,0 +1,240 @@
+[
+ {
+  "key": "remora",
+  "name": "Remora",
+  "zh": "延滞",
+  "elements": [
+   "Lakshana",
+   "Cosmos"
+  ],
+  "nums": [
+   "5"
+  ],
+  "desc": {
+   "id": "Target masuk status Remora selama {0} detik setelah Esper Cycle terpicu: kecepatan gerak dan serangannya turun. Efeknya memudar seiring waktu dan durasinya makin pendek bila diterapkan berulang.",
+   "en": "The target enters Remora for {0}s after triggering Esper Cycle, slowing their movement and attack speed. The effect decays over time, and will have a shorter duration if repeatedly applied."
+  },
+  "members": [
+   {
+    "slug": "skia"
+   },
+   {
+    "slug": "hathor"
+   },
+   {
+    "slug": "chaos"
+   },
+   {
+    "slug": "akane-rin"
+   },
+   {
+    "slug": "elyms"
+   }
+  ]
+ },
+ {
+  "key": "blossom",
+  "name": "Blossom",
+  "zh": "创生",
+  "elements": [
+   "Cosmos",
+   "Anima"
+  ],
+  "nums": [
+   "1",
+   "5",
+   "2",
+   "3"
+  ],
+  "desc": {
+   "id": "Memunculkan {0} Vita Bud di dekat target setelah Esper Cycle terpicu, yang mekar menjadi {1} Vita Pistil.\nVita Pistil lalu terbang ke target dalam jangkauan, meledak setiap {2} detik dan memberi DMG area.\nMaksimal {3} Vita Bud ada di lapangan sekaligus.",
+   "en": "Generates {0} Vita Bud near the target after triggering Esper Cycle, which blossoms {1} Vita Pistils.\nVita Pistils then fly toward targets within range, exploding every {2}s and dealing DMG to an area.\nUp to {3} Vita Buds can exist on the field at once."
+  },
+  "members": [
+   {
+    "slug": "nanally"
+   },
+   {
+    "slug": "mint"
+   },
+   {
+    "slug": "hotori"
+   },
+   {
+    "slug": "jiuyuan"
+   },
+   {
+    "slug": "iroi"
+   }
+  ]
+ },
+ {
+  "key": "hexed",
+  "name": "Hexed",
+  "zh": "覆纹",
+  "elements": [
+   "Anima",
+   "Incantation"
+  ],
+  "nums": [
+   "12",
+   "20%"
+  ],
+  "desc": {
+   "id": "Memberi satu hit Follow-up Attack DMG tambahan pada target sebesar {1} dari Anima atau Incantation DMG yang diterimanya dalam {0} detik setelah Esper Cycle terpicu.",
+   "en": "Deals an additional instance of follow-up attack DMG to the target equal to {1} of Anima or Incantation DMG taken within {0}s after triggering Esper Cycle."
+  },
+  "members": [
+   {
+    "slug": "linko"
+   }
+  ]
+ },
+ {
+  "key": "nova",
+  "name": "Nova",
+  "zh": "黯星",
+  "elements": [
+   "Chaos",
+   "Psyche"
+  ],
+  "nums": [
+   "5"
+  ],
+  "desc": {
+   "id": "Menerapkan Nova pada target selama {0} detik setelah Esper Cycle terpicu. Saat efeknya berakhir, target menerima Mental Damage besar.",
+   "en": "Inflicts Nova on the target for {0}s after triggering Esper Cycle. When the effect ends, the target takes massive Mental Damage."
+  },
+  "members": [
+   {
+    "slug": "fadia"
+   },
+   {
+    "slug": "haniel"
+   },
+   {
+    "slug": "aurelia"
+   },
+   {
+    "slug": "blackbird"
+   },
+   {
+    "slug": "exe"
+   }
+  ]
+ },
+ {
+  "key": "scorch",
+  "name": "Scorch",
+  "zh": "浊燃",
+  "elements": [
+   "Incantation",
+   "Chaos"
+  ],
+  "nums": [
+   "15"
+  ],
+  "desc": {
+   "id": "Saat Esper Cycle terpicu, target terkena Scorch selama {0} detik dan menerima DoT.",
+   "en": "Upon triggering Esper Cycle, inflicts Scorch on the target for {0}s, dealing DoT."
+  },
+  "members": [
+   {
+    "slug": "baicang"
+   },
+   {
+    "slug": "sakiri"
+   },
+   {
+    "slug": "adler"
+   },
+   {
+    "slug": "zankou"
+   }
+  ]
+ },
+ {
+  "key": "stain",
+  "name": "Stain",
+  "zh": "浸染",
+  "elements": [
+   "Psyche",
+   "Lakshana"
+  ],
+  "nums": [
+   "12",
+   "20%"
+  ],
+  "desc": {
+   "id": "Setelah Esper Cycle terpicu, Psyche dan Lakshana DMG yang diterima target naik {1} selama {0} detik.",
+   "en": "Increases the target's Psyche and Lakshana DMG taken by {1} for {0}s after triggering Esper Cycle."
+  },
+  "members": [
+   {
+    "slug": "blackbird"
+   }
+  ]
+ },
+ {
+  "key": "charge",
+  "name": "Charge",
+  "zh": "盈蓄",
+  "elements": [
+   "Cosmos",
+   "Anima",
+   "Lakshana"
+  ],
+  "nums": [
+   "10"
+  ],
+  "desc": {
+   "id": "Karakter yang sedang aktif mendapat {0} Ultimate Energy tambahan saat Vita Pistil mengenai target yang terkena Remora.",
+   "en": "Grants the active character {0} additional Ultimate Energy when Vita Pistils hit targets affected by Remora."
+  },
+  "members": [
+   {
+    "slug": "zero-1051",
+    "p": 0
+   },
+   {
+    "slug": "zero-1046",
+    "p": 0
+   },
+   {
+    "slug": "chiz"
+   },
+   {
+    "slug": "edgar"
+   },
+   {
+    "slug": "shinku"
+   },
+   {
+    "slug": "elyms"
+   }
+  ]
+ },
+ {
+  "key": "discord",
+  "name": "Discord",
+  "zh": "失谐",
+  "elements": [
+   "Chaos",
+   "Psyche",
+   "Incantation"
+  ],
+  "nums": [],
+  "desc": {
+   "id": "Mengurangi sebagian Break target saat target terkena Nova dan Scorch sekaligus.",
+   "en": "Deducts a percentage of the target's Break when they are simultaneously affected by Nova and Scorch."
+  },
+  "members": [
+   {
+    "slug": "lacrimosa"
+   },
+   {
+    "slug": "daffodill"
+   }
+  ]
+ }
+]

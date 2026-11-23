@@ -130,6 +130,7 @@
     [/^\/usulan\/?$/, viewProposal],
     [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
+    [/^\/siklus\/?$/, viewCycles],
     [/^\/pencapaian\/?$/, viewAchievements],
     [/^\/fashion\/?$/, viewFashion],
     [/^\/makanan\/?$/, viewFood],
@@ -276,6 +277,7 @@
       ["/cerita", "08", S("Cerita", "Story"), S("Ringkasan bab utama dan spinoff", "Main story & spinoff recaps"), N.cerita, thumbs("cerita")],
       ["/anomali", "09", S("Anomali", "Anomalies"), S("Arsip Anomaly, monster, dan boss", "Anomaly files, monsters & bosses"), N.anomali, thumbs("anomali")],
       ["/istilah", "10", S("Istilah", "Glossary"), S("Istilah resmi dunia NTE", "Official NTE terminology"), N.istilah, ""],
+      ["/siklus", "16", "Esper Cycle", S("Efek reaksi elemen dan karakter yang menguatkannya", "Element reaction effects and the characters that enhance them"), 8, ""],
       ["/pencapaian", "11", S("Pencapaian", "Achievements"), S("Medali, syarat, hadiah, dan penanda progres", "Medals, requirements, rewards & progress tracker"), N.pencapaian, thumbs("pencapaian")],
       ["/fashion", "12", "Fashion", S("Kostum Esper dan ilustrasinya", "Esper outfits & illustrations"), N.fashion, thumbs("fashion")],
       ["/makanan", "13", S("Makanan", "Food"), S("Makanan, efek buff, dan bahan masak", "Dishes, buffs & ingredients"), N.makanan, thumbs("makanan")],
@@ -3003,6 +3005,43 @@
     });
   }
 
+  // Esper Cycle: 8 efek reaksi, elemen pemicu, dan penguatan tiap karakter (teks diambil dari data Esper)
+  async function viewCycles() {
+    const [cycles, espers] = await Promise.all([load("cycles"), load("espers")]);
+    const CY = window.NteCycles;
+    const bySlug = Object.fromEntries(espers.map((e) => [e.slug, e]));
+    setTitle("Esper Cycle");
+    const filled = (c) => CY.fill(tx(c.desc), c.nums);
+    const elChip = (el) => `<span class="cy-el ${elClass(el)}"><i></i>${esc(el)}</span>`;
+    const memberText = (c, m) => {
+      const e = bySlug[m.slug]; if (!e) return "";
+      const pas = e.skills.filter((s) => s.group === "passive");
+      const own = pas.map((s) => CY.enhancement(s.desc, c.name)).find(Boolean);
+      return own || (m.p != null && pas[m.p] ? String(pas[m.p].desc).replace(/<b>[^<]*Enhancement<\/b>\s*[:：]\s*/, "") : "");
+    };
+    const card = (c, i) => {
+      const mem = c.members.filter((m) => bySlug[m.slug]);
+      return `<article class="cy-card ${elClass(c.elements[0])}" id="cy-${c.key}" data-q="${esc((c.name + " " + mem.map((m) => bySlug[m.slug].name).join(" ")).toLowerCase())}">
+        <div class="cy-top"><i class="cy-no">${String(i + 1).padStart(2, "0")}</i><h2>${esc(c.name)}</h2><div class="cy-els">${c.elements.map(elChip).join("")}</div></div>
+        <p class="txt cy-desc">${rich(filled(c))}</p>
+        ${mem.length ? `<details class="cy-mem"><summary><span>${S("Penguatan karakter", "Character enhancements")}</span><b>${mem.length}</b></summary>
+          <div class="cy-list">${mem.map((m) => { const e = bySlug[m.slug]; return `<div class="cy-row ${elClass(e.element)}"><a href="/esper/${e.slug}" data-link><img src="${img(e.icon)}" alt="" loading="lazy"><span><b>${esc(e.name)}</b><small>${esc(e.element)}</small></span></a><p class="txt">${rich(memberText(c, m))}</p></div>`; }).join("")}</div></details>` : ""}
+      </article>`;
+    };
+    main.innerHTML = head("ESPER CYCLE", "Esper Cycle",
+      S("Delapan efek yang muncul saat dua atau tiga elemen Esper bertemu. Buka tiap kartu untuk melihat karakter yang punya penguatan efek itu.", "Eight effects that trigger when two or three Esper elements meet. Open a card to see which characters have an enhancement for it."), cycles.length) +
+      `<div class="toolbar">${filterBox(S("Cari efek atau karakter…", "Search effect or character…"))}</div><div class="cy-grid" id="cyGrid">${cycles.map(card).join("")}</div><p class="mono cy-empty" id="cyEmpty" hidden>${S("TIDAK ADA YANG COCOK", "NO MATCHES")}</p>`;
+    const input = $(".filter-input", main);
+    const run = () => {
+      const q = input.value.trim().toLowerCase(); let n = 0;
+      main.querySelectorAll(".cy-card").forEach((el) => { const ok = !q || el.dataset.q.includes(q); el.hidden = !ok; if (ok) n++; if (q && ok) el.querySelector("details")?.setAttribute("open", ""); });
+      $("#cyEmpty").hidden = n > 0; $("#countTag").textContent = `${n} ${S("ENTRI", "ENTRIES")}`;
+    };
+    input.addEventListener("input", run);
+    const q0 = new URLSearchParams(location.search).get("q"); if (q0) { input.value = q0; run(); }
+    if (location.hash) { const t = $(location.hash, main); if (t) { t.querySelector("details")?.setAttribute("open", ""); t.scrollIntoView(); } }
+  }
+
   async function viewAchievements() {
     const d = await load("achievements");
     setTitle(S("Pencapaian", "Achievements"));
@@ -3354,7 +3393,7 @@
   let index = null;
   async function buildIndex() {
     if (index) return index;
-    const [es, ar, md, it, fu, ve, st, an, gl, ac, fa, fo] = await Promise.all(["espers", "arcs", "modules", "items", "furniture", "vehicles", "story", "anomalies", "glossary", "achievements", "fashion", "food"].map(load));
+    const [es, ar, md, it, fu, ve, st, an, gl, ac, fa, fo, cy] = await Promise.all(["espers", "arcs", "modules", "items", "furniture", "vehicles", "story", "anomalies", "glossary", "achievements", "fashion", "food", "cycles"].map(load));
     index = [
       ...es.map((x) => ({ g: S("Esper", "Esper"), n: x.name, s: `${x.element} · Rank ${x.rank}`, i: x.icon, href: `/esper/${x.slug}` })),
       ...ar.map((x) => ({ g: "Arc", n: x.name, s: x.type, i: x.icon, href: `/arc/${x.slug}` })),
@@ -3368,6 +3407,7 @@
       ...ac.items.map((x) => ({ g: S("Pencapaian", "Achievement"), n: tx(x.title), s: tx(x.desc), href: `/pencapaian?q=${encodeURIComponent(x.title.en)}` })),
       ...fa.map((x) => ({ g: "Fashion", n: tx(x.name), s: x.char, href: `/fashion?q=${encodeURIComponent(x.name.en)}` })),
       ...fo.map((x) => ({ g: S("Makanan", "Food"), n: tx(x.name), s: "", href: `/makanan?q=${encodeURIComponent(x.name.en)}` })),
+      ...cy.map((x) => ({ g: "Esper Cycle", n: x.name, s: x.elements.join(" · "), href: `/siklus#cy-${x.key}` })),
     ];
     return index;
   }
