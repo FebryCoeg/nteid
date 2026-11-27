@@ -1,0 +1,29 @@
+{
+  "_catatan": "Angka Awakening yang tidak ada di data game (tampil sebagai X). Disalin dari layar Awaken di dalam game. Nomor 7 dan 8 = bonus 3 dan 6 Awakening. Dipakai build.py agar tidak tertimpa saat data dibuat ulang.",
+  "exe": {
+    "1": {
+      "en": "Increases Exe's Chaos DMG by <b>20%</b> while his Rating is SS or higher.",
+      "id": "Meningkatkan Chaos DMG Exe sebesar <b>20%</b> selama Rating-nya SS atau lebih tinggi."
+    },
+    "3": {
+      "en": "Causes Data Exfiltration to pull in enemies within range and reduce their Chaos Resistance by <b>15%</b> for <b>12</b>s.",
+      "id": "Data Exfiltration menarik musuh dalam jangkauan dan mengurangi Chaos Resistance mereka sebesar <b>15%</b> selama <b>12</b> detik."
+    },
+    "4": {
+      "en": "Increases DMG dealt by summons on the field by <b>10%</b>. Digital Echoes gain an additional <b>30%</b> DMG Bonus.",
+      "id": "Meningkatkan DMG yang diberikan summon di medan sebesar <b>10%</b>. Digital Echo mendapat tambahan DMG Bonus <b>30%</b>."
+    },
+    "5": {
+      "en": "Causes Digital Echoes to release a shockwave when they vanish while Shader Compile from Exe's Ultimate is active. Each shockwave deals additional DMG equal to <b>25.8%</b> of ATK to targets in range. The DMG Ratio of Digital Echoes scales with the Basic Attack skill level.",
+      "id": "Selama Shader Compile dari Ultimate Exe aktif, Digital Echo melepaskan gelombang kejut saat menghilang. Setiap gelombang kejut memberikan DMG tambahan sebesar <b>25,8%</b> ATK ke target dalam jangkauan. DMG Ratio Digital Echo mengikuti level skill Basic Attack."
+    },
+    "7": {
+      "en": "Increases the skill levels of Basic Attack, Redirect Skill, and Ultimate by <b>1</b>. Increases Charge Efficiency by <b>25%</b>.\nPrevents Rating from decreasing for the rest of the battle.",
+      "id": "Meningkatkan level skill Basic Attack, Redirect Skill, dan Ultimate sebesar <b>1</b>. Meningkatkan Charge Efficiency sebesar <b>25%</b>.\nRating tidak akan turun sampai pertarungan berakhir."
+    },
+    "8": {
+      "en": "Increases Rating gain rate and Resistance to Interruptions by <b>50%</b>. Unlocks Ω Rating. While at Ω Rating, Exe accumulates Frames faster, and Awaken: define X/Y is modified to grant him an additional <b>50%</b> ATK.\nAllows Network Penetration to also execute Boss targets with less than <b>5%</b> HP while Shader Compile from Exe's Ultimate is active.",
+      "id": "Meningkatkan laju perolehan Rating dan Resistance to Interruptions sebesar <b>50%</b>. Membuka Rating Ω. Selama Rating Ω, Exe mengumpulkan Frame lebih cepat, dan Awaken: define X/Y diubah sehingga ia mendapat tambahan <b>50%</b> ATK.\nSelama Shader Compile dari Ultimate Exe aktif, Network Penetration juga bisa mengeksekusi target Boss dengan HP di bawah <b>5%</b>."
+    }
+  }
+}

@@ -319,6 +319,8 @@ def esper_skills(ns, name):
                 break
     return skills, extras
 
+AWAKEN_FIX = json.loads((TOOLS / "awaken_overrides.json").read_text(encoding="utf-8"))
+
 def build_espers():
     chars = table("DataTable/Character/DT_Character.json")
     like = table("DataTable/LikeabilitySystem/DT_LikeabilityRoleData.json")
@@ -346,6 +348,10 @@ def build_espers():
             if not ns and isinstance(title, dict) and title.get("TableId"):
                 ns = title["TableId"].split("/")[-1].split(".")[0]
             awaken.append({"name": plain(loc_text(title)), "desc": T(loc_text(e.get("Desc")), f"awakening:{name}"), "icon": asset(e.get("AwakenIcon"), "awaken", 128)})
+        fix = AWAKEN_FIX.get(slug(NAME_FIX.get(name, name)), {})  # angka dari layar game (data game masih X)
+        for n, t in fix.items():
+            if int(n) <= len(awaken):
+                awaken[int(n) - 1]["desc"] = t["en" if LANG_BUILD == "en" else "id"]
         skills, extras = esper_skills(ns, name)
         lk = like.get(cid, {})
         prof = esper_profile(name) or {}

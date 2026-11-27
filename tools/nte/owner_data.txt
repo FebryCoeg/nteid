@@ -404,10 +404,10 @@
 * Skill Priority: Ultimate → Skill → Basic Attack → QTE
 * Best Awakening Nodes (Urutan Prioritas 1–6):
    1. A2 (define X/Y) [Prioritas 1]: Meningkatkan ATK Exe sebesar 10%, 12%, 15%, 20%, atau 30% sesuai tingkatan Rating (B, A, S, SS, atau SSS).
-   2. A1 (print Hello, My World!) [Prioritas 2]: Meningkatkan Chaos DMG Exe selama Rating miliknya berada pada tingkatan SS atau lebih tinggi.
-   3. A3 (for Playing Together Forever) [Prioritas 3]: Data Exfiltration menarik musuh di dalam jangkauan dan mengurangi Chaos RES mereka selama beberapa detik.
-   4. A4 (kill Process) [Prioritas 4]: Meningkatkan DMG yang diberikan oleh seluruh summon di field, dan Digital Echoes mendapatkan tambahan DMG Bonus lagi di atasnya.
-   5. A5 (null Pointer) [Prioritas 5]: Selama Shader Compile dari Ultimate Mesh Collision aktif, Digital Echoes melepaskan gelombang kejut saat menghilang yang memberikan extra DMG berdasarkan ATK Exe.
+   2. A1 (print Hello, My World!) [Prioritas 2]: Meningkatkan Chaos DMG Exe sebesar 20% selama Rating miliknya berada pada tingkatan SS atau lebih tinggi.
+   3. A3 (for Playing Together Forever) [Prioritas 3]: Data Exfiltration menarik musuh di dalam jangkauan dan mengurangi Chaos RES mereka sebesar 15% selama 12 detik.
+   4. A4 (kill Process) [Prioritas 4]: Meningkatkan DMG yang diberikan oleh seluruh summon di field sebesar 10%, dan Digital Echoes mendapatkan tambahan DMG Bonus 30% di atasnya.
+   5. A5 (null Pointer) [Prioritas 5]: Selama Shader Compile dari Ultimate Mesh Collision aktif, Digital Echoes melepaskan gelombang kejut saat menghilang yang memberikan extra DMG sebesar 25,8% ATK Exe. DMG Ratio Digital Echoes mengikuti level skill Basic Attack.
    6. A6 (log Bone-Animating Code) [Prioritas 6]: Setiap kali Exe memperoleh Frames, ia memulihkan HP berdasarkan ATK untuk setiap poin Rating; setiap kali menghabiskan Frames, ia mendapatkan ekstra Rating.
 * Build FAQ:
    * Ascension Materials (Lv. 20–80): 525,000 Beetle Coins, 86× Confessional Flower Seed, 17× Blurred Numeral, 18× Unsolved Numeral, 15× Distorted Numeral.
