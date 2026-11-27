@@ -496,6 +496,142 @@
     ]
    },
    "pid": "DrNWEHbuPYPtWWhhqCaHuL1pLtl2_zankou"
+  },
+  {
+   "name": "Bos apapun",
+   "arcs": [
+    "ravenous-blade",
+    "crime-and-punishment",
+    "contemplative-cat",
+    "tears-beneath-the-mask"
+   ],
+   "sets": [
+    {
+     "id": "Suit4",
+     "pieces": 4
+    },
+    {
+     "id": "Suit5",
+     "pieces": 4
+    },
+    {
+     "id": "Suit1",
+     "pieces": 4
+    }
+   ],
+   "stats": [
+    "CRIT Rate",
+    "CRIT DMG",
+    "Incantation DMG"
+   ],
+   "sub": [
+    "Universal DMG",
+    "CRIT Rate / CRIT DMG",
+    "Break Intensity",
+    "ATK %"
+   ],
+   "awks": [],
+   "skills": [
+    "ultimate",
+    "redirect",
+    "basic"
+   ],
+   "rot": [
+    {
+     "c": "zankou",
+     "a": "hold"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "atk"
+    },
+    {
+     "c": "zankou",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "q"
+    },
+    {
+     "c": "daffodill",
+     "a": "e"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "zero-1051",
+     "a": "q"
+    },
+    {
+     "c": "zero-1051",
+     "a": "e"
+    },
+    {
+     "c": "zero-1051",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "mint",
+     "a": "q"
+    },
+    {
+     "c": "mint",
+     "a": "e"
+    },
+    {
+     "c": "zankou",
+     "a": "q"
+    },
+    {
+     "c": "zankou",
+     "a": "switch"
+    },
+    {
+     "c": "daffodill",
+     "a": "switch"
+    },
+    {
+     "c": "zankou",
+     "a": "hold"
+    }
+   ],
+   "repeat": null,
+   "rotation": "",
+   "why": "Mencoba ajj",
+   "credit": {
+    "name": "Muhammad Aulia Fajri",
+    "url": ""
+   },
+   "team": {
+    "members": [
+     "zankou",
+     "daffodill",
+     "zero-1051",
+     "mint"
+    ],
+    "roles": [
+     "DPS",
+     "",
+     "",
+     ""
+    ]
+   },
+   "pid": "9tHQxjbgXBhMYOtzTBZ3abF7o9w1_zankou"
   }
  ],
  "shinku": [
