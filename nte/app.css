@@ -1863,3 +1863,63 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .cy-row .txt { margin-top: 10px; color: var(--text-2); font-size: 0.9rem; white-space: pre-line; }
 .cy-empty { text-align: center; padding: 40px 0; }
 @media (max-width: 600px) { .cy-card { padding: 16px; } .cy-ico { width: 56px; height: 56px; } .cy-ico img { width: 34px; height: 34px; } }
+
+/* ---------------- Penuhi Seluruh Kota ---------------- */
+.ct { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) minmax(0, 320px); gap: 14px; align-items: start; margin-top: 14px; }
+.ct-mid, .ct-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.ct-pal { min-width: 0; }
+.ct-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; max-height: 900px; overflow-y: auto; padding-right: 4px; }
+.ct-b { display: flex; gap: 10px; padding: 10px; border-radius: 16px; background: var(--panel-2); border-left: 4px solid var(--c); }
+.ct-b.on { outline: 2px solid var(--pink); }
+.ct-b img { width: 52px; height: 52px; flex-shrink: 0; object-fit: contain; }
+.ct-b > div { min-width: 0; }
+.ct-b b { font-weight: 800; }
+.ct-b small, .ct-c small, .ct-row small { display: block; color: var(--muted); font: 500 0.68rem var(--mono); }
+.ct-b .txt, .ct-c .txt { margin-top: 4px; font-size: 0.82rem; color: var(--text-2); }
+.ct-bact { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.ct-count { display: inline-flex; align-items: center; gap: 6px; }
+.ct-count button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--edge); background: var(--panel-3); color: var(--text); font-weight: 800; cursor: pointer; }
+.ct-count b { min-width: 20px; text-align: center; }
+.ct-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.ct-hint { margin: 10px 0; min-height: 1.2em; text-transform: none; letter-spacing: 0.02em; }
+.ct-boardwrap { display: flex; justify-content: center; }
+.ct-board { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); grid-template-rows: repeat(var(--n), minmax(0, 1fr)); gap: 4px; width: 100%; max-width: calc(var(--n) * 108px); aspect-ratio: 1; padding: 8px; border-radius: 18px; background: var(--bg-2); box-shadow: var(--ring); }
+.ct-cell { min-width: 0; min-height: 0; border: 2px solid var(--edge); border-radius: 10px; background: var(--cream-2); color: var(--ink); font: 700 0.6rem var(--body); cursor: pointer; padding: 2px; }
+.ct-cell.ext { background: #aab3bf; }
+.ct-cell.off { background: transparent; border: 2px dashed var(--panel-3); }
+.ct-cell.off:disabled { visibility: hidden; }
+.ct-cell.p-high { background: var(--gold); }
+.ct-cell.p-river { background: #58a9e6; }
+.ct-cell.p-monument { background: #6fc08a; }
+.ct-it { position: relative; z-index: 1; min-width: 0; min-height: 0; display: grid; place-items: center; overflow: hidden; border: 3px solid var(--edge); border-radius: 12px; background: color-mix(in srgb, var(--c) 78%, var(--ink)); color: #fff; cursor: pointer; padding: 0; }
+.ct-it img { position: absolute; inset: 14% 10% 20%; width: 80%; height: 66%; object-fit: contain; }
+.ct-it span { position: absolute; left: 2px; right: 2px; bottom: 1px; font: 800 0.62rem var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px #000; }
+.ct-it small { position: absolute; font: 800 0.62rem var(--mono); text-shadow: 0 1px 2px #000, 0 0 3px #000; z-index: 1; }
+.ct-it .tl { top: 2px; left: 4px; } .ct-it .tr { top: 2px; right: 4px; color: #ffe27a; } .ct-it .br { bottom: 13px; right: 4px; }
+.ct-it.bad { outline: 3px solid #ff4d64; opacity: 0.55; }
+.ct-limits { flex-wrap: wrap; }
+.ct-limtext { margin: 10px 0 0; padding-left: 18px; color: var(--text-2); font-size: 0.85rem; }
+.ct-score { display: flex; flex-direction: column; margin-bottom: 12px; }
+.ct-score b { font: 800 2.8rem var(--display); color: var(--gold); line-height: 1.1; overflow-wrap: anywhere; }
+.ct-check { display: flex; gap: 8px; align-items: center; margin: 10px 0; font-size: 0.85rem; }
+.ct-detail { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
+.ct-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px; background: var(--panel-2); border-left: 4px solid var(--c, var(--gold)); }
+.ct-row img { object-fit: contain; }
+.ct-row em { font: 800 1rem var(--display); font-style: normal; color: var(--gold); }
+.ct-cards { margin-top: 14px; }
+.ct-cardgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; max-height: 720px; overflow-y: auto; }
+.ct-c { display: flex; gap: 10px; padding: 10px; border-radius: 14px; background: var(--panel-2); border-left: 4px solid #9fb0c4; }
+.ct-c.r-rare { border-left-color: #5cb8ff; } .ct-c.r-epic { border-left-color: #e9a6ff; }
+.ct-c img { width: 48px; height: 48px; flex-shrink: 0; object-fit: contain; }
+@media (max-width: 1180px) { .ct { grid-template-columns: minmax(0, 1fr) minmax(0, 320px); } .ct-pal { grid-column: 1 / -1; order: 3; } .ct-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); max-height: 520px; } }
+@media (max-width: 760px) { .ct { grid-template-columns: minmax(0, 1fr); } .ct-it span { display: none; } .ct-it small { font-size: 0.54rem; } .ct-it .br { bottom: 2px; } .ct-score b { font-size: 2.2rem; } }
+#ctDrop[hidden] { display: none; }
+.ct-guide { margin-top: 14px; }
+.ct-guide > .txt { color: var(--text-2); }
+.ct-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 10px; margin-top: 12px; }
+.ct-modes > div { padding: 12px 14px; border-radius: 14px; background: var(--panel-2); border-left: 4px solid var(--pink); }
+.ct-modes .txt { margin-top: 6px; font-size: 0.86rem; color: var(--text-2); }
+.ct-boss { margin-top: 12px; border-top: 2px dashed var(--panel-3); padding-top: 10px; }
+.ct-boss summary { cursor: pointer; font: 800 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+.ct-boss ul { margin: 10px 0 0; padding-left: 18px; color: var(--text-2); font-size: 0.85rem; }
+.ct-boss li { margin-bottom: 6px; }

@@ -65,6 +65,7 @@ PAGES = [
     ("usulan", "Usulkan Build dan Tim", "Usulkan build dan susunan tim karakter Neverness to Everness: login Google, isi Arc, set modul, stat, Awakening, skill, dan rotasi, lalu kirim untuk ditinjau admin."),
     ("tracker", "Tracker Gacha", "Catat gacha Neverness to Everness: total pull dan S-Class, hitung pity, statistik, dan diagram batang pity. Data hanya tersimpan di browser."),
     ("istilah", "Istilah", "Arti istilah dunia Neverness to Everness dari buku panduan dalam game."),
+    ("tycoons-deck", "Tycoon's Deck", "Alat bantu event Tycoon's Deck Neverness to Everness 1.5: panduan mode, susun bangunan, hitung skor, cari susunan otomatis, dan 111 Strategy Card."),
     ("siklus", "Esper Cycle", "Delapan efek Esper Cycle Neverness to Everness (Remora, Blossom, Hexed, Nova, Scorch, Stain, Charge, Discord) beserta karakter yang menguatkannya."),
     ("pencapaian", "Pencapaian", "Lebih dari 450 pencapaian Neverness to Everness lengkap dengan syarat dan hadiah."),
     ("fashion", "Fashion", "Galeri ilustrasi kostum setiap Esper di Neverness to Everness."),

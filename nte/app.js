@@ -131,6 +131,7 @@
     [/^\/tentang\/?$/, viewAbout],
     [/^\/istilah\/?$/, viewGlossary],
     [/^\/siklus\/?$/, viewCycles],
+    [/^\/tycoons-deck\/?$/, viewCity],
     [/^\/pencapaian\/?$/, viewAchievements],
     [/^\/fashion\/?$/, viewFashion],
     [/^\/makanan\/?$/, viewFood],
@@ -277,6 +278,7 @@
       ["/cerita", "08", S("Cerita", "Story"), S("Ringkasan bab utama dan spinoff", "Main story & spinoff recaps"), N.cerita, thumbs("cerita")],
       ["/anomali", "09", S("Anomali", "Anomalies"), S("Arsip Anomaly, monster, dan boss", "Anomaly files, monsters & bosses"), N.anomali, thumbs("anomali")],
       ["/istilah", "10", S("Istilah", "Glossary"), S("Istilah resmi dunia NTE", "Official NTE terminology"), N.istilah, ""],
+      ["/tycoons-deck", "17", "Tycoon's Deck", S("Susun bangunan, hitung skor, dan cari susunan terbaik", "Lay out buildings, score them and search for good layouts"), "", ""],
       ["/siklus", "16", "Esper Cycle", S("Efek reaksi elemen dan karakter yang menguatkannya", "Element reaction effects and the characters that enhance them"), 8, ""],
       ["/pencapaian", "11", S("Pencapaian", "Achievements"), S("Medali, syarat, hadiah, dan penanda progres", "Medals, requirements, rewards & progress tracker"), N.pencapaian, thumbs("pencapaian")],
       ["/fashion", "12", "Fashion", S("Kostum Esper dan ilustrasinya", "Esper outfits & illustrations"), N.fashion, thumbs("fashion")],
@@ -3042,6 +3044,18 @@
     input.addEventListener("input", run);
     const q0 = new URLSearchParams(location.search).get("q"); if (q0) { input.value = q0; run(); }
     if (location.hash) { const t = $(location.hash, main); if (t) { t.querySelector("details")?.setAttribute("open", ""); t.scrollIntoView(); } }
+  }
+
+  // Tycoon's Deck (铺满全城): skripnya dimuat hanya saat halaman dibuka
+  async function viewCity() {
+    setTitle("Tycoon's Deck");
+    const script = (src) => new Promise((res, rej) => {
+      if (document.querySelector(`script[data-src="${src}"]`)) return res();
+      const el = document.createElement("script"); el.src = src + ver; el.dataset.src = src; el.onload = res; el.onerror = () => { el.remove(); rej(new Error(src)); }; document.head.appendChild(el);
+    });
+    const [data] = await Promise.all([load("city"), script("/nte/city-engine.js"), script("/nte/city-view.js")]);
+    if (!/^\/tycoons-deck\/?$/.test(location.pathname)) return;
+    window.NteCityView({ main, data, E: window.NteCity.create(data), S, esc, img, head, toast, ver });
   }
 
   async function viewAchievements() {

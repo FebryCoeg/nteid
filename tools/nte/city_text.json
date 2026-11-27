@@ -1,0 +1,825 @@
+{
+ "_catatan": "Nama bangunan, kartu, dan syarat Boss Blind adalah nama resmi game (ST_BalatroLike, bahasa Inggris). Efek diterjemahkan sendiri mengikuti angka dari data 19 November. Bangunan: [nama, pasif ID, pasif EN]; kartu: [nama, efek ID, efek EN]; bossBlinds: [kode, pembatasan, nama, ID, EN].",
+ "buildings": {
+  "OneCafe": [
+   "The Cafe by Origen",
+   "Bila ada bangunan Kuliner di sebelahnya, mendapat +10 Pengunjung.",
+   "Gains +10 Foot Traffic if a Dining building is adjacent."
+  ],
+  "Mcdonald": [
+   "Quick Bites",
+   "Tiap Quick Bites lain di sebelahnya, skor akhirnya +50%.",
+   "+50% final score for each adjacent Quick Bites."
+  ],
+  "Takoyaki": [
+   "Dango Stand",
+   "Saat lolos Blind, mendapat 1 Koin.",
+   "Gain 1 Coin when you clear a Blind."
+  ],
+  "Bread": [
+   "Bakehouse",
+   "Tiap jenis nama bangunan berbeda di sebelahnya, mendapat +8 Pengunjung.",
+   "+8 Foot Traffic for each differently named adjacent building."
+  ],
+  "BrandHotel": [
+   "Midnight Diner",
+   "Tiap jenis nama bangunan Kuliner berbeda di sebelahnya: +10 Pengunjung dan rasio konversi +40%.",
+   "For each differently named adjacent Dining building: +10 Foot Traffic and +40% conversion."
+  ],
+  "Arcade": [
+   "Arcade",
+   "Bangunan berulang di sebelahnya dihitung 1 kali lebih banyak.",
+   "Adjacent repeating buildings score 1 extra time."
+  ],
+  "Gacha": [
+   "Capsule Toy Shop",
+   "Berulang: tiap 15 Pengunjung dihitung 1 kali, tiap kali memberi 15 Poin.",
+   "Repeats: scores once per 15 Foot Traffic, 15 Points each time."
+  ],
+  "DeskGame": [
+   "Board Game Shop",
+   "Saat ditaruh, ambil 1 kartu dari dek (tidak bisa dibatalkan).",
+   "On placement, draw 1 card (cannot be undone)."
+  ],
+  "Cinema": [
+   "Cinema",
+   "Tiap 20 Pengunjung yang didapat, bangunan di sekitarnya mendapat +5 Poin tiap kali dihitung.",
+   "For every 20 Foot Traffic it gets, surrounding buildings gain +5 Points each time they score."
+  ],
+  "ThemePark": [
+   "Puka Theme Park",
+   "Berulang: tiap 20 Pengunjung dihitung 1 kali; pertama 20 Poin, tiap hitungan berikutnya bertambah 3 Poin.",
+   "Repeats: scores once per 20 Foot Traffic; 20 Points first, each later time is worth 3 more."
+  ],
+  "StreetShop": [
+   "Corner Shop",
+   "Selama ada di papan, tiap tukar kartu memberi 1 Koin.",
+   "While on the board, each card swap gives 1 Coin."
+  ],
+  "Konbini": [
+   "Neighborhood Mart",
+   "Bila semua petak di sebelahnya terisi bangunan, mendapat 1 Koin.",
+   "Gain 1 Coin if all adjacent cells have buildings."
+  ],
+  "LargeStore": [
+   "Big-Box Store",
+   "Hitungan pertama: 1 Koin tiap 2 jenis nama bangunan di papan; hitungan berikutnya 1 Koin.",
+   "First scoring: 1 Coin per 2 building names on the board; 1 Coin each time after."
+  ],
+  "LuxuryHall": [
+   "Luxury Galleria",
+   "Bila Pengunjungnya mencapai kapasitas, mendapat 2 Koin.",
+   "Gain 2 Coins if its Foot Traffic reaches capacity."
+  ],
+  "InvestCenter": [
+   "Investment Center",
+   "Tiap 1 Koin yang dihasilkan bangunan Belanja di Blind ini, rasio konversinya +15%; saat lolos Blind mendapat 3 Koin.",
+   "+15% conversion per Coin earned by Retail buildings this Blind; gain 3 Coins on clear."
+  ],
+  "LittleGreen": [
+   "Pocket Green Space",
+   "Saat ditaruh, hapus efek negatif 1 bangunan di sebelahnya dan kapasitasnya +10 di Blind ini.",
+   "On placement, cleanse 1 adjacent building and give it +10 capacity this Blind."
+  ],
+  "CityGarden": [
+   "City Garden",
+   "Hitungan pertama: +20 Poin tiap jenis nama bangunan berbeda di sebelahnya.",
+   "First scoring: +20 Points per differently named adjacent building."
+  ],
+  "RainGarden": [
+   "Rainflower Market",
+   "Aura: bangunan penghasil poin di sebelahnya mendapat kapasitas +40 (aura sejenis tidak menumpuk).",
+   "Aura: adjacent scoring buildings get +40 capacity (same aura does not stack)."
+  ],
+  "GreenHall": [
+   "Shaded Promenade",
+   "Aura: bangunan penghasil poin di sebelahnya mendapat rasio konversi +60% (aura sejenis tidak menumpuk).",
+   "Aura: adjacent scoring buildings get +60% conversion (same aura does not stack)."
+  ],
+  "WishFountain": [
+   "Nacupeda Wishing Pool",
+   "Aura: bangunan di sebelahnya yang juga bersebelahan dengan bangunan Alam lain mendapat kapasitas +60 dan konversi +60%.",
+   "Aura: an adjacent building that also touches another Nature building gets +60 capacity and +60% conversion."
+  ],
+  "Metro": [
+   "Subway Entrance",
+   "Menjangkau 2 petak searah baris dan kolomnya; bangunan penghasil poin dalam jangkauan mendapat +15 Pengunjung.",
+   "Reaches 2 cells along its rows and columns; scoring buildings in range get +15 Foot Traffic."
+  ],
+  "BikeStation": [
+   "Bike-Share Station",
+   "Bangunan penghasil poin dalam 1 petak di sekelilingnya (termasuk diagonal) mendapat +10 Pengunjung.",
+   "Scoring buildings within 1 cell around it (diagonals included) get +10 Foot Traffic."
+  ],
+  "TrafficStation": [
+   "Transit Stop",
+   "Menghasilkan 40 Pengunjung sementara yang dibagikan ke bangunan paling menguntungkan.",
+   "Creates 40 temporary Foot Traffic, assigned where it earns the most."
+  ],
+  "CommuHouse": [
+   "Transit Dispatch Hub",
+   "Bila kedua ujung sisi pendeknya diapit bangunan penghasil poin yang sudah mendapat Pengunjung dari transportasi, keduanya mendapat +50 Pengunjung dan konversi +50%.",
+   "If both short ends touch scoring buildings already fed by transit, both get +50 Foot Traffic and +50% conversion."
+  ],
+  "BuildSite": [
+   "Construction Site",
+   "Hitungan pertama: berubah menjadi bangunan acak seukuran di sebelahnya.",
+   "First scoring: turns into a random same-size adjacent building."
+  ],
+  "TempStore": [
+   "Pop-Up Shop",
+   "Memiliki semua tema: Kuliner, Hiburan, Belanja, Alam, Transportasi, dan Umum.",
+   "Counts as every theme: Dining, Entertainment, Retail, Nature, Transit and General."
+  ],
+  "LoanCenter": [
+   "Mortgage Center",
+   "Tiap tukar 1 kartu: +15 Pengunjung dan skor akhirnya +20%; direset setelah dihitung.",
+   "Each swapped card: +15 Foot Traffic and +20% final score; resets after scoring."
+  ]
+ },
+ "cards": {
+  "Blueprint": [
+   "Copycat",
+   "Aturan: meniru kemampuan kartu strategi di atasnya.",
+   "Rule: copies the ability of the strategy card above."
+  ],
+  "Brainstorm": [
+   "Bottom Line",
+   "Aturan: meniru kemampuan kartu strategi paling bawah.",
+   "Rule: copies the ability of the bottom strategy card."
+  ],
+  "CrowdFrenzy": [
+   "Crowd Pleaser",
+   "Saat dihitung, tiap 50 total Pengunjung memberi +0,4 pengali.",
+   "On scoring, +0.4 mult per 50 total Foot Traffic."
+  ],
+  "CrowdMagnet": [
+   "Around-the-Clock Traffic",
+   "Aturan: saat memainkan kartu pengunjung, bangunan di sebelah target mendapat +15 Pengunjung.",
+   "Rule: when playing a Foot Traffic card, buildings next to the target get +15 Foot Traffic."
+  ],
+  "EntertainmentSupremacy": [
+   "Entertainment Rules!",
+   "Bila total hitungan bangunan lebih dari 30, pengali ×3.",
+   "If buildings score more than 30 times in total, ×3 mult."
+  ],
+  "Environmentalist": [
+   "Green Revolution",
+   "Aturan: bangunan Alam bisa ditingkatkan; setelahnya efek auranya +100%.",
+   "Rule: Nature buildings can be upgraded; their aura values then increase by 100%."
+  ],
+  "GourmetFrenzy": [
+   "Food Frenzy",
+   "Tiap bangunan Kuliner di papan: +0,3 pengali.",
+   "+0.3 mult per Dining building on the board."
+  ],
+  "ForestRestaurant": [
+   "Nature's Kitchen",
+   "Aturan: semua bangunan Alam juga dianggap bangunan Kuliner.",
+   "Rule: all Nature buildings also count as Dining."
+  ],
+  "GoldenJoker": [
+   "Prime Real Estate",
+   "Saat lolos Blind, mendapat 3 Koin.",
+   "Gain 3 Coins when you clear a Blind."
+  ],
+  "GluttonJoker": [
+   "Food Court",
+   "Tiap bangunan Kuliner di papan: +15 Poin.",
+   "+15 Points per Dining building."
+  ],
+  "TransitKing": [
+   "Transit Hub",
+   "Tiap 50 Pengunjung yang diberikan bangunan Transportasi: +0,4 pengali.",
+   "+0.4 mult per 50 Foot Traffic supplied by Transit buildings."
+  ],
+  "SynergyMaster": [
+   "Master Connector",
+   "Tiap efek kombinasi bangunan yang berhasil terpicu: +0,1 pengali.",
+   "+0.1 mult per building synergy triggered."
+  ],
+  "OneMoreRound": [
+   "Twice as Nice",
+   "Aturan: semua bangunan Hiburan berulang dihitung 2 kali lebih banyak.",
+   "Rule: all repeating Entertainment buildings score 2 extra times."
+  ],
+  "EarlyShowing": [
+   "Matinee Rush",
+   "12 hitungan Hiburan pertama mendapat tambahan +10 Poin.",
+   "The first 12 Entertainment scorings gain +10 Points."
+  ],
+  "IceCream": [
+   "Ice Cream",
+   "Memberi 120 Poin; tiap selesai dihitung kartu ini kehilangan 10 Poin (minimal 0).",
+   "+120 Points; loses 10 after each scoring (min 0)."
+  ],
+  "PlayJoker": [
+   "Construction Frenzy",
+   "Tiap hitungan bangunan memberi +10 Poin.",
+   "+10 Points per building scoring."
+  ],
+  "HighRiseJoker": [
+   "Mega Structures",
+   "Tiap bangunan 2 petak atau lebih: +20 Poin dan +0,4 pengali.",
+   "Each building of 2+ cells: +20 Points and +0.4 mult."
+  ],
+  "NailHouse": [
+   "Holdout",
+   "Tiap bangunan yang keempat sisinya terkepung: +0,2 pengali.",
+   "+0.2 mult per building enclosed on all sides."
+  ],
+  "Tycoon": [
+   "Business Tycoon",
+   "Tiap 10 Koin yang dimiliki: +0,7 pengali.",
+   "+0.7 mult per 10 Coins held."
+  ],
+  "GreenOasis": [
+   "Urban Oasis",
+   "Tiap bangunan Alam: +20 Poin dan +0,2 pengali; yang bersebelahan dengan petak sungai +10 Poin dan +0,1 pengali tambahan.",
+   "Each Nature building: +20 Points and +0.2 mult; riverside ones add +10 Points and +0.1 mult."
+  ],
+  "RoadsideShops": [
+   "Main Street Shops",
+   "Tiap bangunan yang menyentuh tepi lahan: +12 Poin.",
+   "+12 Points per building touching the edge of the buildable land."
+  ],
+  "CityObserver": [
+   "City Spotter",
+   "Tiap jenis nama bangunan di papan: +10 Poin.",
+   "+10 Points per building name on the board."
+  ],
+  "MicroDistrict": [
+   "Microdistrict",
+   "Tiap bangunan 1 petak: +12 Poin.",
+   "+12 Points per 1-cell building."
+  ],
+  "LevelUp": [
+   "Level Up!",
+   "Tiap memakai Power Card Renovasi, kartu ini mendapat +15 Poin.",
+   "Gains +15 Points each time a Repair card is used."
+  ],
+  "EcoNetwork": [
+   "Eco Network",
+   "Tiap bangunan non-Alam penghasil poin yang mendapat bonus Alam: +15 Poin.",
+   "+15 Points per non-Nature scoring building boosted by Nature."
+  ],
+  "LandmarkProject": [
+   "Landmark Project",
+   "Bangunan penghasil poin dengan kapasitas dasar tertinggi: rasio konversi +100%.",
+   "The scoring building with the highest base capacity gets +100% conversion."
+  ],
+  "CentralHub": [
+   "Central Hub",
+   "Bangunan yang dipengaruhi minimal 3 bangunan Transportasi: rasio konversi +200%.",
+   "Buildings affected by 3+ Transit buildings get +200% conversion."
+  ],
+  "LastStand": [
+   "Closing Bell",
+   "Pada hitungan terakhir di Blind ini, pengali ×2.",
+   "On the last scoring of the Blind, ×2 mult."
+  ],
+  "FirstCharge": [
+   "Full Steam Ahead",
+   "Aturan: hitungan pertama pengali ×3; skor hitungan kedua menjadi 0.",
+   "Rule: first scoring ×3 mult; the second scoring gives 0."
+  ],
+  "HologramProjection": [
+   "Building Boom",
+   "Tiap menambah 1 kartu bangunan ke dek, kartu ini mendapat ×0,1 pengali.",
+   "Gains ×0.1 mult for each building card added to the deck."
+  ],
+  "Ramen": [
+   "Salary Cap",
+   "Pengali ×2; tiap menukar 1 kartu, kartu ini kehilangan ×0,02.",
+   "×2 mult; loses ×0.02 for each card swapped."
+  ],
+  "CoreTeam": [
+   "Core Team",
+   "Bila memegang paling banyak 4 kartu strategi (termasuk ini), pengali ×3,5.",
+   "If you hold 4 or fewer strategy cards (this included), ×3.5 mult."
+  ],
+  "BigSpender": [
+   "High Roller",
+   "Aturan: hitungan pertama, bila punya minimal 50 Koin, bayar 10 Koin dan Blind ini pengali ×2,5.",
+   "Rule: on first scoring with 50+ Coins, pay 10 for ×2.5 mult this Blind."
+  ],
+  "CommercialEmpire": [
+   "Business Empire",
+   "Bila ada minimal 4 jenis nama bangunan Belanja, pengali ×2.",
+   "With 4+ differently named Retail buildings, ×2 mult."
+  ],
+  "RestaurantGroup": [
+   "Restaurant Group",
+   "Bila ada 3 pasang bangunan Kuliner berbeda, pengali ×3.",
+   "With 3 different pairs of Dining buildings, ×3 mult."
+  ],
+  "LivableCity": [
+   "Livable City",
+   "Bila minimal 8 jenis bangunan non-Alam mendapat bonus Alam, pengali ×3.",
+   "With 8+ kinds of non-Nature buildings boosted by Nature, ×3 mult."
+  ],
+  "OnSiteDispatch": [
+   "On-the-Fly Dispatch",
+   "Bila giliran ini memainkan minimal 2 Power Card, pengali ×2,5.",
+   "If 2+ Power Cards were played this turn, ×2.5 mult."
+  ],
+  "RefinedLifestyle": [
+   "The Good Life",
+   "Tiap kartu bangunan berefek tambahan positif di dek menambah 0,2 pada pengali kali kartu ini.",
+   "Each building card with a positive modifier in the deck adds 0.2 to this card's multiplier."
+  ],
+  "UrbanArtery": [
+   "Urban Lifelines",
+   "Bila minimal 20 bangunan mendapat bonus Transportasi, pengali ×3.",
+   "With 20+ buildings boosted by Transit, ×3 mult."
+  ],
+  "FlagshipStore": [
+   "Dining Hotspot",
+   "Bila ada bangunan Kuliner yang menghasilkan 100 Poin atau lebih, pengali ×2.",
+   "If a Dining building makes 100+ Points, ×2 mult."
+  ],
+  "HeadlineStar": [
+   "Star Attraction",
+   "Bila 1 bangunan Hiburan dihitung minimal 6 kali, pengali ×2.",
+   "If one Entertainment building scores 6+ times, ×2 mult."
+  ],
+  "ParallelTransit": [
+   "Transit Alliance",
+   "Bila ada 2 bangunan Transportasi bersebelahan: +2,5 pengali.",
+   "+2.5 mult if two Transit buildings are adjacent."
+  ],
+  "CreditCard": [
+   "Overdraft",
+   "Aturan: boleh berutang sampai 20 Koin.",
+   "Rule: you may go up to 20 Coins in debt."
+  ],
+  "CityPass": [
+   "Citywide Pass",
+   "Aturan: tiap 2 bangunan Hiburan non-berulang, semua bangunan berulang dihitung +1.",
+   "Rule: every 2 non-repeating Entertainment buildings give all repeating Entertainment buildings +1 scoring."
+  ],
+  "MrBones": [
+   "Beyond the Grave",
+   "Aturan: bila jatah hitungan habis dan skor minimal 25% target, Blind tetap lolos; kartu ini hancur.",
+   "Rule: if scorings run out with at least 25% of the target, you still clear; then this card is destroyed."
+  ],
+  "Consumerism": [
+   "Consumer Culture",
+   "Beli di rak penjualan langsung: 1 Koin; tiap toko disegarkan: 2 Koin.",
+   "1 Coin per direct-sale purchase; 2 Coins per shop refresh."
+  ],
+  "StationPartnership": [
+   "Transit Partnership",
+   "Tiap bangunan Transportasi yang memberi Pengunjung: +0,6 pengali.",
+   "+0.6 mult per Transit building that supplies Foot Traffic."
+  ],
+  "MysticSummit": [
+   "All or Nothing",
+   "Bila jatah tukar kartu habis: +1,5 pengali.",
+   "+1.5 mult when no swaps remain."
+  ],
+  "Swashbuckler": [
+   "Brotherhood",
+   "Tiap 1 Koin harga jual kartu strategi lain: +0,1 pengali.",
+   "+0.1 mult per Coin of sell value of your other strategy cards."
+  ],
+  "ShootTheMoon": [
+   "Collector",
+   "Tiap Power Card di tangan: +1 pengali.",
+   "+1 mult per Power Card in hand."
+  ],
+  "GreedyJoker": [
+   "Sin of Gluttony",
+   "Bila bangunan Kuliner paling banyak di papan: +1,2 pengali.",
+   "+1.2 mult if Dining buildings are the most numerous."
+  ],
+  "LustyJoker": [
+   "Sin of Lust",
+   "Bila bangunan Hiburan paling banyak di papan: +1,2 pengali.",
+   "+1.2 mult if Entertainment buildings are the most numerous."
+  ],
+  "WrathfulJoker": [
+   "Sin of Greed",
+   "Bila bangunan Belanja paling banyak di papan: +1,2 pengali.",
+   "+1.2 mult if Retail buildings are the most numerous."
+  ],
+  "GreenJoker": [
+   "Construction Foreman",
+   "Tiap menaruh 1 kartu bangunan +0,02 pengali; tiap menukar 1 kartu −0,02.",
+   "+0.02 mult per building placed; −0.02 per card swapped."
+  ],
+  "ProjectSupervisor": [
+   "Site Supervisor",
+   "Tiap Renovasi atau Pembongkaran: kartu ini +0,2 pengali.",
+   "Gains +0.2 mult per Repair or Demolish."
+  ],
+  "GoldenHours": [
+   "Final Inspection",
+   "Bila total hitungan bangunan mencapai 15: +1,5 pengali; mencapai 30: +1,5 lagi.",
+   "+1.5 mult at 15 total scorings; another +1.5 at 30."
+  ],
+  "FinancialAdvisor": [
+   "Financial Advisor",
+   "Saat lolos Blind, tiap 1 Koin bunga memberi +0,06 pengali.",
+   "On clear, +0.06 mult per Coin of interest."
+  ],
+  "BusPriorityLane": [
+   "Express Route",
+   "Pengunjung dari bangunan Transportasi +50%.",
+   "Transit buildings supply 50% more Foot Traffic."
+  ],
+  "BrandFranchise": [
+   "Franchise Network",
+   "Tiap pasang bangunan Kuliner di papan: +0,8 pengali.",
+   "+0.8 mult per pair of Dining buildings."
+  ],
+  "BookendEcho": [
+   "Perfect Match",
+   "Bila punya minimal 3 kartu strategi dan kelangkaan kartu teratas dan terbawah sama: +2 pengali.",
+   "With 3+ strategy cards and matching top and bottom rarity, +2 mult."
+  ],
+  "CityLightShow": [
+   "City Lights",
+   "Tiap jenis efek tambahan positif pada bangunan di papan: +0,6 pengali.",
+   "+0.6 mult per distinct positive modifier on the board."
+  ],
+  "FoodStreet": [
+   "Imperial Feast",
+   "Tiap jenis bangunan Kuliner yang bersebelahan dengan Kuliner bernama lain: +0,6 pengali.",
+   "+0.6 mult per kind of Dining building next to a differently named one."
+  ],
+  "Biodiversity": [
+   "Biodiversity",
+   "Tiap tema bangunan non-Alam yang terkena tiap jenis aura: +0,5 pengali.",
+   "+0.5 mult for each theme each aura affects."
+  ],
+  "NightEconomy": [
+   "After-Hours Economy",
+   "Tiap bangunan Belanja: +0,3 pengali; pada hitungan terakhir Blind menjadi +0,6.",
+   "+0.3 mult per Retail building; +0.6 on the last scoring."
+  ],
+  "FullLoadLine": [
+   "Packed Express",
+   "Tiap jenis bangunan yang diberi Pengunjung transportasi sampai penuh: +0,4 pengali.",
+   "+0.4 mult per kind of building filled to capacity with transit Foot Traffic."
+  ],
+  "DemolitionOffice": [
+   "Urban Renewal Office",
+   "Tiap membongkar 1 bangunan non-Transportasi: kartu ini +0,3 pengali.",
+   "Gains +0.3 mult per non-Transit building demolished."
+  ],
+  "OniWarrior": [
+   "Anomaly: Kiroumaru",
+   "Saat masuk Blind, memakan kartu strategi di atasnya; tiap 1 Koin harga jualnya memberi +0,1 pengali.",
+   "On Blind start, eats the card above; +0.1 mult per Coin of its sell value."
+  ],
+  "WelcomeBack": [
+   "Come Again!",
+   "Tiap toko disegarkan: kartu ini +0,2 pengali.",
+   "Gains +0.2 mult per shop refresh."
+  ],
+  "BoxOfficeChampion": [
+   "Box Office Hit",
+   "Bangunan Hiburan dengan hitungan terbanyak: +0,5 pengali tiap hitungannya.",
+   "+0.5 mult per scoring of your most-scoring Entertainment building."
+  ],
+  "InternalBidding": [
+   "Closed Bidding",
+   "Bila Blind ini sudah membongkar minimal 4 petak non-Transportasi, tiap bangunan Transportasi +2 pengali.",
+   "After demolishing 4+ non-Transit cells this Blind, +2 mult per Transit building."
+  ],
+  "NewTransitRoute": [
+   "New Transit Line",
+   "Tiap bangunan yang dipengaruhi Transportasi: kartu ini +0,02 pengali.",
+   "+0.02 mult per building affected by Transit."
+  ],
+  "ComparisonShopper": [
+   "Shop Around",
+   "Aturan: segarkan pertama di tiap toko gratis.",
+   "Rule: the first refresh in each shop is free."
+  ],
+  "GreenCredit": [
+   "Green Financing",
+   "Saat lolos Blind, tiap 2 bangunan non-Alam yang mendapat bonus Alam memberi 1 Koin.",
+   "On clear, 1 Coin per 2 non-Nature buildings boosted by Nature."
+  ],
+  "BigIsGood": [
+   "Landlord",
+   "Tiap bangunan 2 petak atau lebih punya peluang 1/3 memberi 1 Koin.",
+   "Each 2+ cell building has a 1/3 chance to give 1 Coin."
+  ],
+  "DelayedGratification": [
+   "Never Give Up",
+   "Saat lolos Blind tanpa menukar kartu, tiap sisa jatah tukar memberi 2 Koin.",
+   "Clear without swapping to gain 2 Coins per swap left."
+  ],
+  "MailInRebate": [
+   "Trade-In Rebate",
+   "Satu tema dipilih acak; menukar bangunan tema itu di Blind ini memberi 2 Koin.",
+   "A random theme: swapping its buildings this Blind gives 2 Coins."
+  ],
+  "TurnoverSpecialist": [
+   "Logistics Specialist",
+   "Aturan: tukar kartu pertama di tiap Blind tidak mengurangi jatah.",
+   "Rule: the first swap each Blind is free."
+  ],
+  "TenantSubsidy": [
+   "Business Incentives",
+   "Satu tema dipilih acak; menaruh bangunan tema itu di Blind ini memberi 2 Koin.",
+   "A random theme: placing its buildings this Blind gives 2 Coins."
+  ],
+  "ImportantCustomer": [
+   "VIP Client",
+   "Koin dari bunga menjadi dua kali.",
+   "Interest Coins are doubled."
+  ],
+  "CommercialBank": [
+   "Commercial Bank",
+   "Aturan: di akhir Blind, tiap bangunan Belanja menaikkan batas bunga 1 Koin.",
+   "Rule: at Blind end, each Retail building raises the interest cap by 1."
+  ],
+  "WorkingCapital": [
+   "Working Capital",
+   "Tiap 10 Koin yang dimiliki: +25 Poin.",
+   "+25 Points per 10 Coins held."
+  ],
+  "ComboMeal": [
+   "Combo Meal",
+   "Tiap bangunan Kuliner yang bersebelahan dengan Kuliner bernama lain: +20 Poin.",
+   "+20 Points per Dining building next to a differently named one."
+  ],
+  "SignboardStreet": [
+   "Restaurant Row",
+   "Tiap jenis bangunan Kuliner memberi semua bangunan Kuliner 5 Pengunjung.",
+   "Each kind of Dining building gives all Dining buildings 5 Foot Traffic."
+  ],
+  "MembershipPass": [
+   "All-Access Pass",
+   "Aturan: Pengunjung yang dibutuhkan bangunan Hiburan untuk hitungan berulang −5.",
+   "Rule: Entertainment buildings need 5 less Foot Traffic per repeat."
+  ],
+  "BustlingAtmosphere": [
+   "Foodie Buzz",
+   "Tiap bangunan Kuliner lain di sebelahnya: rasio konversi bangunan Kuliner +20%.",
+   "Dining buildings get +20% conversion per adjacent Dining building."
+  ],
+  "StreetPerformance": [
+   "Street Performance",
+   "Tiap bangunan Hiburan: +15 Poin.",
+   "+15 Points per Entertainment building."
+  ],
+  "ArrivalTraffic": [
+   "Station Arrivals",
+   "Tiap bangunan penghasil poin yang diberi Pengunjung transportasi: +15 Poin.",
+   "+15 Points per scoring building fed by Transit."
+  ],
+  "PickySelection": [
+   "Pick & Choose",
+   "Aturan: batas kartu di tangan −1; memberi 250 Poin.",
+   "Rule: hand size −1; +250 Points."
+  ],
+  "StrengthInNumbers": [
+   "Strength in Numbers",
+   "Tiap kartu strategi yang dimiliki (termasuk ini): +0,3 pengali.",
+   "+0.3 mult per strategy card held (this included)."
+  ],
+  "GrandOpening": [
+   "Grand Opening",
+   "+0,5 pengali.",
+   "+0.5 mult."
+  ],
+  "ViralHit": [
+   "High-Stakes Dice",
+   "Pengali acak antara 0 dan 3.",
+   "Random +0 to +3 mult."
+  ],
+  "SpareRoom": [
+   "An Ace Up Your Sleeve",
+   "Bila ada minimal 1 kartu bangunan di tangan: +100 Poin.",
+   "+100 Points if you hold a building card."
+  ],
+  "PopUpCraze": [
+   "Flash in the Pan",
+   "+2,5 pengali; tiap lolos 1 Blind kehilangan 0,5.",
+   "+2.5 mult; loses 0.5 per Blind cleared."
+  ],
+  "ToolkitJoker": [
+   "Operations Toolkit",
+   "Tiap Power Card di seluruh dek: +40 Poin.",
+   "+40 Points per Power Card in the full deck."
+  ],
+  "EmpowerDna": [
+   "Copy Center",
+   "Aturan: Power Card permanen pertama yang berhasil dipakai tiap Blind disalin ke tumpukan ambil.",
+   "Rule: the first permanent Power Card used each Blind is copied into the draw pile."
+  ],
+  "OnePunch": [
+   "Going Once, Going Twice",
+   "Aturan: hanya 1 hitungan per Blind, batas tangan +2, jatah tukar +1; pengali ×4.",
+   "Rule: 1 scoring per Blind, hand size +2, +1 swap; ×4 mult."
+  ],
+  "MoreGuests": [
+   "Customers Galore",
+   "Aturan: tiap menukar kartu muncul kartu Pengunjung kecil sementara.",
+   "Rule: each swap creates a temporary small Foot Traffic card."
+  ],
+  "EmptyLand": [
+   "Room to Grow",
+   "Tiap petak kosong yang bisa dibangun: +10 Poin.",
+   "+10 Points per empty buildable cell."
+  ],
+  "LessIsMore": [
+   "Less Is More",
+   "Bila bangunan tidak lebih dari 8: +2 pengali.",
+   "+2 mult with 8 or fewer buildings."
+  ],
+  "PuzzleGame": [
+   "Puzzle Master",
+   "Bila semua petak yang bisa dibangun terisi, pengali ×2,5.",
+   "If every buildable cell is occupied, ×2.5 mult."
+  ],
+  "SmallThingsAddUp": [
+   "Small Steps, Big Gains",
+   "Tiap berhasil menaruh bangunan di Blind ini, pengali kali kartu ini bertambah ×0,06.",
+   "Gains ×0.06 for each building placed this Blind."
+  ],
+  "GardenRenewal": [
+   "Lumberjack",
+   "Saat membongkar 1 bangunan Alam, mendapat 4 Koin.",
+   "Gain 4 Coins when you demolish a Nature building."
+  ],
+  "GreenAudit": [
+   "Species Census",
+   "Aturan: setelah hitungan pertama, ambil 1 kartu tiap jenis bangunan Alam.",
+   "Rule: after the first scoring, draw 1 card per kind of Nature building."
+  ],
+  "GreenArchive": [
+   "Green Dividend",
+   "Saat lolos Blind, tiap jenis bangunan non-Alam yang mendapat bonus Alam memberi kartu ini +0,05 pengali.",
+   "On clear, gains +0.05 mult per kind of non-Nature building boosted by Nature."
+  ],
+  "Greenway": [
+   "Scenic Surroundings",
+   "Tiap bangunan Alam di sebelahnya: rasio konversi bangunan penghasil poin +30%.",
+   "Scoring buildings get +30% conversion per adjacent Nature building."
+  ],
+  "ClearanceSale": [
+   "Cheap Thrills",
+   "Bila Koin kurang dari 10, tiap bangunan Belanja +30 Poin.",
+   "With fewer than 10 Coins, each Retail building gives +30 Points."
+  ],
+  "CreditTerms": [
+   "Buy Now, Pay Later",
+   "Boleh berutang 10 Koin; tiap jenis bangunan Belanja +0,5 pengali.",
+   "Up to 10 Coins of debt; +0.5 mult per kind of Retail building."
+  ],
+  "BrandExpansion": [
+   "Brand Expansion",
+   "Tiap kartu bangunan Belanja masuk dek: kartu ini +0,4 pengali.",
+   "Gains +0.4 mult per Retail building card added to the deck."
+  ],
+  "TourBuzz": [
+   "Rave Reviews",
+   "Saat lolos Blind, bila 1 bangunan Hiburan total dihitung minimal 6 kali: kartu ini +0,4 pengali.",
+   "On clear, if one Entertainment building scored 6+ times this Blind, gains +0.4 mult."
+  ],
+  "MerchSales": [
+   "Merch Sales",
+   "Bila ada bangunan Hiburan dihitung minimal 3 kali, mendapat 2 Koin.",
+   "Gain 2 Coins if a Entertainment building scores 3+ times."
+  ],
+  "WarmupShow": [
+   "Opening Act",
+   "Bila semua bangunan Hiburan total dihitung minimal 8 kali: +120 Poin.",
+   "+120 Points if Entertainment buildings score 8+ times in total."
+  ]
+ },
+ "bossBlinds": [
+  [
+   "OuterDecay",
+   "outerDecay",
+   "Outer Ring Slump",
+   "Skor bangunan yang menempati lingkar terluar papan turun 50% saat dihitung.",
+   "Reduces the score of buildings occupying the board's outermost ring by 50% when they score."
+  ],
+  [
+   "SectorRivalry",
+   "innerRoll",
+   "Cutthroat Competition",
+   "Saat bangunan dihitung, skornya turun 8% untuk tiap jenis bangunan lain bertema sama di papan.",
+   "Reduces a building's score by 8% for each distinct building type of the same theme on the board whenever it scores."
+  ],
+  [
+   "HeightLimit",
+   "heightCap",
+   "Height Restriction",
+   "Mult dasar dan efek tambahan bangunan 2 petak atau lebih dibagi dua.",
+   "Halves base Mult and additional effects for buildings occupying 2 or more tiles."
+  ],
+  [
+   "BusinessTax",
+   "tax",
+   "Business Tax",
+   "Poin dari semua sumber turun 25% selama permainan ini.",
+   "Reduces points earned from all sources by 25% for this run."
+  ],
+  [
+   "CongestionPenalty",
+   "jamZero",
+   "Gridlock Penalty",
+   "Bila terjadi kemacetan, poin pada hitungan itu menjadi 0.",
+   "Sets the points earned in the current scoring attempt to 0 if Congestion occurs."
+  ],
+  [
+   "PollutionIncident",
+   "pollution",
+   "Pollution Alert",
+   "Semua bangunan terkena Pollution selama Blind ini.",
+   "Applies Pollution to all buildings for this Blind."
+  ],
+  [
+   "EntertainmentControl",
+   "funControl",
+   "Entertainment Restrictions",
+   "Semua bangunan Entertainment terkena Weakened.",
+   "Applies Weakened to all buildings with the Entertainment attribute."
+  ],
+  [
+   "DiningRestriction",
+   "foodControl",
+   "Dining Restrictions",
+   "Semua bangunan Dining terkena Weakened.",
+   "Applies Weakened to all buildings with the Dining attribute."
+  ],
+  [
+   "TightDeadline",
+   null,
+   "Crunch Time",
+   "Jatah hitungan berkurang 1.",
+   "Reduces available scoring attempts by 1."
+  ],
+  [
+   "SectorDebt",
+   null,
+   "Industry Debt",
+   "Bangunan bertema paling banyak di dekmu terkena Debt.",
+   "Applies Debt to buildings of the most common theme in your deck."
+  ],
+  [
+   "DisposalFee",
+   null,
+   "Waste Disposal Fee",
+   "Tiap menukar kartu dipotong 10 Koin; tidak bisa menukar bila Koin kurang dari 10.",
+   "Deducts 10 Coins each time you swap cards. Prevents card swaps if you have fewer than 10 Coins."
+  ],
+  [
+   "FixedSupply",
+   null,
+   "Rationed Supplies",
+   "Setelah tiap tukar kartu atau hitungan, hanya menarik 3 kartu.",
+   "Draws 3 cards after each card swap or scoring attempt."
+  ],
+  [
+   "TargetHike",
+   null,
+   "Raised Quotas",
+   "Skor yang dibutuhkan naik lebih tinggi lagi.",
+   "Increases the required score even further."
+  ],
+  [
+   "MunicipalRepairs",
+   null,
+   "Citywide Overhaul",
+   "Empat petak terbuka yang dipilih acak sementara tidak bisa dibangun.",
+   "Four randomly selected plots that are currently available are temporarily blocked from building placement."
+  ],
+  [
+   "BusinessSuspension",
+   null,
+   "Closed for Inspection",
+   "Tiap bangunan terkena Lockdown 1 giliran setelah dihitung.",
+   "Applies 1 turn of Lockdown to each building after it scores."
+  ],
+  [
+   "AnomalySurge",
+   null,
+   "Anomaly Outbreak",
+   "Setelah dihitung, 1 bangunan acak di papan hancur.",
+   "Destroys 1 random building on the board after scoring."
+  ],
+  [
+   "LicenseInspection",
+   null,
+   "License Check",
+   "1 Strategy Card acak disegel (kemampuannya mati), tetap tersegel walau posisinya diubah.",
+   "Seals 1 random Strategy Card, disabling its ability, and keeps that card sealed even if its position changes."
+  ],
+  [
+   "RelocationBan",
+   null,
+   "Relocation Ban",
+   "Semua bangunan terkena Nailed Down selama Blind ini.",
+   "Applies Nailed Down to all buildings for this Blind."
+  ]
+ ]
+}
