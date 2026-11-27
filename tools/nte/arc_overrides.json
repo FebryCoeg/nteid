@@ -1,0 +1,14 @@
+{
+  "_catatan": "Efek Arc yang di game sudah berubah dari data sumber, disalin dari layar Arc di dalam game. Nilai berawalan ~ adalah perkiraan (selisih rata antara tingkat 1 dan 5) sampai ada tangkapan layarnya. Dipakai build.py agar tidak tertimpa.",
+  "dotted-horizon": {
+    "en": "Increases Crit DMG by <b>{0}</b>.\nIncreases the Wearer's ATK by <b>{1}</b>. Whenever the Wearer deals Chaos DMG, DMG dealt by their summons increases by <b>{2}</b> for <b>{3}</b>s, up to <b>10</b> stacks. Resets the duration when triggered again.",
+    "id": "Meningkatkan Crit DMG sebesar <b>{0}</b>.\nMeningkatkan ATK pemakai sebesar <b>{1}</b>. Setiap kali pemakai memberikan Chaos DMG, DMG yang diberikan summon miliknya meningkat <b>{2}</b> selama <b>{3}</b> detik, hingga <b>10</b> stack. Durasi diatur ulang saat terpicu lagi.",
+    "values": [
+      ["28%", "28%", "2%", "20"],
+      ["~31%", "35%", "2.5%", "20"],
+      ["~34%", "42%", "3%", "20"],
+      ["~37%", "49%", "3.5%", "20"],
+      ["40%", "56%", "4%", "20"]
+    ]
+  }
+}

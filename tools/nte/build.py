@@ -412,6 +412,8 @@ def fmt(v, pct):
         return (f"{v:.1f}".rstrip("0").rstrip(".")) + "%"
     return f"{v:.2f}".rstrip("0").rstrip(".")
 
+ARC_FIX = json.loads((TOOLS / "arc_overrides.json").read_text(encoding="utf-8"))
+
 def build_arcs():
     forks = table("DataTable/Fork/DT_ForkItemData.json")
     stars = table("DataTable/Fork/DT_ForkUpgradeStarDataTable.json")
@@ -435,6 +437,10 @@ def build_arcs():
                     vals.append(fmt(curve_value(curves.get(dl.get("NameId")), i), dl.get("bIsPercent")))
                 values.append(vals)
             effect = {"name": plain(loc_text(t0.get("Title"))).strip('"'), "text": T(loc_text(t0.get("Description")), f"efek-arc:{name}"), "values": values}
+        fix = ARC_FIX.get(slug(name))  # efek dari layar game bila data sumber ketinggalan
+        if fix and effect:
+            effect["text"] = fix["en" if LANG_BUILD == "en" else "id"]
+            effect["values"] = fix["values"]
         grp = GROUP.get((ed.get("ApplyGroupType") or "").rsplit("_", 1)[-1], 0)
         out.append({
             "id": fid,
