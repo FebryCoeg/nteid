@@ -148,5 +148,9 @@ def apply(out):
         out[slug] = b
     if "zero-1051" in out:
         out["zero-1046"] = json.loads(json.dumps(out["zero-1051"]))  # Zero satu karakter dengan dua gender
+    # build dari video pemilik situs menimpa hasil owner_data.txt
+    for slug, o in json.loads((HERE / "build_overrides.json").read_text(encoding="utf-8")).items():
+        if not slug.startswith("_"):
+            out.setdefault(slug, {}).update(o)
     if unknown:
         print("TIDAK DIKENAL (dilewati):", unknown)

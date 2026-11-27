@@ -1,0 +1,59 @@
+{
+  "_catatan": "Build yang diisi pemilik situs dari videonya (NTE Combat Showcase Exe, Febry Coeg). Menimpa hasil owner_data.txt; digabungkan oleh curated_owner.py.",
+  "exe": {
+    "arcs": ["dotted-horizon", "ready-ready", "fluff-of-fortitude", "raging-flames"],
+    "arcPct": {
+      "dotted-horizon": { "m1": 100, "m5": 126 },
+      "ready-ready": { "m1": 85 },
+      "fluff-of-fortitude": { "m1": 73, "m5": 82 },
+      "raging-flames": { "m1": 70 }
+    },
+    "arcNote": {
+      "id": "Persentase dibandingkan dengan Dotted Horizon T1 sebagai patokan 100% (M1 = Mixing T1, M5 = Mixing T5). Fluff of Fortitude dihitung dengan efek terisi penuh.",
+      "en": "Percentages are relative to Dotted Horizon T1 = 100% (M1 = Mixing T1, M5 = Mixing T5). Fluff of Fortitude assumes its effect at full."
+    },
+    "sets": [{ "id": "Suit1", "pieces": 4 }],
+    "setNote": {
+      "Suit1": {
+        "id": "Cartridge Diabolos Legendary +20 dengan stat utama CRIT Rate 30%. Modul yang dipakai antara lain Type II ×1, Type III ×2, dan Type IV ×1; tiap modul Type III menambah CRIT Rate 8%.",
+        "en": "Legendary Diabolos cartridge +20 with a 30% CRIT Rate main stat. Modules include Type II ×1, Type III ×2 and Type IV ×1; each Type III module adds 8% CRIT Rate."
+      }
+    },
+    "stats": ["CRIT Rate", "Chaos DMG"],
+    "sub": ["CRIT Rate", "CRIT DMG", "ATK %", "DMG %", "ATK"],
+    "minStats": [
+      { "stat": "ATK", "min": "2000", "ideal": "2200+" },
+      { "stat": "CRIT Rate", "min": "60%", "ideal": "80%" },
+      { "stat": "CRIT DMG", "min": "180%", "ideal": "200%+" },
+      { "stat": "Universal DMG", "min": "15%", "ideal": "30%" }
+    ],
+    "skills": ["basic", "redirect", "ultimate", "support"],
+    "skillNote": {
+      "id": "Naikkan Basic Attack, Skill, dan Ultimate sampai 10; Support cukup 6. Aktifkan dulu Pasif 1 dan 2.",
+      "en": "Take Basic Attack, Skill and Ultimate to 10; Support is fine at 6. Unlock Passives 1 and 2 first."
+    },
+    "awks": [4, 3, 1, 2, 5, 6],
+    "awkGain": { "1": 11.4, "2": 10.9, "3": 13.8, "4": 24, "5": 10 },
+    "awkNote": {
+      "id": "Angka di tiap Awakening = kenaikan menurut hitungan di video. A6 memberi pemulihan HP dan Rating, bukan kenaikan damage. Bonus 3 Awakening +8%, bonus 6 Awakening +78%.",
+      "en": "The figure on each Awakening is the gain calculated in the video. A6 gives healing and Rating rather than damage. The 3-Awakening bonus is +8%, the 6-Awakening bonus +78%."
+    },
+    "awkDesc": {
+      "4": "Meningkatkan DMG yang diberikan summon di medan sebesar 10%. Digital Echo mendapat tambahan DMG Bonus 30%.",
+      "3": "Data Exfiltration menarik musuh dalam jangkauan dan mengurangi Chaos Resistance mereka sebesar 15% selama 12 detik.",
+      "1": "Meningkatkan Chaos DMG Exe sebesar 20% selama Rating-nya SS atau lebih tinggi.",
+      "2": "Meningkatkan ATK Exe sebesar 10%/12%/15%/20%/30% pada Rating B/A/S/SS/SSS secara berurutan.",
+      "5": "Selama Shader Compile dari Ultimate Exe aktif, Digital Echo melepaskan gelombang kejut saat menghilang. Setiap gelombang kejut memberikan DMG tambahan sebesar 25,8% ATK ke target dalam jangkauan. DMG Ratio Digital Echo mengikuti level skill Basic Attack.",
+      "6": "Saat mendapat Frame, memulihkan HP sebesar 2% ATK untuk setiap poin Rating yang didapat. Memberikan Rating tambahan sebesar Rating yang didapat dari menghabiskan Frame."
+    },
+    "teams": [
+      {
+        "name": { "id": "Tim Exe", "en": "Exe team" },
+        "members": ["exe", "blackbird", "iroi", "sakiri"],
+        "roles": [{ "id": "DPS", "en": "DPS" }, { "id": "Sub DPS", "en": "Sub DPS" }, { "id": "Support", "en": "Support" }, { "id": "Support", "en": "Support" }],
+        "tag": { "id": "REKOMENDASI", "en": "RECOMMENDED" },
+        "why": []
+      }
+    ]
+  }
+}
