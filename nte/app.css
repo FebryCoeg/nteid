@@ -1933,3 +1933,10 @@ main { flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: clamp(1
 .bd-awkgain { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--gold); color: var(--ink); font: 800 0.68rem var(--mono); font-style: normal; }
 .bd-awks .bd-awk-row small em.bd-awkgain { color: var(--ink); background: var(--gold); }
 @media (max-width: 560px) { .bd-tm-mem { gap: 6px; } .bd-tm-mem a { width: auto; flex: 1 1 0; min-width: 0; } .bd-tm-mem img { width: 46px; height: 46px; } }
+.bd-video { display: flex; align-items: center; gap: 14px; margin: 14px 0; padding: 14px 16px; border-radius: 18px; background: var(--panel); box-shadow: var(--ring); color: var(--text); text-decoration: none; border-left: 4px solid #ff3040; transition: transform 0.15s ease; }
+.bd-video:hover { transform: translateY(-2px); }
+.bd-video:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.bd-video i { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 50%; background: #ff3040; color: #fff; font-style: normal; font-size: 1.05rem; padding-left: 3px; border: 3px solid var(--edge); }
+.bd-video span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bd-video b { font: 800 0.92rem var(--display); }
+.bd-video small { font: 500 0.78rem var(--body); color: var(--muted); }

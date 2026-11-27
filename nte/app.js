@@ -579,6 +579,7 @@
         if (feat) html += `<div class="af-sec bd-feat"><p class="mono">${S("BUILD UTAMA DARI KOMUNITAS", "MAIN BUILD FROM THE COMMUNITY")}</p><p class="txt">${S(`Build ini dipilih dari usulan komunitas dan menggantikan build bawaan: <b>${esc(feat.name)}</b>.`, `This build was picked from community suggestions and replaces the default build: <b>${esc(feat.name)}</b>.`)}</p>${creditHtml(feat.credit, S("DIBUAT OLEH", "MADE BY"))}</div>`;
         if (bd) {
           if (bd.role) html += `<p class="bd-roleline"><b>${esc(bd.role.rank)}-${S("RANK", "RANK")}</b><span>${esc(bd.role.role)}</span>${bd.role.tier ? `<em>${esc(bd.role.tier)}</em>` : ""}</p>`;
+          if (bd.video && /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+$/.test(bd.video.url)) html += `<a class="bd-video" href="${esc(bd.video.url)}" target="_blank" rel="noopener"><i aria-hidden="true">▶</i><span><b>${S("Tonton video penjelasannya", "Watch the video guide")}</b><small>${S("Penjelasan lengkap build ini di YouTube", "Full walkthrough of this build on YouTube")}${bd.video.by ? ` · ${esc(bd.video.by)}` : ""}</small></span></a>`;
           const arcOf = (sl) => ARCS.find((a) => a.slug === sl);
           const WHY = {
             type: S("Tipe Arc cocok", "Arc type match"), rare: S("Bintang 5", "5-star"), element: S(`Bonus ${e.element}`, `${e.element} bonus`), crit: "CRIT", atk: "ATK",

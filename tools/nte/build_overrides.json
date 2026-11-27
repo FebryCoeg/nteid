@@ -1,6 +1,7 @@
 {
   "_catatan": "Build yang diisi pemilik situs dari videonya (NTE Combat Showcase Exe, Febry Coeg). Menimpa hasil owner_data.txt; digabungkan oleh curated_owner.py.",
   "exe": {
+    "video": {"url": "https://www.youtube.com/watch?v=fqjASSLXS6c", "by": "Febry Coeg"},
     "arcs": ["dotted-horizon", "ready-ready", "fluff-of-fortitude", "raging-flames"],
     "arcPct": {
       "dotted-horizon": { "m1": 100, "m5": 126 },
@@ -13,12 +14,6 @@
       "en": "Percentages are relative to Dotted Horizon T1 = 100% (M1 = Mixing T1, M5 = Mixing T5). Fluff of Fortitude assumes its effect at full."
     },
     "sets": [{ "id": "Suit1", "pieces": 4 }],
-    "setNote": {
-      "Suit1": {
-        "id": "Cartridge Diabolos Legendary +20 dengan stat utama CRIT Rate 30%. Modul yang dipakai antara lain Type II ×1, Type III ×2, dan Type IV ×1; tiap modul Type III menambah CRIT Rate 8%.",
-        "en": "Legendary Diabolos cartridge +20 with a 30% CRIT Rate main stat. Modules include Type II ×1, Type III ×2 and Type IV ×1; each Type III module adds 8% CRIT Rate."
-      }
-    },
     "stats": ["CRIT Rate", "Chaos DMG"],
     "sub": ["CRIT Rate", "CRIT DMG", "ATK %", "DMG %", "ATK"],
     "minStats": [
@@ -34,10 +29,6 @@
     },
     "awks": [4, 3, 1, 2, 5, 6],
     "awkGain": { "1": 11.4, "2": 10.9, "3": 13.8, "4": 24, "5": 10 },
-    "awkNote": {
-      "id": "Angka di tiap Awakening = kenaikan menurut hitungan di video. A6 memberi pemulihan HP dan Rating, bukan kenaikan damage. Bonus 3 Awakening +8%, bonus 6 Awakening +78%.",
-      "en": "The figure on each Awakening is the gain calculated in the video. A6 gives healing and Rating rather than damage. The 3-Awakening bonus is +8%, the 6-Awakening bonus +78%."
-    },
     "awkDesc": {
       "4": "Meningkatkan DMG yang diberikan summon di medan sebesar 10%. Digital Echo mendapat tambahan DMG Bonus 30%.",
       "3": "Data Exfiltration menarik musuh dalam jangkauan dan mengurangi Chaos Resistance mereka sebesar 15% selama 12 detik.",

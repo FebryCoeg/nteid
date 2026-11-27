@@ -37,3 +37,14 @@ for (const file of ["builds_draft", "builds_curated"]) {
 test("halaman Esper tidak lagi menahan build Exe", () => {
   assert.doesNotMatch(fs.readFileSync(path.join(R, "nte/app.js"), "utf8"), /Exe belum rilis/);
 });
+
+for (const file of ["builds_draft", "builds_curated"]) {
+  test(`${file}: build Exe menautkan video pemilik situs`, () => {
+    assert.equal(J(file).exe.video.url, "https://www.youtube.com/watch?v=fqjASSLXS6c");
+  });
+}
+
+test("tab Build menampilkan tautan video di tab baru", () => {
+  const app = fs.readFileSync(path.join(R, "nte/app.js"), "utf8");
+  assert.match(app, /class="bd-video"[^`]*target="_blank" rel="noopener"/);
+});
